@@ -3,7 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function fetchNews() {
-    fetch('/news')
+    const NEWS_API_KEY = '91512918f7c546c88c7c734f348c1709'; // Replace with your API key
+    const NEWS_API_URL = `https://newsapi.org/v2/everything?q=true crime&apiKey=${NEWS_API_KEY}`;
+
+    fetch(NEWS_API_URL)
         .then(response => response.json())
         .then(data => {
             const structuredNews = structureNewsData(data.articles);
@@ -24,9 +27,8 @@ function structureNewsData(articles) {
 }
 
 function generateActivity(article) {
-    // Generate a question based on the article
     return {
-        type: 'question', // other types could be 'puzzle', 'clue', etc.
+        type: 'question',
         content: `Based on the article titled "${article.title}", what is the main suspect's motive?`,
         options: [
             "Revenge",
