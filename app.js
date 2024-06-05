@@ -4,15 +4,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function fetchNews() {
     const NEWS_API_KEY = '91512918f7c546c88c7c734f348c1709'; // Replace with your API key
-    const NEWS_API_URL = `https://newsapi.org/v2/everything?q=true crime&apiKey=${NEWS_API_KEY}`;
+    const NEWS_API_URL = `https://newsapi.org/v2/everything?q=true%20crime&apiKey=${NEWS_API_KEY}`;
 
     fetch(NEWS_API_URL)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            if (!data.articles) {
+                throw new Error('No articles found in the response');
+            }
             const structuredNews = structureNewsData(data.articles);
             displayNews(structuredNews);
         })
-        .catch(error => console.error('Error fetching news:', error));
+        .catch(error => {
+            console.error('Error fetching news:', error);
+            const newsContainer = document.getElementById('news');
+            newsContainer.innerHTML = `<div class="error-message">Error fetching news: ${error.message}</div>`;
+        });
 }
 
 function structureNewsData(articles) {
