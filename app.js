@@ -3,9 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function fetchNews() {
+    const loadingMessage = document.getElementById('loading');
+    const newsContainer = document.getElementById('news');
+    
+    loadingMessage.style.display = 'block';
+    newsContainer.style.display = 'none';
+
     const CORS_PROXY = 'https://api.allorigins.win/get?url=';
     const NEWS_API_KEY = '91512918f7c546c88c7c734f348c1709'; // Replace with your API key
-    const NEWS_API_URL = `https://newsapi.org/v2/everything?q=true%20crime&apiKey=${NEWS_API_KEY}`;
+    const NEWS_API_URL = `https://newsapi.org/v2/everything?q=general&apiKey=${NEWS_API_KEY}`; // Changed to a general lookup
 
     fetch(CORS_PROXY + encodeURIComponent(NEWS_API_URL))
         .then(response => {
@@ -21,11 +27,14 @@ function fetchNews() {
             }
             const structuredNews = structureNewsData(jsonData.articles);
             displayNews(structuredNews);
+            loadingMessage.style.display = 'none';
+            newsContainer.style.display = 'block';
         })
         .catch(error => {
             console.error('Error fetching news:', error);
-            const newsContainer = document.getElementById('news');
             newsContainer.innerHTML = `<div class="error-message">Error fetching news: ${error.message}</div>`;
+            loadingMessage.style.display = 'none';
+            newsContainer.style.display = 'block';
         });
 }
 
