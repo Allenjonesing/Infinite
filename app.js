@@ -20,8 +20,9 @@ async function fetchNews() {
             throw new Error('No articles found in the response');
         }
 
-        const structuredNews = structureNewsData(jsonData.articles);
-        await generateAIResponse(structuredNews);
+        // Limit to 5 articles
+        const structuredNews = structureNewsData(jsonData.articles.slice(0, 5));
+        await generateAIResponses(structuredNews);
         loadingMessage.style.display = 'none';
         newsContainer.style.display = 'block';
     } catch (error) {
@@ -42,33 +43,42 @@ function structureNewsData(articles) {
     });
 }
 
-async function generateAIResponse(newsData) {
-    const prompt = `Discuss the following news articles:\n\n${newsData.map(news => `${news.title}: ${news.description}`).join('\n\n')}`;
+async function generateAIResponses(newsData) {
+    const newsContainer = document.getElementById('news');
+    newsContainer.innerHTML = ''; // Clear previous content
 
-    try {
-        const response = await fetch('http://localhost:3000/generate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ prompt: prompt })
-        });
+    for (const news of newsData) {
+        const prompt = `Discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Proxy server error! Status: ${response.status} Response: ${errorText}`);
+        try {
+            const response = await fetch('http://localhost:3000/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ prompt: prompt })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Proxy server error! Status: ${response.status} Response: ${errorText}`);
+            }
+
+            const data = await response.json();
+            displayAIResponse(news.title, data);
+        } catch (error) {
+            console.error('Error generating AI response:', error);
+            newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
         }
-
-        const data = await response.json();
-        displayAIResponse(data);
-    } catch (error) {
-        console.error('Error generating AI response:', error);
-        const newsContainer = document.getElementById('news');
-        newsContainer.innerHTML = `<div class="error-message">Error generating AI response: ${error.message}</div>`;
     }
 }
 
-function displayAIResponse(responseText) {
+function displayAIResponse(newsTitle, responseText) {
     const newsContainer = document.getElementById('news');
-    newsContainer.innerHTML = `<div class="ai-response">${responseText}</div>`;
+    newsContainer.innerHTML += `
+        <div class="news-article">
+            <h3>${newsTitle}</h3>
+            <div class="ai-response">${responseText}</div>
+        </div>
+    `;
 }
