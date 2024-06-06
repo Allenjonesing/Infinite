@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function fetchNews() {
-    const CORS_PROXY = 'https://corsproxy.io/?';
+    const CORS_PROXY = 'https://api.allorigins.win/get?url=';
     const NEWS_API_KEY = '91512918f7c546c88c7c734f348c1709'; // Replace with your API key
     const NEWS_API_URL = `https://newsapi.org/v2/everything?q=true%20crime&apiKey=${NEWS_API_KEY}`;
 
@@ -15,10 +15,11 @@ function fetchNews() {
             return response.json();
         })
         .then(data => {
-            if (!data.articles) {
+            const jsonData = JSON.parse(data.contents);
+            if (!jsonData.articles) {
                 throw new Error('No articles found in the response');
             }
-            const structuredNews = structureNewsData(data.articles);
+            const structuredNews = structureNewsData(jsonData.articles);
             displayNews(structuredNews);
         })
         .catch(error => {
