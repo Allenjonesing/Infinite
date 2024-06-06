@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchNews() {
     const loadingMessage = document.getElementById('loading');
     const newsContainer = document.getElementById('news');
- 
+
     loadingMessage.style.display = 'block';
     newsContainer.style.display = 'none';
 
@@ -43,7 +43,7 @@ function structureNewsData(articles) {
 }
 
 async function generateAIResponse(newsData) {
-    const prompt = `Generate a discussion about the following news articles:\n\n${newsData.map(news => `${news.title}: ${news.description}`).join('\n\n')}`;
+    const prompt = `Discuss the following news articles:\n\n${newsData.map(news => `${news.title}: ${news.description}`).join('\n\n')}`;
 
     try {
         const response = await fetch('http://localhost:3000/generate', {
@@ -55,7 +55,8 @@ async function generateAIResponse(newsData) {
         });
 
         if (!response.ok) {
-            throw new Error(`Proxy server error! Status: ${response.status}`);
+            const errorText = await response.text();
+            throw new Error(`Proxy server error! Status: ${response.status} Response: ${errorText}`);
         }
 
         const data = await response.json();

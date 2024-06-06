@@ -15,7 +15,7 @@ app.get('/news', async (req, res) => {
     const CORS_PROXY = 'https://api.allorigins.win/get?url=';
     const NEWS_API_KEY = process.env.NEWS_API_KEY;
     const NEWS_API_URL = `https://newsapi.org/v2/everything?q=general&apiKey=${NEWS_API_KEY}`;
-    
+
     try {
         const response = await fetch(CORS_PROXY + encodeURIComponent(NEWS_API_URL));
         const data = await response.json();
@@ -44,14 +44,15 @@ app.post('/generate', async (req, res) => {
         });
 
         if (!response.ok) {
-            throw new Error(`AI API error! Status: ${response.status}`);
+            const errorText = await response.text();
+            throw new Error(`AI API error! Status: ${response.status} Response: ${errorText}`);
         }
 
         const data = await response.json();
         res.json(data.choices[0].text);
     } catch (error) {
-        console.error('Error generating AI response:', error);
-        res.status(500).json({ error: 'Failed to generate AI response' });
+        console.error('Error generating AI response:', error.message);
+        res.status(500).json({ error: 'Failed to generate AI response', details: error.message });
     }
 });
 
