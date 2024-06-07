@@ -8,7 +8,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({ origin: '*' }));
+app.use(cors());
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -18,22 +18,16 @@ app.use((req, res, next) => {
     next();
 });
 
-console.log('Starting server...');
-console.log('NEWS_API_KEY:', process.env.NEWS_API_KEY ? 'Loaded' : 'Not Loaded');
-console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY ? 'Loaded' : 'Not Loaded');
-
 app.get('/news', async (req, res) => {
     const CORS_PROXY = 'https://api.allorigins.win/get?url=';
     const NEWS_API_KEY = process.env.NEWS_API_KEY;
     const NEWS_API_URL = `https://newsapi.org/v2/everything?q=general&apiKey=${NEWS_API_KEY}`;
     
-    console.log('Fetching news...');
     try {
         const response = await fetch(CORS_PROXY + encodeURIComponent(NEWS_API_URL));
         const data = await response.json();
         const jsonData = JSON.parse(data.contents);
 
-        console.log('News fetched successfully');
         res.json(jsonData);
     } catch (error) {
         console.error('Error fetching news:', error);
@@ -43,7 +37,6 @@ app.get('/news', async (req, res) => {
 
 app.post('/generate', async (req, res) => {
     const { prompt } = req.body;
-    console.log('Generating AI response for prompt:', prompt);
     try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
@@ -68,7 +61,6 @@ app.post('/generate', async (req, res) => {
         }
 
         const data = await response.json();
-        console.log('AI response generated successfully');
         res.json(data.choices[0].message.content);
     } catch (error) {
         console.error('Error generating AI response:', error.message);
