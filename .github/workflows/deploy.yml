@@ -9,26 +9,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Inject environment variables
-        run: echo "window.__APP_CONFIG__ = { SERVER_KEY: '${{ secrets.SERVER_KEY }}' };" > ./public/config.js
-
-      - name: Build the project
-        run: npm run build
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+    steps: 
+    - name: Build and deploy
+      working-directory: ./app
+      run: npm run deploy
+      env:
+        token: ${{ secrets.SERVER_KEY }}
+         # deploy token is used to build and deploy to a gh-pages branch 
+         # (needs permission to create a branch, build the app and modify that branch, 
+         # push changes to that branch, and deploy to github pages)
