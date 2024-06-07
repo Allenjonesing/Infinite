@@ -21,10 +21,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Inject environment variables
+        run: echo "window.__APP_CONFIG__ = { SERVER_KEY: '${{ secrets.SERVER_KEY }}' };" > ./public/config.js
+
       - name: Build the project
         run: npm run build
-        env:
-          REACT_APP_SERVER_KEY: ${{ secrets.SERVER_KEY }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
