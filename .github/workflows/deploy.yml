@@ -11,7 +11,7 @@ jobs:
 
     steps: 
     - name: Build and deploy
-      working-directory: ./app
+      working-directory: ./
       run: npm run deploy
       env:
         token: ${{ secrets.SERVER_KEY }}
