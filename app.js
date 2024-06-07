@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchNews();
 });
@@ -5,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchNews() {
     const loadingMessage = document.getElementById('loading');
     const newsContainer = document.getElementById('news');
-    const serverKey = process.env.SERVER_KEY; // Access the injected SERVER_KEY
 
     loadingMessage.style.display = 'block';
     newsContainer.style.display = 'none';
@@ -13,7 +15,7 @@ async function fetchNews() {
     try {
         const response = await fetch('https://my-vercel-oddqtt1bh-allen-jones-projects.vercel.app/news', {
             headers: {
-                'Authorization': `Bearer ${serverKey}`
+                'Authorization': `Bearer ${process.env.SERVER_KEY}`
             }
         });
         if (!response.ok) {
