@@ -10,7 +10,7 @@ async function fetchNews() {
     newsContainer.style.display = 'none';
 
     try {
-        const response = await fetch('https://infinite-jzuype0l5-allen-jones-projects.vercel.app');
+        const response = await fetch('https://infinite-kcj19dpao-allen-jones-projects.vercel.app/news');
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
