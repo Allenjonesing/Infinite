@@ -8,8 +8,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-import newsRouter from './api/news.js';
-import generateRouter from './api/generate.js';
+import newsRouter from './news.js';
+import generateRouter from './generate.js';
 
 app.use('/api/news', newsRouter);
 app.use('/api/generate', generateRouter);
