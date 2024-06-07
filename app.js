@@ -10,7 +10,9 @@ async function fetchNews() {
     newsContainer.style.display = 'none';
 
     try {
-        const response = await fetch('https://my-vercel-oddqtt1bh-allen-jones-projects.vercel.app/news', {
+        const newsUrl = 'https://my-vercel-oddqtt1bh-allen-jones-projects.vercel.app/news';
+        const allOriginsUrl = 'https://api.allorigins.win/get?url=';
+        const response = await fetch(allOriginsUrl + encodeURIComponent(newsUrl), {
             headers: {
                 'Authorization': `Bearer E6RTRBlGoC7V94MGmgSk2usz`
             }
