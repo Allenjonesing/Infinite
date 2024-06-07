@@ -1,20 +1,14 @@
 {
     "version": 2,
     "builds": [
-      {
-        "src": "api/server.mjs",
-        "use": "@vercel/node"
-      }
+      { "src": "api/server.mjs", "use": "@vercel/node" },
+      { "src": "api/news.js", "use": "@vercel/node" },
+      { "src": "api/generate.js", "use": "@vercel/node" }
     ],
     "routes": [
-      {
-        "src": "/api/(.*)",
-        "dest": "/api/server.mjs"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/index.html"
-      }
+      { "src": "/api/news", "dest": "/api/news.js" },
+      { "src": "/api/generate", "dest": "/api/generate.js" },
+      { "src": "/(.*)", "dest": "/public/index.html" }
     ]
   }
   

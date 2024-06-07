@@ -1,84 +1,66 @@
-document.addEventListener('DOMContentLoaded', () => {
-    fetchNews();
-});
+import express from 'express';
+import fetch from 'node-fetch';
+import cors from 'cors';
+import dotenv from 'dotenv';
 
-async function fetchNews() {
-    const loadingMessage = document.getElementById('loading');
-    const newsContainer = document.getElementById('news');
+dotenv.config();
 
-    loadingMessage.style.display = 'block';
-    newsContainer.style.display = 'none';
+const app = express();
+const PORT = process.env.PORT || 3001; // Change the port number here
 
+app.use(cors());
+app.use(express.json());
+
+app.get('/news', async (req, res) => {
+    const CORS_PROXY = 'https://api.allorigins.win/get?url=';
+    const NEWS_API_KEY = process.env.NEWS_API_KEY;
+    const NEWS_API_URL = `https://newsapi.org/v2/everything?q=general&apiKey=${NEWS_API_KEY}`;
+    
     try {
-        const response = await fetch('https://infinite-2kgyked5t-allen-jones-projects.vercel.app/news');
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+        const response = await fetch(CORS_PROXY + encodeURIComponent(NEWS_API_URL));
+        const data = await response.json();
+        const jsonData = JSON.parse(data.contents);
 
-        const jsonData = await response.json();
-        if (!jsonData.articles) {
-            throw new Error('No articles found in the response');
-        }
-
-        // Limit to 5 articles
-        const structuredNews = structureNewsData(jsonData.articles.slice(0, 5));
-        await generateAIResponses(structuredNews);
-        loadingMessage.style.display = 'none';
-        newsContainer.style.display = 'block';
+        res.json(jsonData);
     } catch (error) {
         console.error('Error fetching news:', error);
-        newsContainer.innerHTML = `<div class="error-message">Error fetching news: ${error.message}</div>`;
-        loadingMessage.style.display = 'none';
-        newsContainer.style.display = 'block';
+        res.status(500).json({ error: 'Failed to fetch news' });
     }
-}
+});
 
-function structureNewsData(articles) {
-    return articles.map(article => {
-        return {
-            title: article.title,
-            description: article.description,
-            url: article.url
-        };
-    });
-}
+app.post('/generate', async (req, res) => {
+    const { prompt } = req.body;
+    try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: 'gpt-3.5-turbo',
+                messages: [{ role: 'user', content: prompt }],
+                max_tokens: 150
+            })
+        });
 
-async function generateAIResponses(newsData) {
-    const newsContainer = document.getElementById('news');
-    newsContainer.innerHTML = ''; // Clear previous content
-
-    for (const news of newsData) {
-        const prompt = `Discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
-
-        try {
-            const response = await fetch('https://infinite-pqi7ezojz-allen-jones-projects.vercel.app/generate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ prompt: prompt })
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Proxy server error! Status: ${response.status} Response: ${errorText}`);
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`AI API error! Status: ${response.status} Response: ${errorText}`);
+            if (response.status === 429) {
+                throw new Error('You have exceeded your API quota. Please check your plan and billing details.');
             }
-
-            const data = await response.json();
-            displayAIResponse(news.title, data);
-        } catch (error) {
-            console.error('Error generating AI response:', error);
-            newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
+            throw new Error(`AI API error! Status: ${response.status} Response: ${errorText}`);
         }
-    }
-}
 
-function displayAIResponse(newsTitle, responseText) {
-    const newsContainer = document.getElementById('news');
-    newsContainer.innerHTML += `
-        <div class="news-article">
-            <h3>${newsTitle}</h3>
-            <div class="ai-response">${responseText}</div>
-        </div>
-    `;
-}
+        const data = await response.json();
+        res.json(data.choices[0].message.content);
+    } catch (error) {
+        console.error('Error generating AI response:', error.message);
+        res.status(500).json({ error: 'Failed to generate AI response', details: error.message });
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`Proxy server is running on http://localhost:${PORT}`);
+});
