@@ -1,6 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 document.addEventListener('DOMContentLoaded', () => {
     fetchNews();
 });
@@ -15,7 +12,7 @@ async function fetchNews() {
     try {
         const response = await fetch('https://my-vercel-oddqtt1bh-allen-jones-projects.vercel.app/news', {
             headers: {
-                'Authorization': `Bearer ${process.env.SERVER_KEY}`
+                'Authorization': `Bearer E6RTRBlGoC7V94MGmgSk2usz`
             }
         });
         if (!response.ok) {
