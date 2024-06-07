@@ -6,10 +6,17 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+});
 
 app.get('/news', async (req, res) => {
     const CORS_PROXY = 'https://api.allorigins.win/get?url=';
