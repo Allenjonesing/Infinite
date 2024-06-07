@@ -18,6 +18,10 @@ app.use((req, res, next) => {
     next();
 });
 
+// Debug logs to verify environment variables
+console.log('NEWS_API_KEY:', process.env.NEWS_API_KEY);
+console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY);
+
 app.get('/news', async (req, res) => {
     const CORS_PROXY = 'https://api.allorigins.win/get?url=';
     const NEWS_API_KEY = process.env.NEWS_API_KEY;
