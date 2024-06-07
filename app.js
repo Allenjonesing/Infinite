@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function fetchNews() {
     const loadingMessage = document.getElementById('loading');
     const newsContainer = document.getElementById('news');
-    const serverKey = window.__APP_CONFIG__.SERVER_KEY; // Access the injected SERVER_KEY
+    const serverKey = process.env.SERVER_KEY; // Access the injected SERVER_KEY
 
     loadingMessage.style.display = 'block';
     newsContainer.style.display = 'none';
