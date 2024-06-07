@@ -10,7 +10,7 @@ async function fetchNews() {
     newsContainer.style.display = 'none';
 
     try {
-        const response = await fetch('https://infinite-hyl2850z9-allen-jones-projects.vercel.app/news');
+        const response = await fetch('https://infinite-pqi7ezojz-allen-jones-projects.vercel.app/news');
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -51,7 +51,7 @@ async function generateAIResponses(newsData) {
         const prompt = `Discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
 
         try {
-            const response = await fetch('http://localhost:3000/generate', {
+            const response = await fetch('https://infinite-pqi7ezojz-allen-jones-projects.vercel.app/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
