@@ -10,25 +10,33 @@ async function fetchNews() {
     newsContainer.style.display = 'none';
 
     try {
-        const VercelUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
+        const apiUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
         const newsEndpoint = '/test';
-        const allOriginsUrl = 'https://api.allorigins.win/get?url=';
-        const response = await fetch(VercelUrl + newsEndpoint, {
-            headers: {
-                'Authorization': `Bearer E6RTRBlGoC7V94MGmgSk2usz`
-            }
-        });
+        const response = await fetch(apiUrl + newsEndpoint);
+
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
+        
         const jsonData = await response.json();
-        if (!jsonData || !jsonData.body || !jsonData.body.articles) {
-            throw new Error('No articles found in the response');
+        
+        if (!jsonData) {
+            throw new Error('No Data gathered!');
+        }
+
+        // Parsing the stringified JSON data in the body
+        const bodyData = JSON.parse(jsonData.body);
+        
+        if (!bodyData) {
+            throw new Error('No body found in the response!');
+        }
+
+        if (!bodyData.articles) {
+            throw new Error('No articles found in the body!');
         }
 
         // Limit to 5 articles
-        const structuredNews = structureNewsData(jsonData.articles.slice(0, 5));
+        const structuredNews = structureNewsData(bodyData.articles.slice(0, 5));
         await generateAIResponses(structuredNews);
         loadingMessage.style.display = 'none';
         newsContainer.style.display = 'block';
