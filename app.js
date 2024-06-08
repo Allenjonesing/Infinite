@@ -66,7 +66,7 @@ async function generateAIResponses(newsData) {
         const prompt = `Discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
 
         try {
-            const response = await fetch('https://infinite-pqi7ezojz-allen-jones-projects.vercel.app/generate', {
+            const response = await fetch('https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
