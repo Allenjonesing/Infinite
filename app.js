@@ -10,8 +10,8 @@ async function fetchNews() {
     newsContainer.style.display = 'none';
 
     try {
-        const VercelUrl = 'https://my-vercel-rnrj5vi6f-allen-jones-projects.vercel.app';
-        const newsEndpoint = '/api/news';
+        const VercelUrl = 'https://jpkr1s1toe.execute-api.us-east-2.amazonaws.com';
+        const newsEndpoint = '/hello';
         const allOriginsUrl = 'https://api.allorigins.win/get?url=';
         const response = await fetch(VercelUrl + newsEndpoint, {
             headers: {
