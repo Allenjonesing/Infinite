@@ -23,7 +23,7 @@ async function fetchNews() {
         }
 
         const jsonData = await response.json();
-        if (!jsonData || !jsonData.body || !jsonData.bod.articles) {
+        if (!jsonData || !jsonData.body || !jsonData.body.articles) {
             throw new Error('No articles found in the response');
         }
 
