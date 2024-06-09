@@ -64,9 +64,10 @@ async function generateAIResponses(newsData) {
 
     for (const news of newsData) {
         const prompt = `Discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
+        const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
 
         try {
-            const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt={${prompt}}`, {
+            const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -87,6 +88,7 @@ async function generateAIResponses(newsData) {
         }
     }
 }
+
 
 function displayAIResponse(newsTitle, responseText) {
     const newsContainer = document.getElementById('news');
