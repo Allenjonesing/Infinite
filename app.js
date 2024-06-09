@@ -66,7 +66,7 @@ async function generateAIResponses(newsData) {
         const prompt = `Discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
 
         try {
-            const response = await fetch('https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test', {
+            const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt={${prompt}}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
