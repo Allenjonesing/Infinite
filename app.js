@@ -82,6 +82,10 @@ async function generateAIResponses(newsData) {
 
             console.log('typeof response: ', typeof response);
             console.log('response: ', response);
+            console.log('typeof response.text(): ', typeof response.text());
+            console.log('response.text(): ', response.text());
+            console.log('typeof response.data: ', typeof response.data);
+            console.log('response.data: ', response.data);
             displayAIResponse(news.title, response);
         } catch (error) {
             console.error('Error generating AI response:', error);
