@@ -82,13 +82,7 @@ async function generateAIResponses(newsData) {
             .then(data => {
                 console.log('data: ', data); // Now 'data' is a JavaScript object
                 console.log('typeof data: ', typeof data); // Now 'data' is a JavaScript object
-                // Assuming 'data' is already a JavaScript object equivalent to the previously handled JSON string
-                if (data.choices && data.choices.length > 0) {
-                    const content = data.choices[0].message.content;
-                    displayAIResponse(news.title, content);
-                } else {
-                    throw new Error('No choices available in the data');
-                }                
+                displayAIResponse(news.title, content);
             })
             .catch(error => {
                 console.error('There was a problem with your fetch operation:', error);
