@@ -108,45 +108,28 @@ async function generateAIResponses(newsData) {
     }
 }
 
-function displayAIResponse(newsTitle, apiResponse) {
-    const content = extractFirstChoiceContent(apiResponse);
-    console.log('typeof content: ', typeof content);
-    console.log('content: ', content);
+function displayAIResponse(newsTitle, aiResponse) {
     const newsContainer = document.getElementById('news');
-    newsContainer.innerHTML += `
-        <div class="news-article">
+    if (aiResponse 
+        && aiResponse.choices 
+        && aiResponse.choices.length 
+        && aiResponse.choices[0] 
+        && aiResponse.choices[0].message
+        && aiResponse.choices[0].message.content )
+        {
+            newsContainer.innerHTML += `
+            <div class="news-article">
             <h3>${newsTitle}</h3>
-            <div class="ai-response">${content}</div>
-        </div>
-    `;
-}
-
-function extractFirstChoiceContent(response) {
-    // Strip the leading "b'" and trailing single quote if present
-    if (response.startsWith("b'")) {
-        response = response.slice(2, -1);
-    }
-
-    // Replace escaped backslashes and escape control characters
-    response = response.replace(/\\\\/g, '\\').replace(/\\'/g, "'");
-
-    // Decode Unicode escape sequences and escape control characters in JSON string literals
-    response = response.replace(/\\n/g, "\\n").replace(/\\r/g, "\\r").replace(/\\t/g, "\\t");
-
-    // Attempt to parse the JSON string into an object
-    let responseObject;
-    try {
-        responseObject = JSON.parse(response);
-    } catch (e) {
-        console.error("Error parsing JSON:", e);
-        return null;
-    }
-
-    // Access the first choice's content if available
-    if (responseObject && responseObject.choices && responseObject.choices.length > 0) {
-        const content = responseObject.choices[0].message.content;
-        return content;
-    } else {
-        return "No content available";
-    }
+            <div class="ai-response">${aiResponse.choices[0].message.content}</div>
+            </div>
+            `;
+        } else {
+            console.error('No choices found!');
+            newsContainer.innerHTML += `
+            <div class="news-article">
+            <h3>${newsTitle}</h3>
+            <div class="ai-response">No choices found!</div>
+            </div>
+            `;
+        }
 }
