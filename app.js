@@ -114,7 +114,10 @@ async function generateAIResponses(newsData) {
     }
 }
 
-function displayAIResponse(newsTitle, content) {
+function displayAIResponse(newsTitle, apiResponse) {
+    const content = extractFirstChoiceContent(apiResponse);
+    comsole.log('typeof content: ', typeof content);
+    comsole.log('content: ', content);
     const newsContainer = document.getElementById('news');
     newsContainer.innerHTML += `
         <div class="news-article">
@@ -125,6 +128,8 @@ function displayAIResponse(newsTitle, content) {
 }
 
 function extractFirstChoiceContent(response) {
+    comsole.log('typeof response: ', typeof response);
+    comsole.log('response: ', response);
     // Strip the leading "b'" and trailing single quote if present
     if (response.startsWith("b'")) {
         response = response.slice(2, -1);
@@ -132,6 +137,9 @@ function extractFirstChoiceContent(response) {
 
     // Replace escaped backslashes and newlines to properly format the JSON
     response = response.replace(/\\\\n/g, "").replace(/\\"/g, '"');
+
+    // Decode the unicode escape sequences
+    response = decodeURIComponent(JSON.parse('"' + response + '"'));
 
     // Parse the JSON string into an object
     const responseObject = JSON.parse(response);
