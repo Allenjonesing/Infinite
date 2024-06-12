@@ -80,8 +80,13 @@ async function generateAIResponses(newsData) {
                 throw new Error(`Proxy server error! Status: ${response.status} Response: ${errorText}`);
             }
 
-            const data = await response.json();
-            displayAIResponse(news.title, data);
+            const jsonData = await response.json(); // Get JSON directly from the response
+            if (jsonData.choices && jsonData.choices.length > 0) {
+                const aiContent = jsonData.choices[0].message.content; // Navigate to the desired content
+                displayAIResponse(news.title, aiContent);
+            } else {
+                throw new Error("Invalid response structure");
+            }
         } catch (error) {
             console.error('Error generating AI response:', error);
             newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
@@ -89,10 +94,9 @@ async function generateAIResponses(newsData) {
     }
 }
 
-
 function displayAIResponse(newsTitle, responseText) {
-    const newsContainer = document.getElementById('news');
-    newsContainer.innerHTML += `
+    const newsLogContainer = document.getElementById('news');
+    newsLogContainer.innerHTML += `
         <div class="news-article">
             <h3>${newsTitle}</h3>
             <div class="ai-response">${responseText}</div>
