@@ -82,7 +82,7 @@ async function generateAIResponses(newsData) {
             .then(data => {
                 console.log('data: ', data); // Now 'data' is a JavaScript object
                 console.log('typeof data: ', typeof data); // Now 'data' is a JavaScript object
-                displayAIResponse(news.title, content);
+                displayAIResponse(news.title, data);
             })
             .catch(error => {
                 console.error('There was a problem with your fetch operation:', error);
