@@ -113,8 +113,7 @@ async function generateAIResponses(newsData) {
     }
 }
 
-function displayAIResponse(newsTitle, responseText) {
-    const content = extractFirstChoiceContent(responseText);
+function displayAIResponse(newsTitle, content) {
     const newsContainer = document.getElementById('news');
     newsContainer.innerHTML += `
         <div class="news-article">
