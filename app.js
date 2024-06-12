@@ -88,10 +88,10 @@ async function generateAIResponses(newsData) {
                 console.error('There was a problem with your fetch operation:', error);
             });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Proxy server error! Status: ${response.status} Response: ${errorText}`);
-            }
+            // if (!response.ok) {
+            //     const errorText = await response.text();
+            //     throw new Error(`Proxy server error! Status: ${response.status} Response: ${errorText}`);
+            // }
 
             // const jsonResponse = response.json();
             // console.log('typeof jsonResponse: ', typeof jsonResponse);
