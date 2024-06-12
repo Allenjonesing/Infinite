@@ -110,8 +110,8 @@ async function generateAIResponses(newsData) {
 
 function displayAIResponse(newsTitle, apiResponse) {
     const content = extractFirstChoiceContent(apiResponse);
-    comsole.log('typeof content: ', typeof content);
-    comsole.log('content: ', content);
+    console.log('typeof content: ', typeof content);
+    console.log('content: ', content);
     const newsContainer = document.getElementById('news');
     newsContainer.innerHTML += `
         <div class="news-article">
@@ -122,8 +122,8 @@ function displayAIResponse(newsTitle, apiResponse) {
 }
 
 function extractFirstChoiceContent(response) {
-    comsole.log('typeof response: ', typeof response);
-    comsole.log('response: ', response);
+    console.log('typeof response: ', typeof response);
+    console.log('response: ', response);
     // Strip the leading "b'" and trailing single quote if present
     if (response.startsWith("b'")) {
         response = response.slice(2, -1);
