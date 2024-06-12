@@ -81,7 +81,7 @@ async function generateAIResponses(newsData) {
             }
 
             const jsonData = await response.json(); // Get JSON directly from the response
-            if (jsonData.choices && jsonData.choices.length > 0) {
+            if (jsonData.choices && jsonData.choices.length > 0 && jsonData.choices[0].message) {
                 const aiContent = jsonData.choices[0].message.content; // Navigate to the desired content
                 displayAIResponse(news.title, aiContent);
             } else {
@@ -95,11 +95,31 @@ async function generateAIResponses(newsData) {
 }
 
 function displayAIResponse(newsTitle, responseText) {
-    const newsLogContainer = document.getElementById('news');
-    newsLogContainer.innerHTML += `
+    const content = extractFirstChoiceContent(responseText);
+    const newsContainer = document.getElementById('news');
+    newsContainer.innerHTML += `
         <div class="news-article">
             <h3>${newsTitle}</h3>
-            <div class="ai-response">${responseText}</div>
+            <div class="ai-response">${content}</div>
         </div>
     `;
 }
+
+function extractFirstChoiceContent(response) {
+    // Strip the leading "b'" and trailing single quote if present
+    if (response.startsWith("b'")) {
+        response = response.slice(2, -1);
+    }
+
+    // Replace escaped backslashes and newlines to properly format the JSON
+    response = response.replace(/\\\\n/g, "").replace(/\\"/g, '"');
+
+    // Parse the JSON string into an object
+    const responseObject = JSON.parse(response);
+
+    // Access the first choice's content
+    const content = responseObject.choices[0].message.content;
+
+    return content;
+}
+
