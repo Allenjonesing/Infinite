@@ -67,12 +67,30 @@ async function generateAIResponses(newsData) {
         const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
 
         try {
-            const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
+            fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ prompt: prompt })
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // This converts the response body to JSON
+            })
+            .then(data => {
+                console.log(data); // Now 'data' is a JavaScript object
+                // Assuming 'data' is already a JavaScript object equivalent to the previously handled JSON string
+                if (data.choices && data.choices.length > 0) {
+                    const content = data.choices[0].message.content;
+                    displayAIResponse(news.title, content);
+                } else {
+                    throw new Error('No choices available in the data');
+                }                
+            })
+            .catch(error => {
+                console.error('There was a problem with your fetch operation:', error);
             });
 
             if (!response.ok) {
@@ -80,14 +98,14 @@ async function generateAIResponses(newsData) {
                 throw new Error(`Proxy server error! Status: ${response.status} Response: ${errorText}`);
             }
 
-            const jsonResponse = response.json();
-            console.log('typeof jsonResponse: ', typeof jsonResponse);
-            console.log('jsonResponse: ', jsonResponse);
-            console.log('typeof jsonResponse.text(): ', typeof jsonResponse.text());
-            console.log('response.jsonResponse(): ', response.jsonResponse());
-            console.log('typeof jsonResponse.data: ', typeof jsonResponse.data);
-            console.log('jsonResponse.data: ', jsonResponse.data);
-            displayAIResponse(news.title, response);
+            // const jsonResponse = response.json();
+            // console.log('typeof jsonResponse: ', typeof jsonResponse);
+            // console.log('jsonResponse: ', jsonResponse);
+            // console.log('typeof jsonResponse.text(): ', typeof jsonResponse.text());
+            // console.log('response.jsonResponse(): ', response.jsonResponse());
+            // console.log('typeof jsonResponse.data: ', typeof jsonResponse.data);
+            // console.log('jsonResponse.data: ', jsonResponse.data);
+            // displayAIResponse(news.title, response);
         } catch (error) {
             console.error('Error generating AI response:', error);
             newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
