@@ -80,12 +80,13 @@ async function generateAIResponses(newsData) {
                 throw new Error(`Proxy server error! Status: ${response.status} Response: ${errorText}`);
             }
 
-            console.log('typeof response: ', typeof response);
-            console.log('response: ', response);
-            console.log('typeof response.text(): ', typeof response.text());
-            console.log('response.text(): ', response.text());
-            console.log('typeof response.data: ', typeof response.data);
-            console.log('response.data: ', response.data);
+            const jsonResponse = response.json();
+            console.log('typeof jsonResponse: ', typeof jsonResponse);
+            console.log('jsonResponse: ', jsonResponse);
+            console.log('typeof jsonResponse.text(): ', typeof jsonResponse.text());
+            console.log('response.jsonResponse(): ', response.jsonResponse());
+            console.log('typeof jsonResponse.data: ', typeof jsonResponse.data);
+            console.log('jsonResponse.data: ', jsonResponse.data);
             displayAIResponse(news.title, response);
         } catch (error) {
             console.error('Error generating AI response:', error);
