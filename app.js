@@ -80,7 +80,8 @@ async function generateAIResponses(newsData) {
                 return response.json(); // This converts the response body to JSON
             })
             .then(data => {
-                console.log(data); // Now 'data' is a JavaScript object
+                console.log('data: ', data); // Now 'data' is a JavaScript object
+                console.log('typeof data: ', typeof data); // Now 'data' is a JavaScript object
                 // Assuming 'data' is already a JavaScript object equivalent to the previously handled JSON string
                 if (data.choices && data.choices.length > 0) {
                     const content = data.choices[0].message.content;
