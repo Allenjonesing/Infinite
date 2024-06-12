@@ -130,17 +130,31 @@ function extractFirstChoiceContent(response) {
     }
 
     // Replace escaped backslashes and newlines to properly format the JSON
-    response = response.replace(/\\\\n/g, "").replace(/\\"/g, '"');
+    response = response.replace(/\\\\n/g, "\\n").replace(/\\"/g, '"').replace(/\\\\/g, '\\');
 
-    // Decode the unicode escape sequences
-    response = decodeURIComponent(JSON.parse('"' + response + '"'));
+    // Decode unicode escape sequences
+    try {
+        response = decodeURIComponent(JSON.parse('"' + response.replace(/"/g, '\\"') + '"'));
+    } catch (e) {
+        console.error("Error decoding the response:", e);
+        return null;
+    }
 
-    // Parse the JSON string into an object
-    const responseObject = JSON.parse(response);
+    // Try to parse the JSON string into an object
+    let responseObject;
+    try {
+        responseObject = JSON.parse(response);
+    } catch (e) {
+        console.error("Error parsing JSON:", e);
+        return null;
+    }
 
-    // Access the first choice's content
-    const content = responseObject.choices[0].message.content;
-
-    return content;
+    // Access the first choice's content if available
+    if (responseObject && responseObject.choices && responseObject.choices.length > 0) {
+        const content = responseObject.choices[0].message.content;
+        return content;
+    } else {
+        return "No content available";
+    }
 }
 
