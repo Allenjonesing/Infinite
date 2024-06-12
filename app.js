@@ -77,11 +77,7 @@ async function generateAIResponses(newsData) {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                console.log('response: ', response); // Now 'data' is a JavaScript object
-                console.log('typeof response: ', typeof response); // Now 'data' is a JavaScript object
-                const jsonResponse = response.json(); // This converts the response body to JSON
-                console.log('jsonResponse: ', jsonResponse); // Now 'data' is a JavaScript object
-                console.log('typeof jsonResponse: ', typeof jsonResponse); // Now 'data' is a JavaScript object
+                return response.json(); // This converts the response body to JSON
             })
             .then(data => {
                 console.log('data: ', data); // Now 'data' is a JavaScript object
@@ -126,25 +122,18 @@ function displayAIResponse(newsTitle, apiResponse) {
 }
 
 function extractFirstChoiceContent(response) {
-    console.log('typeof response: ', typeof response);
-    console.log('response: ', response);
     // Strip the leading "b'" and trailing single quote if present
     if (response.startsWith("b'")) {
         response = response.slice(2, -1);
     }
 
-    // Replace escaped backslashes and newlines to properly format the JSON
-    response = response.replace(/\\\\n/g, "\\n").replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+    // Replace escaped backslashes and escape control characters
+    response = response.replace(/\\\\/g, '\\').replace(/\\'/g, "'");
 
-    // Decode unicode escape sequences
-    try {
-        response = decodeURIComponent(JSON.parse('"' + response.replace(/"/g, '\\"') + '"'));
-    } catch (e) {
-        console.error("Error decoding the response:", e);
-        return null;
-    }
+    // Decode Unicode escape sequences and escape control characters in JSON string literals
+    response = response.replace(/\\n/g, "\\n").replace(/\\r/g, "\\r").replace(/\\t/g, "\\t");
 
-    // Try to parse the JSON string into an object
+    // Attempt to parse the JSON string into an object
     let responseObject;
     try {
         responseObject = JSON.parse(response);
@@ -161,4 +150,3 @@ function extractFirstChoiceContent(response) {
         return "No content available";
     }
 }
-
