@@ -77,7 +77,11 @@ async function generateAIResponses(newsData) {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                return response.json(); // This converts the response body to JSON
+                console.log('response: ', response); // Now 'data' is a JavaScript object
+                console.log('typeof response: ', typeof response); // Now 'data' is a JavaScript object
+                const jsonResponse = response.json(); // This converts the response body to JSON
+                console.log('jsonResponse: ', jsonResponse); // Now 'data' is a JavaScript object
+                console.log('typeof jsonResponse: ', typeof jsonResponse); // Now 'data' is a JavaScript object
             })
             .then(data => {
                 console.log('data: ', data); // Now 'data' is a JavaScript object
