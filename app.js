@@ -80,6 +80,8 @@ async function generateAIResponses(newsData) {
                 throw new Error(`Proxy server error! Status: ${response.status} Response: ${errorText}`);
             }
 
+            console.loog('typeof response: ', typeof response);
+            console.loog('response: ', response);
             displayAIResponse(news.title, response);
         } catch (error) {
             console.error('Error generating AI response:', error);
