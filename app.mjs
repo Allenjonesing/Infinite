@@ -1,5 +1,3 @@
-import { connectToDatabase } from './db.mjs';
-
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     await connectToDatabase();
