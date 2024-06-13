@@ -1,4 +1,3 @@
-// db.js
 import sql from 'mssql';
 import dotenv from 'dotenv';
 
@@ -10,8 +9,8 @@ const dbConfig = {
   server: process.env.DB_SERVER,
   database: process.env.DB_NAME,
   options: {
-    encrypt: true,
-    enableArithAbort: true
+    encrypt: true, // Use encryption
+    enableArithAbort: true // Required for recent versions of SQL Server
   }
 };
 
