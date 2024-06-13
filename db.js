@@ -1,6 +1,8 @@
 // db.js
-const sql = require('mssql');
-require('dotenv').config();
+import sql from 'mssql';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const dbConfig = {
   user: process.env.DB_USER,
@@ -8,14 +10,14 @@ const dbConfig = {
   server: process.env.DB_SERVER,
   database: process.env.DB_NAME,
   options: {
-    encrypt: true, // Use encryption
-    enableArithAbort: true // Required for recent versions of SQL Server
+    encrypt: true,
+    enableArithAbort: true
   }
 };
 
 let pool;
 
-const connectToDatabase = async () => {
+export const connectToDatabase = async () => {
   if (!pool) {
     try {
       pool = await sql.connect(dbConfig);
@@ -26,8 +28,4 @@ const connectToDatabase = async () => {
     }
   }
   return pool;
-};
-
-module.exports = {
-  connectToDatabase
 };
