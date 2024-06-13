@@ -2,6 +2,46 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchNews();
 });
 
+async function connectToDb() {
+    try {
+        const apiUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
+        const newsEndpoint = '/test/db';
+        const response = await fetch(apiUrl + newsEndpoint);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const jsonData = await response.json();
+        
+        if (!jsonData) {
+            throw new Error('No Data gathered!');
+        }
+
+        // Parsing the stringified JSON data in the body
+        const bodyData = JSON.parse(jsonData.body);
+        
+        if (!bodyData) {
+            throw new Error('No body found in the response!');
+        }
+
+        if (!bodyData.articles) {
+            throw new Error('No articles found in the body!');
+        }
+
+        // Limit to 5 articles
+        const structuredNews = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 5));
+        await generateAIResponses(structuredNews);
+        loadingMessage.style.display = 'none';
+        newsContainer.style.display = 'block';
+    } catch (error) {
+        console.error('Error fetching news:', error);
+        newsContainer.innerHTML = `<div class="error-message">Error fetching news: ${error.message}</div>`;
+        loadingMessage.style.display = 'none';
+        newsContainer.style.display = 'block';
+    }
+}
+
 async function fetchNews() {
     const loadingMessage = document.getElementById('loading');
     const newsContainer = document.getElementById('news');
