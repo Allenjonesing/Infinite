@@ -1,6 +1,14 @@
-document.addEventListener('DOMContentLoaded', () => {
+import { connectToDatabase } from './db.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await connectToDatabase();
     fetchNews();
+  } catch (error) {
+    console.error('Error during initial database connection:', error);
+  }
 });
+
 
 async function fetchNews() {
     const loadingMessage = document.getElementById('loading');
