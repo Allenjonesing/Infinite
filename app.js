@@ -107,12 +107,12 @@ async function create() {
     });
 
     // Periodically spawn more enemies
-    this.time.addEvent({
-        delay: 5000, // Spawn every 5 seconds
-        callback: () => spawnEnemies(this),
-        callbackScope: this,
-        loop: true
-    });
+    // this.time.addEvent({
+    //     delay: 5000, // Spawn every 5 seconds
+    //     callback: () => spawnEnemies(this),
+    //     callbackScope: this,
+    //     loop: true
+    // });
 }
 
 function update() {
