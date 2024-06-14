@@ -267,10 +267,10 @@ async function generateAIResponses(newsData, personas, setting) {
         console.log('generateAIResponses... typeof personas.personas: ', typeof personas.personas);
         console.log('generateAIResponses... typeof personas: ', typeof personas);
         console.log('generateAIResponses... personas.length: ', personas.length);
-        if (personas.personas && personas.personas.length && typeof personas.personas == 'Array') {
+        if (personas.personas && personas.personas.length && typeof personas.personas == 'object') {
             console.log('foundPersonas = personas.personas...');
             foundPersonas = personas.personas;
-        } else if (personas.length && typeof personas == 'Array') {
+        } else if (personas.length && typeof personas == 'object') {
             console.log('foundPersonas = personas...');
             foundPersonas = personas;
         } else {
