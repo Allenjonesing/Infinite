@@ -322,7 +322,7 @@ function spawnEnemies(scene) {
 
 async function generatePersonas(setting) {
     console.log('generatePersonas... setting: ', setting);
-    const prompt = `Generate 5 short (5-10 word), but detailed fictional personas for a ${setting} setting. Make sure the response is formatted like: # Name: Description`;
+    const prompt = `Generate 5 detailed fictional personas for a ${setting} setting in JSON format. Each persona should have a name and a description.`;
     const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
     let parsedPersonas = [];
 
@@ -360,16 +360,12 @@ async function generatePersonas(setting) {
 
 function parsePersonas(content) {
     console.log('parsePersonas... content: ', content);
-    const personas = [];
-    const regex = /\d+\.\s(.*?):\s(.*?)(?=\d+\.|$)/gs;
-
-    let match;
-    while ((match = regex.exec(content)) !== null) {
-        const name = match[1].trim();
-        const description = match[2].trim();
-        personas.push({ name, description });
+    try {
+        console.log('parsePersonas... JSON.parse(content) ', JSON.parse(content));
+        return JSON.parse(content);
+    } catch (error) {
+        console.error('Error parsing personas:', error);
+        return [];
     }
-
-    console.log('parsePersonas... returning personas: ', personas);
-    return personas;
 }
+    
