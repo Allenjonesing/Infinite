@@ -259,10 +259,30 @@ async function generateAIResponses(newsData, personas, setting) {
     newsContainer.innerHTML = ''; // Clear previous content
     const responses = [];
 
+    let foundPersonas = [];
+    if (personas) {
+        if (personas.personas && personas.personas.length && typeof personas.personas == 'Array') {
+            console.log('generateAIResponses...');
+            foundPersonas = personas.personas;
+        } else if (personas.length && typeof personas == 'Array') {
+            console.log('generateAIResponses...');
+            foundPersonas = personas;
+        } else {
+            // Failsafe
+            console.log('Failsafe...');
+            foundPersonas = ['Bob the Loser', 'John the terrible', 'No Work Terk', 'Jery the dim', 'Jimmy the reclaimer'];
+        }
+    } else {
+        // MEGA Failsafe
+        console.log('Mega Failsafe...');
+        foundPersonas = ['Bob the Loser', 'John the terrible', 'No Work Terk', 'Jery the dim', 'Jimmy the reclaimer'];
+    }
+    console.log('generateAIResponses... foundPersonas: ', foundPersonas);
+
     for (let i = 0; i < newsData.length; i++) {
         const news = newsData[i];
         console.log('generateAIResponses... looped news: ', news);
-        const persona = personas.personas[i % personas.personas.length]; // Cycle through personas
+        const persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
         console.log('generateAIResponses... looped persona: ', persona);
         const prompt = `As ${persona.name}, ${persona.description}, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}, as it pertains to the setting chosen: ${setting}. Be sure to really, REALLY, get into character and blend the article with the setting without revealing ANY Brand names, celebrity names, etc.`;
         console.log('generateAIResponses... looped prompt: ', prompt);
