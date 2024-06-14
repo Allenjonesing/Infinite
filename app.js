@@ -260,7 +260,7 @@ async function generateAIResponses(newsData, personas, setting) {
 
     for (let i = 0; i < newsData.length; i++) {
         const news = newsData[i];
-        const persona = personas[i % personas.length]; // Cycle through personas
+        const persona = personas.personas[i % personas.length]; // Cycle through personas
         const prompt = `As ${persona.name}, ${persona.description}, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}, as it pertains to the setting chosen: ${setting}. Be sure to really, REALLY, get into character and blend the article with the setting without revealing ANY Brand names, celebrity names, etc.`;
         const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
 
