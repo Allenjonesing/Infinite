@@ -36,6 +36,8 @@ function preload() {
 }
 
 async function create() {
+    let setting = prompt("Enter a setting for the game (e.g., Medieval, Futuristic, etc.):");
+
     // Create player
     this.player = this.physics.add.sprite(400, 300, 'player');
     this.player.setCollideWorldBounds(true);
@@ -86,21 +88,25 @@ async function create() {
     });
 
     // Fetch news data and generate AI responses
+    const personas = await generatePersonas(setting);
     const newsData = await fetchNews();
 
-// Assign news articles to NPCs
-this.npcs.children.iterate((npc, index) => {
-    let newsIndex = index % newsData.length;
-    npc.newsText = newsData[newsIndex].description; // or use AI response
-});
 
-// Enable NPC interaction
-this.npcs.children.iterate((npc) => {
-    npc.setInteractive();
-    npc.on('pointerdown', () => {
-        alert(npc.newsText);
+    this.npcs.children.iterate((npc, index) => {
+        let persona = personas[index % personas.length]; // Cycle through personas
+        npc.persona = persona;
+        // Assign news articles to NPCs
+        let newsIndex = index % newsData.length;
+        npc.newsText = newsData[newsIndex].description; // or use AI response
     });
-});
+
+    // Enable NPC interaction
+    this.npcs.children.iterate((npc) => {
+        npc.setInteractive();
+        npc.on('pointerdown', () => {
+            alert(`${npc.persona}: ${npc.response}`);
+        });
+    });
 
     // Periodically spawn more enemies
     this.time.addEvent({
@@ -223,9 +229,10 @@ async function fetchNews() {
 
         // Limit to 5 articles
         const structuredNews = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 5));
-        await generateAIResponses(structuredNews);        loadingMessage.style.display = 'none';
+        let generatedAIResponses = await generateAIResponses(structuredNews);
+        loadingMessage.style.display = 'none';
         newsContainer.style.display = 'block';
-        return structuredNews;
+        return generatedAIResponses;
     } catch (error) {
         console.error('Error fetching news:', error);
         newsContainer.innerHTML = `<div class="error-message">Error fetching news: ${error.message}</div>`;
@@ -245,14 +252,15 @@ function structureNewsData(articles) {
     });
 }
 
-async function generateAIResponses(newsData) {
+async function generateAIResponses(newsData, personas) {
     const newsContainer = document.getElementById('news');
     newsContainer.innerHTML = ''; // Clear previous content
+    const responses = [];
 
     for (let i = 0; i < newsData.length; i++) {
         const news = newsData[i];
         const persona = personas[i % personas.length]; // Cycle through personas
-        const prompt = `As a ${persona} in teh dark ages, discuss the following news article as if it were happening here and causing these enemies to spawn:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
+        const prompt = `As a ${persona}, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
         const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
 
         try {
@@ -269,7 +277,16 @@ async function generateAIResponses(newsData) {
                 return response.json(); // This converts the response body to JSON
             })
             .then(data => {
-                displayAIResponse(news.title, data, persona);
+                if (aiResponse 
+                    && aiResponse.choices 
+                    && aiResponse.choices.length 
+                    && aiResponse.choices[0] 
+                    && aiResponse.choices[0].message
+                    && aiResponse.choices[0].message.content )
+                    {
+                        responses.push({ response: aiResponse.choices[0].message.content, persona: persona });
+                        displayAIResponse(news.title, aiResponse.choices[0].message.content, persona);
+                    }
             })
             .catch(error => {
                 console.error('There was a problem with your fetch operation:', error);
@@ -279,34 +296,20 @@ async function generateAIResponses(newsData) {
             newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
         }
     }
+
+    return responses;
 }
 
 function displayAIResponse(newsTitle, aiResponse, persona) {
     const newsContainer = document.getElementById('news');
-    if (aiResponse 
-        && aiResponse.choices 
-        && aiResponse.choices.length 
-        && aiResponse.choices[0] 
-        && aiResponse.choices[0].message
-        && aiResponse.choices[0].message.content )
-        {
-            newsContainer.innerHTML += `
-            <div class="news-article">
-                <h3>${newsTitle}</h3>
-                <div class="ai-response">
-                    <p><strong>${persona}:</strong> ${aiResponse.choices[0].message.content}</p>
-                </div>
-            </div>
-            `;
-        } else {
-            console.error('No choices found!');
-            newsContainer.innerHTML += `
-            <div class="news-article">
+        newsContainer.innerHTML += `
+        <div class="news-article">
             <h3>${newsTitle}</h3>
-            <div class="ai-response">No choices found!</div>
+            <div class="ai-response">
+                <p><strong>${persona}:</strong> ${aiResponse}</p>
             </div>
-            `;
-        }
+        </div>
+        `;
 }
 
 function spawnEnemies(scene) {
@@ -315,5 +318,34 @@ function spawnEnemies(scene) {
         let y = Phaser.Math.Between(50, 550);
         let enemy = enemies.create(x, y, 'enemy');
         enemy.setCollideWorldBounds(true);
+    }
+}
+
+async function generatePersonas(setting) {
+    const prompt = `Generate 5 detailed fictional personas for a ${setting} setting.`;
+    const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
+
+    try {
+        fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: prompt })
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // This converts the response body to JSON
+        })
+        .then(data => {
+            displayAIResponse(news.title, data, persona);
+        })
+        .catch(error => {
+            console.error('There was a problem with your fetch operation:', error);
+        });
+    } catch (error) {
+        console.error('Error generating AI response:', error);
+        newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
     }
 }
