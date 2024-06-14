@@ -86,7 +86,7 @@ async function create() {
     // Fetch news data and generate AI responses
     const personas = await generatePersonas(setting);
     console.log('create... personas: ', personas);
-    const newsData = await fetchNews(personas);
+    const newsData = await fetchNews(personas, setting);
     console.log('create... newsData: ', newsData);
 
 
@@ -181,7 +181,7 @@ async function connectToDb() {
 
         // Limit to 5 articles
         const structuredNews = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 5));
-        await generateAIResponses(structuredNews, personas);
+        await generateAIResponses(structuredNews, personas, setting);
         loadingMessage.style.display = 'none';
         newsContainer.style.display = 'block';
     } catch (error) {
@@ -192,7 +192,7 @@ async function connectToDb() {
     }
 }
 
-async function fetchNews(personas) {
+async function fetchNews(personas, setting) {
     console.log('fetchNews... personas: ', personas);
     const loadingMessage = document.getElementById('loading');
     const newsContainer = document.getElementById('news');
@@ -228,7 +228,7 @@ async function fetchNews(personas) {
 
         // Limit to 5 articles
         const structuredNews = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 5));
-        let generatedAIResponses = await generateAIResponses(structuredNews, personas);
+        let generatedAIResponses = await generateAIResponses(structuredNews, personas, setting);
         loadingMessage.style.display = 'none';
         newsContainer.style.display = 'block';
         return generatedAIResponses;
@@ -251,7 +251,7 @@ function structureNewsData(articles) {
     });
 }
 
-async function generateAIResponses(newsData, personas) {
+async function generateAIResponses(newsData, personas, setting) {
     console.log('generateAIResponses... newsData: ', newsData);
     console.log('generateAIResponses... personas: ', personas);
     const newsContainer = document.getElementById('news');
@@ -261,7 +261,7 @@ async function generateAIResponses(newsData, personas) {
     for (let i = 0; i < newsData.length; i++) {
         const news = newsData[i];
         const persona = personas[i % personas.length]; // Cycle through personas
-        const prompt = `As a ${persona}, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
+        const prompt = `As ${persona.name}, ${persona.description}, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}, as it pertains to teh setting chosen: ${setting}`;
         const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
 
         try {
