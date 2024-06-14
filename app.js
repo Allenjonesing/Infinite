@@ -260,12 +260,31 @@ async function generateAIResponses(newsData) {
     }
 }
 
-function displayAIResponse(title, response, persona) {
+function displayAIResponse(newsTitle, aiResponse, persona) {
     const newsContainer = document.getElementById('news');
-    newsContainer.innerHTML += `
-        <div class="news-article">
-            <h2>${title}</h2>
-            <p><strong>${persona}:</strong> ${response}</p>
-        </div>
-    `;
+    if (aiResponse 
+        && aiResponse.choices 
+        && aiResponse.choices.length 
+        && aiResponse.choices[0] 
+        && aiResponse.choices[0].message
+        && aiResponse.choices[0].message.content )
+        {
+            newsContainer.innerHTML += `
+            <div class="news-article">
+                <h3>${newsTitle}</h3>
+                <div class="ai-response">
+                    <p><strong>${persona}:</strong> ${aiResponse.choices[0].message.content}</p>
+                </div>
+            </div>
+            `;
+        } else {
+            console.error('No choices found!');
+            newsContainer.innerHTML += `
+            <div class="news-article">
+            <h3>${newsTitle}</h3>
+            <div class="ai-response">No choices found!</div>
+            </div>
+            `;
+        }
 }
+
