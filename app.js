@@ -290,7 +290,7 @@ async function generateAIResponses(newsData, personas, setting) {
         console.log('generateAIResponses... looped news: ', news);
         const persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
         console.log('generateAIResponses... looped persona: ', persona);
-        const prompt = `As ${persona.name}, ${persona.description}, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}, as it pertains to the setting chosen: ${setting}. Be sure to really, REALLY, get into character and blend the article with the setting without revealing ANY Brand names, celebrity names, etc.`;
+        const prompt = `As ${persona.name}, ${persona.description}, As if talking to the player of the game, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}, as it pertains to the setting chosen: ${setting}. Be sure to really, REALLY, get into character and blend the article with the setting without revealing ANY Brand names, celebrity names, etc.`;
         console.log('generateAIResponses... looped prompt: ', prompt);
         const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
 
@@ -352,7 +352,7 @@ function spawnEnemies(scene) {
 
 async function generatePersonas(setting) {
     console.log('generatePersonas... setting: ', setting);
-    const prompt = `Generate 5 detailed fictional personas for a ${setting} setting in JSON format. Each persona should have a name and a description.`;
+    const prompt = `Generate 5 short (5-10 word) and detailed fictional personas for a ${setting} setting in JSON format. Each persona should have a name and a description.`;
     const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
     let parsedPersonas = [];
 
