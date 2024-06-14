@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchNews();
 });
 
-// Phaser game configuration
 const config = {
     type: Phaser.AUTO,
     width: 800,
@@ -20,7 +19,12 @@ const config = {
         update: update
     }
 };
+
 const game = new Phaser.Game(config);
+
+let health = 100;
+let healthText;
+let target = null;
 
 function preload() {
     this.load.image('player', 'assets/player.png');
@@ -32,6 +36,7 @@ function preload() {
 function create() {
     // Create player
     this.player = this.physics.add.sprite(400, 300, 'player');
+    this.player.setCollideWorldBounds(true);
 
     // Create NPCs
     this.npcs = this.physics.add.group();
@@ -49,33 +54,7 @@ function create() {
         this.enemies.create(x, y, 'enemy');
     }
 
-    // Input handling
-    this.input.on('pointerdown', (pointer) => {
-        this.physics.moveTo(this.player, pointer.x, pointer.y, 200);
-    });
-
-    // Fetch news data and generate AI responses
-    fetch('/news')
-        .then(response => response.json())
-        .then(data => {
-            this.newsData = data;
-
-            // Assign news articles to NPCs
-            this.npcs.children.iterate((npc, index) => {
-                let newsIndex = index % this.newsData.length;
-                npc.newsText = this.newsData[newsIndex].title; // or use AI response
-            });
-        });
-
-        // Enable NPC interaction
-        this.npcs.children.iterate((npc) => {
-        npc.setInteractive();
-        npc.on('pointerdown', () => {
-            alert(npc.newsText);
-        });
-    });
-
-    // Add trees
+    // Create trees
     this.trees = this.physics.add.staticGroup();
     for (let i = 0; i < 10; i++) {
         let x = Phaser.Math.Between(50, 750);
@@ -83,14 +62,50 @@ function create() {
         this.trees.create(x, y, 'tree');
     }
 
-    // Collision handling between player and trees
+    // Add collisions
+    this.physics.add.collider(this.player, this.npcs);
+    this.physics.add.collider(this.player, this.enemies, takeDamage, null, this);
     this.physics.add.collider(this.player, this.trees);
+
+    // Health HUD
+    healthText = this.add.text(16, 16, 'Health: 100', { fontSize: '32px', fill: '#fff' });
+
+    // Input handling
+    this.input.on('pointerdown', (pointer) => {
+        target = { x: pointer.x, y: pointer.y };
+    });
+
+    this.input.on('pointerup', () => {
+        target = null;
+    });
 }
 
 function update() {
-    // Player movement logic
-    if (Phaser.Math.Distance.Between(this.player.x, this.player.y, this.input.x, this.input.y) < 4) {
-        this.player.body.setVelocity(0, 0);
+    if (target) {
+        this.physics.moveToObject(this.player, target, 100);
+
+        // Stop the player when it reaches the target
+        if (Phaser.Math.Distance.Between(this.player.x, this.player.y, target.x, target.y) < 4) {
+            this.player.body.setVelocity(0, 0);
+        }
+    }
+
+    // Prevent the player from moving outside the game boundaries
+    if (this.player.x < 0) this.player.x = 0;
+    if (this.player.y < 0) this.player.y = 0;
+    if (this.player.x > 800) this.player.x = 800;
+    if (this.player.y > 600) this.player.y = 600;
+}
+
+function takeDamage(player, enemy) {
+    health -= 0.1; // Reduce health gradually
+    healthText.setText('Health: ' + Math.max(Math.round(health), 0));
+
+    if (health <= 0) {
+        // Handle player death (restart game or end game)
+        this.physics.pause();
+        player.setTint(0xff0000);
+        healthText.setText('Health: 0');
     }
 }
 
