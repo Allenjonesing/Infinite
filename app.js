@@ -21,6 +21,7 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+const personas = ['farmer', 'worker', 'king', 'knight', 'merchant'];
 
 let health = 100;
 let healthText;
@@ -227,8 +228,10 @@ async function generateAIResponses(newsData) {
     const newsContainer = document.getElementById('news');
     newsContainer.innerHTML = ''; // Clear previous content
 
-    for (const news of newsData) {
-        const prompt = `Discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
+    for (let i = 0; i < newsData.length; i++) {
+        const news = newsData[i];
+        const persona = personas[i % personas.length]; // Cycle through personas
+        const prompt = `As a ${persona}, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
         const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
 
         try {
@@ -245,27 +248,11 @@ async function generateAIResponses(newsData) {
                 return response.json(); // This converts the response body to JSON
             })
             .then(data => {
-                console.log('data: ', data); // Now 'data' is a JavaScript object
-                console.log('typeof data: ', typeof data); // Now 'data' is a JavaScript object
-                displayAIResponse(news.title, data);
+                displayAIResponse(news.title, data, persona);
             })
             .catch(error => {
                 console.error('There was a problem with your fetch operation:', error);
             });
-
-            // if (!response.ok) {
-            //     const errorText = await response.text();
-            //     throw new Error(`Proxy server error! Status: ${response.status} Response: ${errorText}`);
-            // }
-
-            // const jsonResponse = response.json();
-            // console.log('typeof jsonResponse: ', typeof jsonResponse);
-            // console.log('jsonResponse: ', jsonResponse);
-            // console.log('typeof jsonResponse.text(): ', typeof jsonResponse.text());
-            // console.log('response.jsonResponse(): ', response.jsonResponse());
-            // console.log('typeof jsonResponse.data: ', typeof jsonResponse.data);
-            // console.log('jsonResponse.data: ', jsonResponse.data);
-            // displayAIResponse(news.title, response);
         } catch (error) {
             console.error('Error generating AI response:', error);
             newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
@@ -273,28 +260,12 @@ async function generateAIResponses(newsData) {
     }
 }
 
-function displayAIResponse(newsTitle, aiResponse) {
+function displayAIResponse(title, response, persona) {
     const newsContainer = document.getElementById('news');
-    if (aiResponse 
-        && aiResponse.choices 
-        && aiResponse.choices.length 
-        && aiResponse.choices[0] 
-        && aiResponse.choices[0].message
-        && aiResponse.choices[0].message.content )
-        {
-            newsContainer.innerHTML += `
-            <div class="news-article">
-            <h3>${newsTitle}</h3>
-            <div class="ai-response">${aiResponse.choices[0].message.content}</div>
-            </div>
-            `;
-        } else {
-            console.error('No choices found!');
-            newsContainer.innerHTML += `
-            <div class="news-article">
-            <h3>${newsTitle}</h3>
-            <div class="ai-response">No choices found!</div>
-            </div>
-            `;
-        }
+    newsContainer.innerHTML += `
+        <div class="news-article">
+            <h2>${title}</h2>
+            <p><strong>${persona}:</strong> ${response}</p>
+        </div>
+    `;
 }
