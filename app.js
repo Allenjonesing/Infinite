@@ -35,6 +35,7 @@ function preload() {
 }
 
 async function create() {
+    console.log('create...');
     let setting = prompt("Enter a setting for the game (e.g., Medieval, Futuristic, etc.):");
 
     // Create player
@@ -88,7 +89,9 @@ async function create() {
 
     // Fetch news data and generate AI responses
     const personas = await generatePersonas(setting);
+    console.log('create... personas: ', personas);
     const newsData = await fetchNews(personas);
+    console.log('create... newsData: ', newsData);
 
 
     this.npcs.children.iterate((npc, index) => {
@@ -194,6 +197,7 @@ async function connectToDb() {
 }
 
 async function fetchNews(personas) {
+    console.log('fetchNews... personas: ', personas);
     const loadingMessage = document.getElementById('loading');
     const newsContainer = document.getElementById('news');
 
@@ -252,6 +256,8 @@ function structureNewsData(articles) {
 }
 
 async function generateAIResponses(newsData, personas) {
+    console.log('generateAIResponses... newsData: ', newsData);
+    console.log('generateAIResponses... personas: ', personas);
     const newsContainer = document.getElementById('news');
     newsContainer.innerHTML = ''; // Clear previous content
     const responses = [];
@@ -318,6 +324,7 @@ function spawnEnemies(scene) {
 }
 
 async function generatePersonas(setting) {
+    console.log('generatePersonas... setting: ', setting);
     const prompt = `Generate 5 short (5-10 word), but detailed fictional personas for a ${setting} setting.`;
     const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
     let parsedPersonas = [];
@@ -355,6 +362,7 @@ async function generatePersonas(setting) {
 }
 
 function parsePersonas(content) {
+    console.log('parsePersonas... content: ', content);
     const personas = [];
     const regex = /\d+\.\s(.*?):\s(.*?)(?=\d+\.|$)/gs;
 
