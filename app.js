@@ -347,7 +347,6 @@ async function generatePersonas(setting) {
             && aiResponse.choices[0].message
             && aiResponse.choices[0].message.content )
             {
-                responses.push({ response: aiResponse.choices[0].message.content, persona: persona });
                 parsedPersonas = parsePersonas(aiResponse.choices[0].message.content);
             }
     } catch (error) {
