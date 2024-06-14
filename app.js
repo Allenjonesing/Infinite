@@ -21,11 +21,12 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
-const personas = ['farmer', 'worker', 'king', 'knight', 'merchant'];
+const personas = ['Peasant Farmer who is living in fear', 'Enslaved worker under the evil reign', 'Evil Overlord who\'s captured the land ', 'Tired Knight unable to continue in battle', 'Greedy merchant overcharging weary Knights and poor peasants'];
 
 let health = 100;
 let healthText;
 let target = null;
+let enemies;
 
 function preload() {
     this.load.image('player', 'assets/player.png');
@@ -40,20 +41,18 @@ async function create() {
     this.player.setCollideWorldBounds(true);
 
     // Create NPCs
-    this.npcs = this.physics.add.group();
+    this.npcs = this.physics.add.group({
+        immovable: true
+    });
     for (let i = 0; i < 5; i++) {
         let x = Phaser.Math.Between(50, 750);
         let y = Phaser.Math.Between(50, 550);
-        this.npcs.create(x, y, 'npc');
+        this.npcs.create(x, y, 'npc').setCollideWorldBounds(true);
     }
 
     // Create enemies
-    this.enemies = this.physics.add.group();
-    for (let i = 0; i < 5; i++) {
-        let x = Phaser.Math.Between(50, 750);
-        let y = Phaser.Math.Between(50, 550);
-        this.enemies.create(x, y, 'enemy');
-    }
+    enemies = this.physics.add.group();
+    spawnEnemies(this);
 
     // Create trees
     this.trees = this.physics.add.staticGroup();
@@ -65,8 +64,13 @@ async function create() {
 
     // Add collisions
     this.physics.add.collider(this.player, this.npcs);
-    this.physics.add.collider(this.player, this.enemies, takeDamage, null, this);
+    this.physics.add.collider(this.player, enemies, takeDamage, null, this);
     this.physics.add.collider(this.player, this.trees);
+    this.physics.add.collider(this.npcs, this.trees);
+    this.physics.add.collider(enemies, this.trees);
+    this.physics.add.collider(this.npcs, enemies);
+    this.physics.add.collider(this.npcs, this.npcs);
+    this.physics.add.collider(enemies, enemies);
 
     // Health HUD
     healthText = this.add.text(16, 16, 'Health: 100', { fontSize: '32px', fill: '#fff' });
@@ -78,41 +82,58 @@ async function create() {
 
     this.input.on('pointerup', () => {
         target = null;
+        this.player.body.setVelocity(0, 0);
     });
 
     // Fetch news data and generate AI responses
     const newsData = await fetchNews();
 
-    // Assign news articles to NPCs
-    this.npcs.children.iterate((npc, index) => {
-        let newsIndex = index % newsData.length;
-        npc.newsText = newsData[newsIndex].title; // or use AI response
-    });
+// Assign news articles to NPCs
+this.npcs.children.iterate((npc, index) => {
+    let newsIndex = index % newsData.length;
+    npc.newsText = newsData[newsIndex].description; // or use AI response
+});
 
-    // Enable NPC interaction
-    this.npcs.children.iterate((npc) => {
-        npc.setInteractive();
-        npc.on('pointerdown', () => {
-            alert(npc.newsText);
-        });
+// Enable NPC interaction
+this.npcs.children.iterate((npc) => {
+    npc.setInteractive();
+    npc.on('pointerdown', () => {
+        alert(npc.newsText);
+    });
+});
+
+    // Periodically spawn more enemies
+    this.time.addEvent({
+        delay: 5000, // Spawn every 5 seconds
+        callback: () => spawnEnemies(this),
+        callbackScope: this,
+        loop: true
     });
 }
 
 function update() {
     if (target) {
-        this.physics.moveToObject(this.player, target, 100);
-
-        // Stop the player when it reaches the target
-        if (Phaser.Math.Distance.Between(this.player.x, this.player.y, target.x, target.y) < 4) {
-            this.player.body.setVelocity(0, 0);
-        }
+        this.physics.moveTo(this.player, target.x, target.y, 100);
     }
 
-    // Prevent the player from moving outside the game boundaries
-    if (this.player.x < 0) this.player.x = 0;
-    if (this.player.y < 0) this.player.y = 0;
-    if (this.player.x > 800) this.player.x = 800;
-    if (this.player.y > 600) this.player.y = 600;
+    // Enemy movement towards player
+    enemies.children.iterate((enemy) => {
+        this.physics.moveToObject(enemy, this.player, 50);
+    });
+
+    // Prevent NPCs from sliding after being pushed
+    this.npcs.children.iterate((npc) => {
+        if (npc.body.speed > 0) {
+            npc.body.setVelocity(0, 0);
+        }
+    });
+
+    // Prevent enemies from sliding after being pushed
+    enemies.children.iterate((enemy) => {
+        if (enemy.body.speed > 0) {
+            enemy.body.setVelocity(0, 0);
+        }
+    });
 }
 
 function takeDamage(player, enemy) {
@@ -231,7 +252,7 @@ async function generateAIResponses(newsData) {
     for (let i = 0; i < newsData.length; i++) {
         const news = newsData[i];
         const persona = personas[i % personas.length]; // Cycle through personas
-        const prompt = `As a ${persona}, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
+        const prompt = `As a ${persona} in teh dark ages, discuss the following news article as if it were happening here and causing these enemies to spawn:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
         const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
 
         try {
@@ -288,3 +309,11 @@ function displayAIResponse(newsTitle, aiResponse, persona) {
         }
 }
 
+function spawnEnemies(scene) {
+    for (let i = 0; i < 3; i++) {
+        let x = Phaser.Math.Between(50, 750);
+        let y = Phaser.Math.Between(50, 550);
+        let enemy = enemies.create(x, y, 'enemy');
+        enemy.setCollideWorldBounds(true);
+    }
+}
