@@ -263,33 +263,30 @@ async function generateAIResponses(newsData, personas) {
         const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
 
         try {
-            fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
+            const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ prompt: prompt })
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+            })
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            
+            const aiResponse = await response.json(); // This converts the response body to JSON
+            
+            if (aiResponse 
+                && aiResponse.choices 
+                && aiResponse.choices.length 
+                && aiResponse.choices[0] 
+                && aiResponse.choices[0].message
+                && aiResponse.choices[0].message.content )
+                {
+                    responses.push({ response: aiResponse.choices[0].message.content, persona: persona });
+                    displayAIResponse(news.title, aiResponse.choices[0].message.content, persona);
                 }
-                return response.json(); // This converts the response body to JSON
-            })
-            .then(aiResponse => {
-                if (aiResponse 
-                    && aiResponse.choices 
-                    && aiResponse.choices.length 
-                    && aiResponse.choices[0] 
-                    && aiResponse.choices[0].message
-                    && aiResponse.choices[0].message.content )
-                    {
-                        responses.push({ response: aiResponse.choices[0].message.content, persona: persona });
-                        displayAIResponse(news.title, aiResponse.choices[0].message.content, persona);
-                    }
-            })
-            .catch(error => {
-                console.error('There was a problem with your fetch operation:', error);
-            });
         } catch (error) {
             console.error('Error generating AI response:', error);
             newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
@@ -326,33 +323,29 @@ async function generatePersonas(setting) {
     let parsedPersonas = [];
 
     try {
-        fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
+        const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ prompt: prompt })
-        }).then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+        })
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const aiResponse = await response.json(); // This converts the response body to JSON
+
+        if (aiResponse 
+            && aiResponse.choices 
+            && aiResponse.choices.length 
+            && aiResponse.choices[0] 
+            && aiResponse.choices[0].message
+            && aiResponse.choices[0].message.content )
+            {
+                responses.push({ response: aiResponse.choices[0].message.content, persona: persona });
+                parsedPersonas = parsePersonas(aiResponse.choices[0].message.content);
             }
-            return response.json(); // This converts the response body to JSON
-        })
-        .then(aiResponse => {
-            if (aiResponse 
-                && aiResponse.choices 
-                && aiResponse.choices.length 
-                && aiResponse.choices[0] 
-                && aiResponse.choices[0].message
-                && aiResponse.choices[0].message.content )
-                {
-                    responses.push({ response: aiResponse.choices[0].message.content, persona: persona });
-                    parsedPersonas = parsePersonas(aiResponse.choices[0].message.content);
-                }
-        })
-        .catch(error => {
-            console.error('There was a problem with your fetch operation:', error);
-        });
     } catch (error) {
         console.error('Error generating AI response:', error);
         newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
