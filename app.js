@@ -21,7 +21,6 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
-const personas = ['Peasant Farmer who is living in fear', 'Enslaved worker under the evil reign', 'Evil Overlord who\'s captured the land ', 'Tired Knight unable to continue in battle', 'Greedy merchant overcharging weary Knights and poor peasants'];
 
 let health = 100;
 let healthText;
@@ -276,7 +275,7 @@ async function generateAIResponses(newsData, personas) {
                 }
                 return response.json(); // This converts the response body to JSON
             })
-            .then(data => {
+            .then(aiResponse => {
                 if (aiResponse 
                     && aiResponse.choices 
                     && aiResponse.choices.length 
@@ -322,8 +321,9 @@ function spawnEnemies(scene) {
 }
 
 async function generatePersonas(setting) {
-    const prompt = `Generate 5 detailed fictional personas for a ${setting} setting.`;
+    const prompt = `Generate 5 short (5-10 word), but detailed fictional personas for a ${setting} setting.`;
     const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
+    let parsedPersonas = [];
 
     try {
         fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
@@ -338,8 +338,17 @@ async function generatePersonas(setting) {
             }
             return response.json(); // This converts the response body to JSON
         })
-        .then(data => {
-            displayAIResponse(news.title, data, persona);
+        .then(aiResponse => {
+            if (aiResponse 
+                && aiResponse.choices 
+                && aiResponse.choices.length 
+                && aiResponse.choices[0] 
+                && aiResponse.choices[0].message
+                && aiResponse.choices[0].message.content )
+                {
+                    responses.push({ response: aiResponse.choices[0].message.content, persona: persona });
+                    parsedPersonas = parsePersonas(aiResponse.choices[0].message.content);
+                }
         })
         .catch(error => {
             console.error('There was a problem with your fetch operation:', error);
@@ -348,4 +357,20 @@ async function generatePersonas(setting) {
         console.error('Error generating AI response:', error);
         newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
     }
+
+    return parsedPersonas;
+}
+
+function parsePersonas(content) {
+    const personas = [];
+    const regex = /\d+\.\s(.*?):\s(.*?)(?=\d+\.|$)/gs;
+
+    let match;
+    while ((match = regex.exec(content)) !== null) {
+        const name = match[1].trim();
+        const description = match[2].trim();
+        personas.push({ name, description });
+    }
+
+    return personas;
 }
