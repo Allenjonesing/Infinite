@@ -264,9 +264,10 @@ async function generateAIResponses(newsData, personas, setting) {
     if (personas) {
         console.log('generateAIResponses... personas: ', personas);
         console.log('generateAIResponses... personas.personas: ', personas.personas);
+        console.log('generateAIResponses... typeof personas.personas: ', typeof personas.personas);
         console.log('generateAIResponses... typeof personas: ', typeof personas);
         console.log('generateAIResponses... personas.length: ', personas.length);
-        console.log('generateAIResponses... typeof personas.personas: ', typeof personas.personas);
+        if (personas.personas && personas.personas.length && typeof personas.personas == 'Array') {
             console.log('foundPersonas = personas.personas...');
             foundPersonas = personas.personas;
         } else if (personas.length && typeof personas == 'Array') {
