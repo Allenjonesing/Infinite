@@ -260,12 +260,17 @@ async function generateAIResponses(newsData, personas, setting) {
     const responses = [];
 
     let foundPersonas = [];
+    console.log('generateAIResponses... newsData: ', newsData);
     if (personas) {
-        if (personas.personas && personas.personas.length && typeof personas.personas == 'Array') {
-            console.log('generateAIResponses...');
+        console.log('generateAIResponses... personas: ', personas);
+        console.log('generateAIResponses... personas.personas: ', personas.personas);
+        console.log('generateAIResponses... typeof personas: ', typeof personas);
+        console.log('generateAIResponses... personas.length: ', personas.length);
+        console.log('generateAIResponses... typeof personas.personas: ', typeof personas.personas);
+            console.log('foundPersonas = personas.personas...');
             foundPersonas = personas.personas;
         } else if (personas.length && typeof personas == 'Array') {
-            console.log('generateAIResponses...');
+            console.log('foundPersonas = personas...');
             foundPersonas = personas;
         } else {
             // Failsafe
