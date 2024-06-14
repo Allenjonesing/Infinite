@@ -33,7 +33,7 @@ function preload() {
     this.load.image('enemy', 'assets/enemy.png');
 }
 
-function create() {
+async function create() {
     // Create player
     this.player = this.physics.add.sprite(400, 300, 'player');
     this.player.setCollideWorldBounds(true);
@@ -77,6 +77,23 @@ function create() {
 
     this.input.on('pointerup', () => {
         target = null;
+    });
+
+    // Fetch news data and generate AI responses
+    const newsData = await fetchNews();
+
+    // Assign news articles to NPCs
+    this.npcs.children.iterate((npc, index) => {
+        let newsIndex = index % newsData.length;
+        npc.newsText = newsData[newsIndex].title; // or use AI response
+    });
+
+    // Enable NPC interaction
+    this.npcs.children.iterate((npc) => {
+        npc.setInteractive();
+        npc.on('pointerdown', () => {
+            alert(npc.newsText);
+        });
     });
 }
 
@@ -183,15 +200,16 @@ async function fetchNews() {
         }
 
         // Limit to 5 articles
-        const structuredNews = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 5));
-        await generateAIResponses(structuredNews);
+        const structuredNews = bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 5);
         loadingMessage.style.display = 'none';
         newsContainer.style.display = 'block';
+        return structuredNews;
     } catch (error) {
         console.error('Error fetching news:', error);
         newsContainer.innerHTML = `<div class="error-message">Error fetching news: ${error.message}</div>`;
         loadingMessage.style.display = 'none';
         newsContainer.style.display = 'block';
+        return [];
     }
 }
 
