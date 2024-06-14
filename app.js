@@ -329,7 +329,7 @@ function displayAIResponse(newsTitle, aiResponse, persona) {
         <div class="news-article">
             <h3>${newsTitle}</h3>
             <div class="ai-response">
-                <p><strong>${persona}:</strong> ${aiResponse}</p>
+                <p><strong>${persona.name}, ${persona.description}:</strong> ${aiResponse}</p>
             </div>
         </div>
         `;
