@@ -1,7 +1,3 @@
-document.addEventListener('DOMContentLoaded', () => {
-    fetchNews();
-});
-
 const config = {
     type: Phaser.AUTO,
     width: 800,
@@ -299,6 +295,7 @@ async function generateAIResponses(newsData, personas) {
         }
     }
 
+    console.log('generateAIResponses... returning responses: ', responses);
     return responses;
 }
 
@@ -358,6 +355,7 @@ async function generatePersonas(setting) {
         newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
     }
 
+    console.log('generatePersonas... Returning parsedPersonas: ', parsedPersonas);
     return parsedPersonas;
 }
 
@@ -373,5 +371,6 @@ function parsePersonas(content) {
         personas.push({ name, description });
     }
 
+    console.log('parsePersonas... returning personas: ', personas);
     return personas;
 }
