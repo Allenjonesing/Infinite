@@ -254,14 +254,18 @@ function structureNewsData(articles) {
 async function generateAIResponses(newsData, personas, setting) {
     console.log('generateAIResponses... newsData: ', newsData);
     console.log('generateAIResponses... personas: ', personas);
+    console.log('generateAIResponses... personas.personas: ', personas.personas);
     const newsContainer = document.getElementById('news');
     newsContainer.innerHTML = ''; // Clear previous content
     const responses = [];
 
     for (let i = 0; i < newsData.length; i++) {
         const news = newsData[i];
-        const persona = personas.personas[i % personas.length]; // Cycle through personas
+        console.log('generateAIResponses... looped news: ', news);
+        const persona = personas.personas[i % personas.personas.length]; // Cycle through personas
+        console.log('generateAIResponses... looped persona: ', persona);
         const prompt = `As ${persona.name}, ${persona.description}, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}, as it pertains to the setting chosen: ${setting}. Be sure to really, REALLY, get into character and blend the article with the setting without revealing ANY Brand names, celebrity names, etc.`;
+        console.log('generateAIResponses... looped prompt: ', prompt);
         const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
 
         try {
