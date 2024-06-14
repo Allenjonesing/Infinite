@@ -201,8 +201,8 @@ async function fetchNews() {
         }
 
         // Limit to 5 articles
-        const structuredNews = bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 5);
-        loadingMessage.style.display = 'none';
+        const structuredNews = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 5));
+        await generateAIResponses(structuredNews);        loadingMessage.style.display = 'none';
         newsContainer.style.display = 'block';
         return structuredNews;
     } catch (error) {
