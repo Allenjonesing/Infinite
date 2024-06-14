@@ -89,7 +89,7 @@ async function create() {
 
     // Fetch news data and generate AI responses
     const personas = await generatePersonas(setting);
-    const newsData = await fetchNews();
+    const newsData = await fetchNews(personas);
 
 
     this.npcs.children.iterate((npc, index) => {
@@ -183,7 +183,7 @@ async function connectToDb() {
 
         // Limit to 5 articles
         const structuredNews = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 5));
-        await generateAIResponses(structuredNews);
+        await generateAIResponses(structuredNews, personas);
         loadingMessage.style.display = 'none';
         newsContainer.style.display = 'block';
     } catch (error) {
@@ -194,7 +194,7 @@ async function connectToDb() {
     }
 }
 
-async function fetchNews() {
+async function fetchNews(personas) {
     const loadingMessage = document.getElementById('loading');
     const newsContainer = document.getElementById('news');
 
@@ -229,7 +229,7 @@ async function fetchNews() {
 
         // Limit to 5 articles
         const structuredNews = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 5));
-        let generatedAIResponses = await generateAIResponses(structuredNews);
+        let generatedAIResponses = await generateAIResponses(structuredNews, personas);
         loadingMessage.style.display = 'none';
         newsContainer.style.display = 'block';
         return generatedAIResponses;
