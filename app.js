@@ -1,6 +1,8 @@
 let health = 100;
 let healthText;
 let target = null;
+let newsData = []; // Global variable to store news articles
+let setting = ''; // Global variable to store the game setting
 
 class ExplorationScene extends Phaser.Scene {
     constructor() {
@@ -16,7 +18,7 @@ class ExplorationScene extends Phaser.Scene {
 
     async create() {
         console.log('create...');
-        let setting = prompt("Enter a setting for the game (e.g., Medieval, Futuristic, etc.):");
+        setting = prompt("Enter a setting for the game (e.g., Medieval, Futuristic, etc.):");
 
         // Create player
         this.player = this.physics.add.sprite(400, 300, 'player');
@@ -68,7 +70,7 @@ class ExplorationScene extends Phaser.Scene {
         // Fetch news data and generate AI responses
         const personas = await generatePersonas(setting);
         console.log('create... personas: ', personas);
-        const newsData = await fetchNews(personas, setting);
+        newsData = await fetchNews(personas, setting); // Store fetched news data globally
         console.log('create... newsData: ', newsData);
 
         this.npcs.children.iterate((npc, index) => {
@@ -86,14 +88,11 @@ class ExplorationScene extends Phaser.Scene {
                 alert(`${npc.persona}: ${npc.response}`);
             });
         });
+    }
 
-        // Periodically spawn more enemies
-        // this.time.addEvent({
-        //     delay: 5000, // Spawn every 5 seconds
-        //     callback: () => spawnEnemies(this),
-        //     callbackScope: this,
-        //     loop: true
-        // });
+    startBattle(player, enemy) {
+        // Transition to the battle scene, passing necessary data
+        this.scene.start('BattleScene', { player: player, enemy: enemy });
     }
 
     update() {
@@ -121,10 +120,6 @@ class ExplorationScene extends Phaser.Scene {
         });
     }
 
-    startBattle(player, enemy) {
-        // Transition to the battle scene, passing necessary data
-        this.scene.start('BattleScene', { player: player, enemy: enemy });
-    }
 }
 
 // Additional functions for handling damage and other game logic
@@ -149,7 +144,7 @@ class BattleScene extends Phaser.Scene {
         // Load assets for the battle scene
     }
 
-    create(data) {
+    async create(data) {
         this.player = data.player;
         this.enemy = data.enemy;
 
@@ -157,19 +152,32 @@ class BattleScene extends Phaser.Scene {
         this.player = { name: 'Player', health: 100, speed: 5, sprite: null, actions: ['Attack', 'Defend'] };
         this.enemy = { name: 'Enemy', health: 100, speed: 3, sprite: null, actions: ['Attack'] };
 
-        // Display player and enemy sprites
-        this.player.sprite = this.add.sprite(100, 300, 'player');
-        this.enemy.sprite = this.add.sprite(500, 300, 'enemy');
+        // Generate enemy image based on news article and setting
+        if (newsData.length > 0) {
+            const newsArticle = newsData[0]; // Use the first article for the enemy
+            const enemyImageUrl = await generateEnemyImage(newsArticle, setting);
+            if (enemyImageUrl) {
+                this.load.image('generatedEnemy', enemyImageUrl);
+                this.load.once('complete', () => {
+                    // Display player and enemy sprites
+                    this.player.sprite = this.add.sprite(100, 300, 'player');
+                    this.enemy.sprite = this.add.sprite(500, 300, 'generatedEnemy');
 
-        // Initialize turn order and current turn index
-        this.turnOrder = this.calculateTurnOrder();
-        this.currentTurnIndex = 0;
+                    // Initialize turn order and current turn index
+                    this.turnOrder = this.calculateTurnOrder();
+                    this.currentTurnIndex = 0;
 
-        // Cooldown flag
-        this.isCooldown = false;
+                    // Cooldown flag
+                    this.isCooldown = false;
 
-        // Display UI elements
-        this.createUI();
+                    // Display UI elements
+                    this.createUI();
+                });
+                this.load.start();
+            } else {
+                console.error('Failed to generate enemy image');
+            }
+        }
     }
 
     update() {
@@ -278,11 +286,12 @@ class BattleScene extends Phaser.Scene {
     startCooldown() {
         this.isCooldown = true;
 
-        
+        // Update turn order display immediately
+        this.updateTurnOrderDisplay();
+
         // Set a timer for the cooldown period (e.g., 2 seconds)
-        this.time.delayedCall(1000, () => {
+        this.time.delayedCall(2000, () => {
             this.isCooldown = false;
-            // Move to the next turn at the end of cooldown
             this.nextTurn();
         }, [], this);
     }
@@ -292,11 +301,8 @@ class BattleScene extends Phaser.Scene {
         if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
             this.enemyAction();
         } else {
-            // Player's turn, UI will already be updated during cooldown
+            this.updateTurnOrderDisplay();
         }
-        // Update turn order display immediately
-        this.updateTurnOrderDisplay();
-
     }
 
     playAttackAnimation(attacker, defender) {
@@ -311,6 +317,35 @@ class BattleScene extends Phaser.Scene {
                 // Optionally, add a hit effect or sound here
             }
         });
+    }
+}
+
+async function generateEnemyImage(newsArticle, setting) {
+    const prompt = `Generate an image of an enemy based on the following news article and setting:\n\nTitle: ${newsArticle.title}\nDescription: ${newsArticle.description}\nSetting: ${setting}`;
+    const encodedPrompt = encodeURIComponent(prompt);
+
+    try {
+        const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodedPrompt}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: prompt, generateImage: true })
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        if (data && data.data && data.data.length > 0) {
+            return data.data[0].url;
+        } else {
+            throw new Error('No image generated');
+        }
+    } catch (error) {
+        console.error('Error generating enemy image:', error);
+        return null;
     }
 }
 
@@ -338,6 +373,7 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+
 async function connectToDb() {
     try {
         const apiUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
