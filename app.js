@@ -3,6 +3,7 @@ let healthText;
 let target = null;
 let newsData = []; // Global variable to store news articles
 let setting = ''; // Global variable to store the game setting
+let enemySpriteUrl = '';
 
 class ExplorationScene extends Phaser.Scene {
     constructor() {
@@ -100,6 +101,13 @@ class ExplorationScene extends Phaser.Scene {
             this.enemies.children.iterate((enemy) => {
                 this.physics.moveToObject(enemy, this.player, 50);
             });
+
+            // Prevent enemies from sliding after being pushed
+            this.enemies.children.iterate((enemy) => {
+                if (enemy.body.speed > 0) {
+                    enemy.body.setVelocity(0, 0);
+                }
+            });
         }
 
         // Prevent NPCs from sliding after being pushed
@@ -109,12 +117,6 @@ class ExplorationScene extends Phaser.Scene {
             }
         });
 
-        // Prevent enemies from sliding after being pushed
-        this.enemies.children.iterate((enemy) => {
-            if (enemy.body.speed > 0) {
-                enemy.body.setVelocity(0, 0);
-            }
-        });
     }
 
 }
@@ -140,6 +142,7 @@ class BattleScene extends Phaser.Scene {
     preload() {
         game.load.baseURL = 'https://allenjonesing.github.io/';
         game.load.crossOrigin = 'anonymous';
+        this.load.image('generatedEnemy', enemySpriteUrl);
     }
 
     async create(data) {
@@ -623,6 +626,7 @@ function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
         imageElement.src = imageUrl;
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
+        enemySpriteUrl = imageUrl;
     }
 
     const personaElement = document.createElement('p');
