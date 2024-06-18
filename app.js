@@ -1,3 +1,7 @@
+let health = 100;
+let healthText;
+let target = null;
+
 class ExplorationScene extends Phaser.Scene {
     constructor() {
         super({ key: 'ExplorationScene' });
