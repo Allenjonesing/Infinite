@@ -699,10 +699,13 @@ function parsePersonas(content) {
 }
 
 function toDataUrl(url, callback) {
+    console.log('toDataUrl...');
     var xhr = new XMLHttpRequest();
     xhr.onload = function() {
+        console.log('onload...');
         var reader = new FileReader();
         reader.onloadend = function() {
+            console.log('onloadend...');
             callback(reader.result);
         }
         reader.readAsDataURL(xhr.response);
@@ -710,4 +713,5 @@ function toDataUrl(url, callback) {
     xhr.open('GET', url);
     xhr.responseType = 'blob';
     xhr.send();
+    console.log('toDataUrl Complete...');
 }
