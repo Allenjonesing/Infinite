@@ -214,12 +214,13 @@ class BattleScene extends Phaser.Scene {
         ];
 
         let turnOrder = [];
-        let currentTime = 0;
+        let currentTime = [0, 0]; // Initialize current times for both participants
 
         for (let i = 0; i < 10; i++) {
-            participants.sort((a, b) => (currentTime + 1) / a.speed - (currentTime + 1) / b.speed);
-            turnOrder.push(participants[0]);
-            currentTime += 1 / participants[0].speed;
+            // Determine whose turn is next based on speed and elapsed time
+            let nextTurnIndex = currentTime[0] / participants[0].speed <= currentTime[1] / participants[1].speed ? 0 : 1;
+            turnOrder.push(participants[nextTurnIndex]);
+            currentTime[nextTurnIndex] += 1; // Increment the chosen participant's elapsed time
         }
 
         return turnOrder;
