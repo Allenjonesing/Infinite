@@ -185,18 +185,18 @@ class BattleScene extends Phaser.Scene {
             this.endBattle('win');
         }
     }
-    
+
     endBattle(result) {
         if (result === 'win') {
             // Handle victory logic
         } else {
             // Handle defeat logic
         }
-    
+
         // Return to the exploration scene
         this.scene.start('ExplorationScene', { player: this.player });
     }
-    
+
     createUI() {
         // Display health bars and actions
         this.playerHealthText = this.add.text(50, 50, `Health: ${this.player.health}`, { fontSize: '20px', fill: '#fff' });
@@ -210,12 +210,30 @@ class BattleScene extends Phaser.Scene {
             actionText.on('pointerdown', () => this.handlePlayerAction(this.player.actions[i]));
             this.actions.add(actionText);
         }
+
+        // Display turn order list
+        this.turnOrderText = this.add.text(600, 50, 'Turn Order:', { fontSize: '20px', fill: '#fff' });
+        this.updateTurnOrderDisplay();
     }
 
     calculateTurnOrder() {
         // Determine the turn order based on speed
         let participants = [this.player, this.enemy];
         return participants.sort((a, b) => b.speed - a.speed);
+    }
+
+    updateTurnOrderDisplay() {
+        // Clear previous turn order text
+        if (this.turnOrderList) {
+            this.turnOrderList.destroy();
+        }
+
+        // Create new turn order text
+        let orderText = '';
+        for (let i = 0; i < this.turnOrder.length; i++) {
+            orderText += `${this.turnOrder[i].name}\n`;
+        }
+        this.turnOrderList = this.add.text(600, 80, orderText, { fontSize: '20px', fill: '#fff' });
     }
 
     handlePlayerAction(action) {
@@ -243,6 +261,7 @@ class BattleScene extends Phaser.Scene {
         if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
             this.enemyAction();
         }
+        this.updateTurnOrderDisplay();
     }
 }
 
