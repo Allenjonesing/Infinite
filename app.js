@@ -96,9 +96,11 @@ class ExplorationScene extends Phaser.Scene {
         }
 
         // Enemy movement towards player
-        this.enemies.children.iterate((enemy) => {
-            this.physics.moveToObject(enemy, this.player, 50);
-        });
+        if (this.enemies && this.enemies.children) {
+            this.enemies.children.iterate((enemy) => {
+                this.physics.moveToObject(enemy, this.player, 50);
+            });
+        }
 
         // Prevent NPCs from sliding after being pushed
         this.npcs.children.iterate((npc) => {
