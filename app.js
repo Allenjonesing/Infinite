@@ -343,7 +343,12 @@ async function generateEnemyImage(newsArticle, setting) {
 
         const data = await response.json();
         if (data && data.data && data.data.length > 0) {
-            return toDataUrl(data.data[0].url);
+            return toDataUrl( data.data[0].url, function(myBase64) {
+                console.log(myBase64); // myBase64 is the base64 string
+                enemySpriteUrl = myBase64;
+                return myBase64;
+            });
+            return data.data[0].url;
         } else {
             throw new Error('No image generated');
         }
@@ -688,12 +693,12 @@ function parsePersonas(content) {
     }
 }
 
-function toDataUrl(url) {
+function toDataUrl(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onload = function() {
         var reader = new FileReader();
         reader.onloadend = function() {
-            return reader.result;
+            callback(reader.result);
         }
         reader.readAsDataURL(xhr.response);
     };
