@@ -229,30 +229,6 @@ class BattleScene extends Phaser.Scene {
         return turnOrder;
     }
 
-    updateTurnOrderDisplay() {
-        // Clear previous turn order text
-        if (this.turnOrderList) {
-            this.turnOrderList.destroy();
-        }
-
-        // Create new turn order text
-        let orderText = '';
-        for (let i = 0; i < 10; i++) {
-            orderText += `${this.turnOrder[(this.currentTurnIndex + i) % this.turnOrder.length].name}\n`;
-        }
-
-        this.turnOrderList = this.add.text(600, 80, orderText, { fontSize: '20px', fill: '#fff' });
-
-        // Add a fade-in effect for the turn order text
-        this.turnOrderList.alpha = 0;
-        this.tweens.add({
-            targets: this.turnOrderList,
-            alpha: 1,
-            duration: 500,
-            ease: 'Power1'
-        });
-    }
-
     handlePlayerAction(action) {
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
             if (action === 'Attack') {
@@ -275,11 +251,35 @@ class BattleScene extends Phaser.Scene {
         }
     }
 
+    updateTurnOrderDisplay() {
+        // Clear previous turn order text
+        if (this.turnOrderList) {
+            this.turnOrderList.destroy();
+        }    
+
+        // Create new turn order text
+        let orderText = '';
+        for (let i = 0; i < 10; i++) {
+            orderText += `${this.turnOrder[(this.currentTurnIndex + i) % this.turnOrder.length].name}\n`;
+        }    
+
+        this.turnOrderList = this.add.text(600, 80, orderText, { fontSize: '20px', fill: '#fff' });
+
+        // Add a fade-in effect for the turn order text
+        this.turnOrderList.alpha = 0;
+        this.tweens.add({
+            targets: this.turnOrderList,
+            alpha: 1,
+            duration: 500,
+            ease: 'Power1'
+        });    
+    }    
+
     startCooldown() {
         this.isCooldown = true;
 
         // Update turn order display immediately
-        this.updateTurnOrderDisplay();
+        //this.updateTurnOrderDisplay();
         
         // Set a timer for the cooldown period (e.g., 2 seconds)
         this.time.delayedCall(2000, () => {
