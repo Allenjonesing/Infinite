@@ -343,7 +343,7 @@ async function generateEnemyImage(newsArticle, setting) {
 
         const data = await response.json();
         if (data && data.data && data.data.length > 0) {
-            return data.data[0].url;
+            return toDataUrl(data.data[0].url);
         } else {
             throw new Error('No image generated');
         }
@@ -686,4 +686,18 @@ function parsePersonas(content) {
         console.error('Error parsing personas:', error);
         return [];
     }
+}
+
+function toDataUrl(url) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+        var reader = new FileReader();
+        reader.onloadend = function() {
+            return reader.result;
+        }
+        reader.readAsDataURL(xhr.response);
+    };
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+    xhr.send();
 }
