@@ -1,19 +1,3 @@
-const config = {
-    type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    scene: [ExplorationScene, BattleScene],
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 0 },
-            debug: false
-        }
-    }
-};
-
-const game = new Phaser.Game(config);
-
 class ExplorationScene extends Phaser.Scene {
     constructor() {
         super({ key: 'ExplorationScene' });
@@ -257,6 +241,22 @@ class BattleScene extends Phaser.Scene {
         }
     }
 }
+
+const config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    scene: [ExplorationScene, BattleScene],
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: false
+        }
+    }
+};
+
+const game = new Phaser.Game(config);
 
 async function connectToDb() {
     try {
