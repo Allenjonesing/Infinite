@@ -1,5 +1,4 @@
 let health = 100;
-let health = 100;
 let healthText;
 let target = null;
 let newsData = []; // Global variable to store news articles
