@@ -321,7 +321,7 @@ async function generateAIResponses(newsData, personas, setting) {
                     
                     const imgPrompt = `Generate an image of ${persona.name}, ${persona.description} in the setting chosen: ${setting}.`;
                     console.log('generateAIResponses...  imgPrompt: ', imgPrompt);
-                    const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
+                    const encodedPrompt = encodeURIComponent(imgPrompt); // Encoding the prompt
             
                     try {
                         const imageResponse  = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodedPrompt}`, {
@@ -329,7 +329,7 @@ async function generateAIResponses(newsData, personas, setting) {
                             headers: {
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({ prompt: prompt, generateImage: true  })
+                            body: JSON.stringify({ prompt: imgPrompt, generateImage: true  })
                         })
             
                         if (!imageResponse .ok) {
