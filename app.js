@@ -278,8 +278,6 @@ class BattleScene extends Phaser.Scene {
     startCooldown() {
         this.isCooldown = true;
 
-        // Update turn order display immediately
-        this.updateTurnOrderDisplay();
         
         // Set a timer for the cooldown period (e.g., 2 seconds)
         this.time.delayedCall(2000, () => {
@@ -296,6 +294,9 @@ class BattleScene extends Phaser.Scene {
         } else {
             // Player's turn, UI will already be updated during cooldown
         }
+        // Update turn order display immediately
+        this.updateTurnOrderDisplay();
+
     }
 
     playAttackAnimation(attacker, defender) {
