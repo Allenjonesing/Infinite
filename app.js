@@ -33,6 +33,9 @@ class ExplorationScene extends Phaser.Scene {
             this.npcs.create(x, y, 'npc').setCollideWorldBounds(true);
         }
 
+        // Initialize enemies group
+        this.enemies = this.physics.add.group();
+
         // Create trees
         this.trees = this.physics.add.staticGroup();
         for (let i = 0; i < 10; i++) {
@@ -360,7 +363,7 @@ function spawnEnemies(scene) {
                     for (let i = 0; i < 3; i++) {
                         let x = Phaser.Math.Between(50, 750);
                         let y = Phaser.Math.Between(50, 550);
-                        let enemy = scene.enemies.create(x, y, 'generatedEnemy');
+                        let enemy = scene.enemies.create(x, y, 'generatedEnemy'); // Create enemies using the initialized group
                         enemy.setCollideWorldBounds(true);
                     }
                     // Add enemy collisions
