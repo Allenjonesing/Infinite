@@ -316,8 +316,44 @@ async function generateAIResponses(newsData, personas, setting) {
                 && aiResponse.choices[0].message
                 && aiResponse.choices[0].message.content )
                 {
-                    responses.push({ response: aiResponse.choices[0].message.content, persona: persona });
-                    displayAIResponse(news.title, aiResponse.choices[0].message.content, persona);
+                    const textContent = aiResponse.choices[0].message.content;
+                    //responses.push({ response: aiResponse.choices[0].message.content, persona: persona });
+                    
+                    const imgPrompt = `Generate an image of ${persona.name}, ${persona.description} in the setting chosen: ${setting}.`;
+                    console.log('generateAIResponses...  imgPrompt: ', imgPrompt);
+                    const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
+            
+                    try {
+                        const imageResponse  = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodedPrompt}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ prompt: prompt, generateImage: true  })
+                        })
+            
+                        if (!imageResponse .ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        
+                        const imageAIResponse = await imageResponse.json(); // This converts the response body to JSON
+                        
+                        if (imageAIResponse 
+                            && imageAIResponse.data 
+                            && imageAIResponse.data.length 
+                            && imageAIResponse.data[0] 
+                            && imageAIResponse.data[0].url) 
+                            {
+                                const imageUrl = imageAIResponse.data[0].url;
+                                responses.push({ response: textContent, persona: persona, imageUrl: imageUrl });
+                                displayAIResponse(news.title, textContent, persona, imageUrl);
+                            }
+                    } catch (error) {
+                        console.error('Error generating AI response:', error);
+                        newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
+                    }
+            
+                    //displayAIResponse(news.title, aiResponse.choices[0].message.content, persona);
                 }
         } catch (error) {
             console.error('Error generating AI response:', error);
@@ -331,14 +367,29 @@ async function generateAIResponses(newsData, personas, setting) {
 
 function displayAIResponse(newsTitle, aiResponse, persona) {
     const newsContainer = document.getElementById('news');
-        newsContainer.innerHTML += `
-        <div class="news-article">
-            <h3>${newsTitle}</h3>
-            <div class="ai-response">
-                <p><strong>${persona.name}, ${persona.description}:</strong> ${aiResponse}</p>
-            </div>
-        </div>
-        `;
+    const newsItem = document.createElement('div');
+    newsItem.className = 'news-item';
+
+    const newsTitle = document.createElement('h2');
+    newsTitle.textContent = title;
+    newsItem.appendChild(newsTitle);
+
+    const newsContent = document.createElement('p');
+    newsContent.textContent = content;
+    newsItem.appendChild(newsContent);
+
+    if (imageUrl) {
+        const imageElement = document.createElement('img');
+        imageElement.src = imageUrl;
+        imageElement.alt = 'Generated image';
+        newsItem.appendChild(imageElement);
+    }
+
+    const newsPersona = document.createElement('p');
+    newsPersona.textContent = `Persona: ${persona.name}`;
+    newsItem.appendChild(newsPersona);
+
+    newsContainer.appendChild(newsItem);
 }
 
 function spawnEnemies(scene) {
