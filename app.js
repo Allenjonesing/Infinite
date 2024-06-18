@@ -2,144 +2,144 @@ const config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
+    scene: [ExplorationScene, BattleScene],
     physics: {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
             debug: false
         }
-    },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
     }
 };
 
 const game = new Phaser.Game(config);
 
-let health = 100;
-let healthText;
-let target = null;
-let enemies;
-
-function preload() {
-    this.load.image('player', 'assets/player.png');
-    this.load.image('tree', 'assets/tree.png');
-    this.load.image('npc', 'assets/npc.png');
-    this.load.image('enemy', 'assets/enemy.png');
-}
-
-async function create() {
-    console.log('create...');
-    let setting = prompt("Enter a setting for the game (e.g., Medieval, Futuristic, etc.):");
-
-    // Create player
-    this.player = this.physics.add.sprite(400, 300, 'player');
-    this.player.setCollideWorldBounds(true);
-
-    // Create NPCs
-    this.npcs = this.physics.add.group({
-        immovable: true
-    });
-    for (let i = 0; i < 5; i++) {
-        let x = Phaser.Math.Between(50, 750);
-        let y = Phaser.Math.Between(50, 550);
-        this.npcs.create(x, y, 'npc').setCollideWorldBounds(true);
+class ExplorationScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'ExplorationScene' });
     }
 
-    // Create enemies
-    enemies = this.physics.add.group();
-    spawnEnemies(this);
-
-    // Create trees
-    this.trees = this.physics.add.staticGroup();
-    for (let i = 0; i < 10; i++) {
-        let x = Phaser.Math.Between(50, 750);
-        let y = Phaser.Math.Between(50, 550);
-        this.trees.create(x, y, 'tree');
+    preload() {
+        this.load.image('player', 'assets/player.png');
+        this.load.image('tree', 'assets/tree.png');
+        this.load.image('npc', 'assets/npc.png');
+        this.load.image('enemy', 'assets/enemy.png');
     }
 
-    // Add collisions
-    this.physics.add.collider(this.player, this.npcs);
-    this.physics.add.collider(this.player, enemies, takeDamage, null, this);
-    this.physics.add.collider(this.player, this.trees);
-    this.physics.add.collider(this.npcs, this.trees);
-    this.physics.add.collider(enemies, this.trees);
-    this.physics.add.collider(this.npcs, enemies);
-    this.physics.add.collider(this.npcs, this.npcs);
-    this.physics.add.collider(enemies, enemies);
+    async create() {
+        console.log('create...');
+        let setting = prompt("Enter a setting for the game (e.g., Medieval, Futuristic, etc.):");
 
-    // Health HUD
-    healthText = this.add.text(16, 16, 'Health: 100', { fontSize: '32px', fill: '#fff' });
+        // Create player
+        this.player = this.physics.add.sprite(400, 300, 'player');
+        this.player.setCollideWorldBounds(true);
 
-    // Input handling
-    this.input.on('pointerdown', (pointer) => {
-        target = { x: pointer.x, y: pointer.y };
-    });
+        // Create NPCs
+        this.npcs = this.physics.add.group({ immovable: true });
+        for (let i = 0; i < 5; i++) {
+            let x = Phaser.Math.Between(50, 750);
+            let y = Phaser.Math.Between(50, 550);
+            this.npcs.create(x, y, 'npc').setCollideWorldBounds(true);
+        }
 
-    this.input.on('pointerup', () => {
-        target = null;
-        this.player.body.setVelocity(0, 0);
-    });
+        // Create enemies
+        this.enemies = this.physics.add.group();
+        spawnEnemies(this);
 
-    // Fetch news data and generate AI responses
-    const personas = await generatePersonas(setting);
-    console.log('create... personas: ', personas);
-    const newsData = await fetchNews(personas, setting);
-    console.log('create... newsData: ', newsData);
+        // Create trees
+        this.trees = this.physics.add.staticGroup();
+        for (let i = 0; i < 10; i++) {
+            let x = Phaser.Math.Between(50, 750);
+            let y = Phaser.Math.Between(50, 550);
+            this.trees.create(x, y, 'tree');
+        }
 
+        // Add collisions
+        this.physics.add.collider(this.player, this.npcs);
+        this.physics.add.collider(this.player, this.enemies, this.startBattle, null, this);
+        this.physics.add.collider(this.player, this.trees);
+        this.physics.add.collider(this.npcs, this.trees);
+        this.physics.add.collider(this.enemies, this.trees);
+        this.physics.add.collider(this.npcs, this.enemies);
+        this.physics.add.collider(this.npcs, this.npcs);
+        this.physics.add.collider(this.enemies, this.enemies);
 
-    this.npcs.children.iterate((npc, index) => {
-        let persona = personas[index % personas.length]; // Cycle through personas
-        npc.persona = persona;
-        // Assign news articles to NPCs
-        let newsIndex = index % newsData.length;
-        npc.newsText = newsData[newsIndex].description; // or use AI response
-    });
+        // Health HUD
+        healthText = this.add.text(16, 16, 'Health: 100', { fontSize: '32px', fill: '#fff' });
 
-    // Enable NPC interaction
-    this.npcs.children.iterate((npc) => {
-        npc.setInteractive();
-        npc.on('pointerdown', () => {
-            alert(`${npc.persona}: ${npc.response}`);
+        // Input handling
+        this.input.on('pointerdown', (pointer) => {
+            target = { x: pointer.x, y: pointer.y };
         });
-    });
 
-    // Periodically spawn more enemies
-    // this.time.addEvent({
-    //     delay: 5000, // Spawn every 5 seconds
-    //     callback: () => spawnEnemies(this),
-    //     callbackScope: this,
-    //     loop: true
-    // });
-}
+        this.input.on('pointerup', () => {
+            target = null;
+            this.player.body.setVelocity(0, 0);
+        });
 
-function update() {
-    if (target) {
-        this.physics.moveTo(this.player, target.x, target.y, 100);
+        // Fetch news data and generate AI responses
+        const personas = await generatePersonas(setting);
+        console.log('create... personas: ', personas);
+        const newsData = await fetchNews(personas, setting);
+        console.log('create... newsData: ', newsData);
+
+        this.npcs.children.iterate((npc, index) => {
+            let persona = personas[index % personas.length]; // Cycle through personas
+            npc.persona = persona;
+            // Assign news articles to NPCs
+            let newsIndex = index % newsData.length;
+            npc.newsText = newsData[newsIndex].description; // or use AI response
+        });
+
+        // Enable NPC interaction
+        this.npcs.children.iterate((npc) => {
+            npc.setInteractive();
+            npc.on('pointerdown', () => {
+                alert(`${npc.persona}: ${npc.response}`);
+            });
+        });
+
+        // Periodically spawn more enemies
+        // this.time.addEvent({
+        //     delay: 5000, // Spawn every 5 seconds
+        //     callback: () => spawnEnemies(this),
+        //     callbackScope: this,
+        //     loop: true
+        // });
     }
 
-    // Enemy movement towards player
-    enemies.children.iterate((enemy) => {
-        this.physics.moveToObject(enemy, this.player, 50);
-    });
-
-    // Prevent NPCs from sliding after being pushed
-    this.npcs.children.iterate((npc) => {
-        if (npc.body.speed > 0) {
-            npc.body.setVelocity(0, 0);
+    update() {
+        if (target) {
+            this.physics.moveTo(this.player, target.x, target.y, 100);
         }
-    });
 
-    // Prevent enemies from sliding after being pushed
-    enemies.children.iterate((enemy) => {
-        if (enemy.body.speed > 0) {
-            enemy.body.setVelocity(0, 0);
-        }
-    });
+        // Enemy movement towards player
+        this.enemies.children.iterate((enemy) => {
+            this.physics.moveToObject(enemy, this.player, 50);
+        });
+
+        // Prevent NPCs from sliding after being pushed
+        this.npcs.children.iterate((npc) => {
+            if (npc.body.speed > 0) {
+                npc.body.setVelocity(0, 0);
+            }
+        });
+
+        // Prevent enemies from sliding after being pushed
+        this.enemies.children.iterate((enemy) => {
+            if (enemy.body.speed > 0) {
+                enemy.body.setVelocity(0, 0);
+            }
+        });
+    }
+
+    startBattle(player, enemy) {
+        // Transition to the battle scene, passing necessary data
+        this.scene.start('BattleScene', { player: player, enemy: enemy });
+    }
 }
 
+// Additional functions for handling damage and other game logic
 function takeDamage(player, enemy) {
     health -= 0.1; // Reduce health gradually
     healthText.setText('Health: ' + Math.max(Math.round(health), 0));
@@ -149,6 +149,112 @@ function takeDamage(player, enemy) {
         this.physics.pause();
         player.setTint(0xff0000);
         healthText.setText('Health: 0');
+    }
+}
+
+function spawnEnemies(scene) {
+    for (let i = 0; i < 3; i++) {
+        let x = Phaser.Math.Between(50, 750);
+        let y = Phaser.Math.Between(50, 550);
+        let enemy = scene.enemies.create(x, y, 'enemy');
+        enemy.setCollideWorldBounds(true);
+    }
+}
+
+class BattleScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'BattleScene' });
+    }
+
+    preload() {
+        // Load assets for the battle scene
+    }
+
+    create(data) {
+        this.player = data.player;
+        this.enemy = data.enemy;
+
+        // Initialize player and enemy data
+        this.player = { name: 'Player', health: 100, speed: 5, sprite: null, actions: ['Attack', 'Defend'] };
+        this.enemy = { name: 'Enemy', health: 100, speed: 3, sprite: null, actions: ['Attack'] };
+
+        // Display player and enemy sprites
+        this.player.sprite = this.add.sprite(100, 300, 'player');
+        this.enemy.sprite = this.add.sprite(500, 300, 'enemy');
+
+        // Initialize turn order and current turn index
+        this.turnOrder = this.calculateTurnOrder();
+        this.currentTurnIndex = 0;
+
+        // Display UI elements
+        this.createUI();
+    }
+
+    update() {
+        if (this.player.health <= 0) {
+            this.endBattle('lose');
+        } else if (this.enemy.health <= 0) {
+            this.endBattle('win');
+        }
+    }
+    
+    endBattle(result) {
+        if (result === 'win') {
+            // Handle victory logic
+        } else {
+            // Handle defeat logic
+        }
+    
+        // Return to the exploration scene
+        this.scene.start('ExplorationScene', { player: this.player });
+    }
+    
+    createUI() {
+        // Display health bars and actions
+        this.playerHealthText = this.add.text(50, 50, `Health: ${this.player.health}`, { fontSize: '20px', fill: '#fff' });
+        this.enemyHealthText = this.add.text(450, 50, `Health: ${this.enemy.health}`, { fontSize: '20px', fill: '#fff' });
+
+        // Display action buttons for the player
+        this.actions = this.add.group();
+        for (let i = 0; i < this.player.actions.length; i++) {
+            let actionText = this.add.text(50, 100 + i * 30, this.player.actions[i], { fontSize: '20px', fill: '#fff' });
+            actionText.setInteractive();
+            actionText.on('pointerdown', () => this.handlePlayerAction(this.player.actions[i]));
+            this.actions.add(actionText);
+        }
+    }
+
+    calculateTurnOrder() {
+        // Determine the turn order based on speed
+        let participants = [this.player, this.enemy];
+        return participants.sort((a, b) => b.speed - a.speed);
+    }
+
+    handlePlayerAction(action) {
+        if (this.turnOrder[this.currentTurnIndex].name === 'Player') {
+            if (action === 'Attack') {
+                this.enemy.health -= 10;
+                this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
+            } else if (action === 'Defend') {
+                // Implement defend logic
+            }
+            this.nextTurn();
+        }
+    }
+
+    enemyAction() {
+        if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
+            this.player.health -= 10;
+            this.playerHealthText.setText(`Health: ${this.player.health}`);
+            this.nextTurn();
+        }
+    }
+
+    nextTurn() {
+        this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
+        if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
+            this.enemyAction();
+        }
     }
 }
 
@@ -391,14 +497,6 @@ function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
 
     newsContainer.appendChild(newsItem);
 }
-function spawnEnemies(scene) {
-    for (let i = 0; i < 3; i++) {
-        let x = Phaser.Math.Between(50, 750);
-        let y = Phaser.Math.Between(50, 550);
-        let enemy = enemies.create(x, y, 'enemy');
-        enemy.setCollideWorldBounds(true);
-    }
-}
 
 async function generatePersonas(setting) {
     console.log('generatePersonas... setting: ', setting);
@@ -448,4 +546,3 @@ function parsePersonas(content) {
         return [];
     }
 }
-    
