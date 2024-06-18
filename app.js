@@ -339,7 +339,11 @@ async function generateEnemyImage(newsArticle, setting) {
 
         const data = await response.json();
         if (data && data.data && data.data.length > 0) {
-            return data.data[0].url;
+            const imageUrl = data.data[0].url;
+
+            // Use a CORS proxy to fetch the image
+            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+            return proxyUrl + imageUrl;
         } else {
             throw new Error('No image generated');
         }
