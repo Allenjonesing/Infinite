@@ -143,8 +143,8 @@ class BattleScene extends Phaser.Scene {
     }
 
     preload() {
-        game.load.baseURL = 'https://allenjonesing.github.io/';
-        game.load.crossOrigin = 'anonymous';
+        this.load.baseURL = 'https://allenjonesing.github.io/';
+        this.load.crossOrigin = 'anonymous';
         this.load.image('generatedEnemy', enemySpriteUrl);
     }
 
