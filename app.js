@@ -248,7 +248,7 @@ class BattleScene extends Phaser.Scene {
         this.tweens.add({
             targets: this.turnOrderList,
             alpha: 1,
-            duration: 500,
+            duration: 1000,
             ease: 'Power1'
         });
     }
@@ -280,7 +280,7 @@ class BattleScene extends Phaser.Scene {
 
         
         // Set a timer for the cooldown period (e.g., 2 seconds)
-        this.time.delayedCall(2000, () => {
+        this.time.delayedCall(1000, () => {
             this.isCooldown = false;
             // Move to the next turn at the end of cooldown
             this.nextTurn();
