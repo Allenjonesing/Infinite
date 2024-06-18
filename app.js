@@ -346,6 +346,7 @@ async function generateEnemyImage(newsArticle, setting) {
         const data = await response.json();
         if (data && data.data && data.data.length > 0) {
             console.log('data.data[0].url: ', data.data[0].url);
+            return await imageUrlToBase64(data.data[0].url).then(console.log)
             return toDataUrl( data.data[0].url, function(myBase64) {
                 console.log(myBase64); // myBase64 is the base64 string
                 enemySpriteUrl = myBase64;
@@ -715,3 +716,21 @@ function toDataUrl(url, callback) {
     xhr.send();
     console.log('toDataUrl Complete...');
 }
+
+async function imageUrlToBase64(url) {
+    console.log('imageUrlToBase64... url: ', url);
+    const data = await fetch(url);
+    const blob = await data.blob();
+    return new Promise((resolve, reject) => {
+        console.log('Promise...');
+        const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = () => {
+        console.log('onloadend... reader.result: ', reader.result);
+        const base64data = reader.result;
+        resolve(base64data);
+      };
+      reader.onerror = reject;
+    });
+  };
+  
