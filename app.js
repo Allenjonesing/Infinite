@@ -140,15 +140,6 @@ function takeDamage(player, enemy) {
     }
 }
 
-function spawnEnemies(scene) {
-    for (let i = 0; i < 3; i++) {
-        let x = Phaser.Math.Between(50, 750);
-        let y = Phaser.Math.Between(50, 550);
-        let enemy = scene.enemies.create(x, y, 'enemy');
-        enemy.setCollideWorldBounds(true);
-    }
-}
-
 class BattleScene extends Phaser.Scene {
     constructor() {
         super({ key: 'BattleScene' });
@@ -217,9 +208,21 @@ class BattleScene extends Phaser.Scene {
     }
 
     calculateTurnOrder() {
-        // Determine the turn order based on speed
-        let participants = [this.player, this.enemy];
-        return participants.sort((a, b) => b.speed - a.speed);
+        let participants = [
+            { name: 'Player', speed: this.player.speed, sprite: this.player.sprite },
+            { name: 'Enemy', speed: this.enemy.speed, sprite: this.enemy.sprite }
+        ];
+
+        let turnOrder = [];
+        let currentTime = 0;
+
+        for (let i = 0; i < 10; i++) {
+            participants.sort((a, b) => (currentTime + 1) / a.speed - (currentTime + 1) / b.speed);
+            turnOrder.push(participants[0]);
+            currentTime += 1 / participants[0].speed;
+        }
+
+        return turnOrder;
     }
 
     updateTurnOrderDisplay() {
@@ -230,12 +233,8 @@ class BattleScene extends Phaser.Scene {
 
         // Create new turn order text
         let orderText = '';
-        let tempTurnOrder = [...this.turnOrder];
-        let index = this.currentTurnIndex;
-
         for (let i = 0; i < 10; i++) {
-            orderText += `${tempTurnOrder[index].name}\n`;
-            index = (index + 1) % tempTurnOrder.length;
+            orderText += `${this.turnOrder[i].name}\n`;
         }
 
         this.turnOrderList = this.add.text(600, 80, orderText, { fontSize: '20px', fill: '#fff' });
@@ -246,6 +245,7 @@ class BattleScene extends Phaser.Scene {
             if (action === 'Attack') {
                 this.enemy.health -= 10;
                 this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
+                this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
             } else if (action === 'Defend') {
                 // Implement defend logic
             }
@@ -257,6 +257,7 @@ class BattleScene extends Phaser.Scene {
         if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
             this.player.health -= 10;
             this.playerHealthText.setText(`Health: ${this.player.health}`);
+            this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
             this.nextTurn();
         }
     }
@@ -267,6 +268,29 @@ class BattleScene extends Phaser.Scene {
             this.enemyAction();
         }
         this.updateTurnOrderDisplay();
+    }
+
+    playAttackAnimation(attacker, defender) {
+        // Simple attack animation: move attacker sprite towards defender and back
+        this.tweens.add({
+            targets: attacker,
+            x: defender.x - 50,
+            duration: 300,
+            yoyo: true,
+            ease: 'Power1',
+            onComplete: () => {
+                // Optionally, add a hit effect or sound here
+            }
+        });
+    }
+}
+
+function spawnEnemies(scene) {
+    for (let i = 0; i < 3; i++) {
+        let x = Phaser.Math.Between(50, 750);
+        let y = Phaser.Math.Between(50, 550);
+        let enemy = scene.enemies.create(x, y, 'enemy');
+        enemy.setCollideWorldBounds(true);
     }
 }
 
