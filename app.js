@@ -160,6 +160,7 @@ class BattleScene extends Phaser.Scene {
         if (newsData.length > 0) {
             const newsArticle = newsData[0]; // Use the first article for the enemy
             const enemyImageUrl = await generateEnemyImage(newsArticle, setting);
+            console.log('enemyImageUrl: ', enemyImageUrl);
             if (enemyImageUrl) {
                 this.load.image('generatedEnemy', enemyImageUrl);
                 this.load.once('complete', () => {
@@ -325,6 +326,7 @@ class BattleScene extends Phaser.Scene {
 }
 
 async function generateEnemyImage(newsArticle, setting) {
+    console.log('generateEnemyImage... newsArticle: ', newsArticle);
     const prompt = `Generate an image of an enemy based on the following news article and setting:\n\nTitle: ${newsArticle.title}\nDescription: ${newsArticle.description}\nSetting: ${setting}`;
     const encodedPrompt = encodeURIComponent(prompt);
 
@@ -343,6 +345,7 @@ async function generateEnemyImage(newsArticle, setting) {
 
         const data = await response.json();
         if (data && data.data && data.data.length > 0) {
+            console.log('data.data[0].url: ', data.data[0].url);
             return toDataUrl( data.data[0].url, function(myBase64) {
                 console.log(myBase64); // myBase64 is the base64 string
                 enemySpriteUrl = myBase64;
@@ -359,9 +362,11 @@ async function generateEnemyImage(newsArticle, setting) {
 }
 
 function spawnEnemies(scene) {
+    console.log('spawnEnemies...');
     if (newsData.length > 0) {
         const newsArticle = newsData[0]; // Use the first article for the enemy
         generateEnemyImage(newsArticle, setting).then(enemyImageUrl => {
+            console.log('enemyImageUrl: ', enemyImageUrl);
             if (enemyImageUrl) {
                 scene.load.image('generatedEnemy', enemyImageUrl);
                 scene.load.once('complete', () => {
