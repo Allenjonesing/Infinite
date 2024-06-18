@@ -138,7 +138,8 @@ class BattleScene extends Phaser.Scene {
     }
 
     preload() {
-        // Enemy image will be dynamically loaded
+        game.load.baseURL = 'https://allenjonesing.github.io/';
+        game.load.crossOrigin = 'anonymous';
     }
 
     async create(data) {
