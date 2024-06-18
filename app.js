@@ -1,4 +1,5 @@
 let health = 100;
+let health = 100;
 let healthText;
 let target = null;
 let newsData = []; // Global variable to store news articles
@@ -13,7 +14,7 @@ class ExplorationScene extends Phaser.Scene {
         this.load.image('player', 'assets/player.png');
         this.load.image('tree', 'assets/tree.png');
         this.load.image('npc', 'assets/npc.png');
-        this.load.image('enemy', 'assets/enemy.png');
+        // Enemy image will be dynamically loaded
     }
 
     async create() {
@@ -32,10 +33,6 @@ class ExplorationScene extends Phaser.Scene {
             this.npcs.create(x, y, 'npc').setCollideWorldBounds(true);
         }
 
-        // Create enemies
-        this.enemies = this.physics.add.group();
-        spawnEnemies(this);
-
         // Create trees
         this.trees = this.physics.add.staticGroup();
         for (let i = 0; i < 10; i++) {
@@ -46,13 +43,9 @@ class ExplorationScene extends Phaser.Scene {
 
         // Add collisions
         this.physics.add.collider(this.player, this.npcs);
-        this.physics.add.collider(this.player, this.enemies, this.startBattle, null, this);
         this.physics.add.collider(this.player, this.trees);
         this.physics.add.collider(this.npcs, this.trees);
-        this.physics.add.collider(this.enemies, this.trees);
-        this.physics.add.collider(this.npcs, this.enemies);
         this.physics.add.collider(this.npcs, this.npcs);
-        this.physics.add.collider(this.enemies, this.enemies);
 
         // Health HUD
         healthText = this.add.text(16, 16, 'Health: 100', { fontSize: '32px', fill: '#fff' });
@@ -88,6 +81,9 @@ class ExplorationScene extends Phaser.Scene {
                 alert(`${npc.persona}: ${npc.response}`);
             });
         });
+
+        // Spawn enemies after data is ready
+        spawnEnemies(this);
     }
 
     startBattle(player, enemy) {
@@ -141,7 +137,7 @@ class BattleScene extends Phaser.Scene {
     }
 
     preload() {
-        // Load assets for the battle scene
+        // Enemy image will be dynamically loaded
     }
 
     async create(data) {
@@ -339,11 +335,7 @@ async function generateEnemyImage(newsArticle, setting) {
 
         const data = await response.json();
         if (data && data.data && data.data.length > 0) {
-            const imageUrl = data.data[0].url;
-
-            // Use a CORS proxy to fetch the image
-            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-            return proxyUrl + imageUrl;
+            return data.data[0].url;
         } else {
             throw new Error('No image generated');
         }
@@ -354,11 +346,31 @@ async function generateEnemyImage(newsArticle, setting) {
 }
 
 function spawnEnemies(scene) {
-    for (let i = 0; i < 3; i++) {
-        let x = Phaser.Math.Between(50, 750);
-        let y = Phaser.Math.Between(50, 550);
-        let enemy = scene.enemies.create(x, y, 'enemy');
-        enemy.setCollideWorldBounds(true);
+    if (newsData.length > 0) {
+        const newsArticle = newsData[0]; // Use the first article for the enemy
+        generateEnemyImage(newsArticle, setting).then(enemyImageUrl => {
+            if (enemyImageUrl) {
+                scene.load.image('generatedEnemy', enemyImageUrl);
+                scene.load.once('complete', () => {
+                    for (let i = 0; i < 3; i++) {
+                        let x = Phaser.Math.Between(50, 750);
+                        let y = Phaser.Math.Between(50, 550);
+                        let enemy = scene.enemies.create(x, y, 'generatedEnemy');
+                        enemy.setCollideWorldBounds(true);
+                    }
+                    // Add enemy collisions
+                    scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
+                    scene.physics.add.collider(scene.enemies, scene.trees);
+                    scene.physics.add.collider(scene.npcs, scene.enemies);
+                    scene.physics.add.collider(scene.enemies, scene.enemies);
+                });
+                scene.load.start();
+            } else {
+                console.error('Failed to generate enemy image');
+            }
+        });
+    } else {
+        console.error('No news data available to generate enemies');
     }
 }
 
