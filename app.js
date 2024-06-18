@@ -248,7 +248,7 @@ class BattleScene extends Phaser.Scene {
         this.tweens.add({
             targets: this.turnOrderList,
             alpha: 1,
-            duration: 1000,
+            duration: 500,
             ease: 'Power1'
         });
     }
