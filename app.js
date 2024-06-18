@@ -234,7 +234,7 @@ class BattleScene extends Phaser.Scene {
         // Create new turn order text
         let orderText = '';
         for (let i = 0; i < 10; i++) {
-            orderText += `${this.turnOrder[i].name}\n`;
+            orderText += `${this.turnOrder[(this.currentTurnIndex + i) % this.turnOrder.length].name}\n`;
         }
 
         this.turnOrderList = this.add.text(600, 80, orderText, { fontSize: '20px', fill: '#fff' });
