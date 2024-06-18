@@ -365,18 +365,18 @@ async function generateAIResponses(newsData, personas, setting) {
     return responses;
 }
 
-function displayAIResponse(newsTitle, aiResponse, persona) {
+function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
     const newsContainer = document.getElementById('news');
     const newsItem = document.createElement('div');
     newsItem.className = 'news-item';
 
-    const newsTitle = document.createElement('h2');
-    newsTitle.textContent = title;
-    newsItem.appendChild(newsTitle);
+    const titleElement = document.createElement('h2');
+    titleElement.textContent = newsTitle;
+    newsItem.appendChild(titleElement);
 
-    const newsContent = document.createElement('p');
-    newsContent.textContent = content;
-    newsItem.appendChild(newsContent);
+    const contentElement = document.createElement('p');
+    contentElement.textContent = aiResponse;
+    newsItem.appendChild(contentElement);
 
     if (imageUrl) {
         const imageElement = document.createElement('img');
@@ -385,13 +385,12 @@ function displayAIResponse(newsTitle, aiResponse, persona) {
         newsItem.appendChild(imageElement);
     }
 
-    const newsPersona = document.createElement('p');
-    newsPersona.textContent = `Persona: ${persona.name}`;
-    newsItem.appendChild(newsPersona);
+    const personaElement = document.createElement('p');
+    personaElement.textContent = `Persona: ${persona.name}`;
+    newsItem.appendChild(personaElement);
 
     newsContainer.appendChild(newsItem);
 }
-
 function spawnEnemies(scene) {
     for (let i = 0; i < 3; i++) {
         let x = Phaser.Math.Between(50, 750);
