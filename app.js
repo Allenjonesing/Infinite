@@ -165,6 +165,9 @@ class BattleScene extends Phaser.Scene {
         this.turnOrder = this.calculateTurnOrder();
         this.currentTurnIndex = 0;
 
+        // Cooldown flag
+        this.isCooldown = false;
+
         // Display UI elements
         this.createUI();
     }
@@ -239,10 +242,19 @@ class BattleScene extends Phaser.Scene {
         }
 
         this.turnOrderList = this.add.text(600, 80, orderText, { fontSize: '20px', fill: '#fff' });
+
+        // Add a fade-in effect for the turn order text
+        this.turnOrderList.alpha = 0;
+        this.tweens.add({
+            targets: this.turnOrderList,
+            alpha: 1,
+            duration: 500,
+            ease: 'Power1'
+        });
     }
 
     handlePlayerAction(action) {
-        if (this.turnOrder[this.currentTurnIndex].name === 'Player') {
+        if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
             if (action === 'Attack') {
                 this.enemy.health -= 10;
                 this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
@@ -250,25 +262,36 @@ class BattleScene extends Phaser.Scene {
             } else if (action === 'Defend') {
                 // Implement defend logic
             }
-            this.nextTurn();
+            this.startCooldown();
         }
     }
 
     enemyAction() {
-        if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
+        if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
             this.player.health -= 10;
             this.playerHealthText.setText(`Health: ${this.player.health}`);
             this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
-            this.nextTurn();
+            this.startCooldown();
         }
+    }
+
+    startCooldown() {
+        this.isCooldown = true;
+
+        // Set a timer for the cooldown period (e.g., 2 seconds)
+        this.time.delayedCall(2000, () => {
+            this.isCooldown = false;
+            this.nextTurn();
+        }, [], this);
     }
 
     nextTurn() {
         this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
         if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
             this.enemyAction();
+        } else {
+            this.updateTurnOrderDisplay();
         }
-        this.updateTurnOrderDisplay();
     }
 
     playAttackAnimation(attacker, defender) {
@@ -310,7 +333,6 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
-
 async function connectToDb() {
     try {
         const apiUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
