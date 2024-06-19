@@ -158,32 +158,30 @@ class BattleScene extends Phaser.Scene {
         this.enemy = { name: 'Enemy', health: 100, speed: 3, sprite: null, actions: ['Attack'] };
 
         // Generate enemy image based on news article and setting
-        // if (newsData.length > 0) {
-        //     const newsArticle = newsData[0]; // Use the first article for the enemy
-        //     const enemyImageUrl = await generateEnemyImage(newsArticle, setting);
-        //     console.log('enemyImageUrl: ', enemyImageUrl);
-        //     if (enemyImageUrl) {
-        //         this.load.image('generatedEnemy', enemyImageUrl);
-                this.load.once('complete', () => {
-                    // Display player and enemy sprites
-                    this.player.sprite = this.add.sprite(100, 300, 'player');
-                    this.enemy.sprite = this.add.sprite(500, 300, 'generatedEnemy');
+        if (newsData.length > 0) {
+            const newsArticle = newsData[0]; // Use the first article for the enemy
+            const enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
+            if (enemyImageBase64) {
+                const imageKey = 'generatedEnemy';
+                this.textures.addBase64(imageKey, enemyImageBase64);
 
-                    // Initialize turn order and current turn index
-                    this.turnOrder = this.calculateTurnOrder();
-                    this.currentTurnIndex = 0;
+                // Display player and enemy sprites
+                this.player.sprite = this.add.sprite(100, 300, 'player');
+                this.enemy.sprite = this.add.sprite(500, 300, imageKey);
 
-                    // Cooldown flag
-                    this.isCooldown = false;
+                // Initialize turn order and current turn index
+                this.turnOrder = this.calculateTurnOrder();
+                this.currentTurnIndex = 0;
 
-                    // Display UI elements
-                    this.createUI();
-                });
-                this.load.start();
-        //     } else {
-        //         console.error('Failed to generate enemy image');
-        //     }
-        // }
+                // Cooldown flag
+                this.isCooldown = false;
+
+                // Display UI elements
+                this.createUI();
+            } else {
+                console.error('Failed to generate enemy image');
+            }
+        }
     }
 
     update() {
@@ -346,14 +344,16 @@ async function generateEnemyImage(newsArticle, setting) {
 
         const data = await response.json();
         if (data && data.data && data.data.length > 0) {
-            console.log('data.data[0].url: ', data.data[0].url);
-            return await imageUrlToBase64(data.data[0].url).then(console.log)
-            return toDataUrl( data.data[0].url, function(myBase64) {
-                console.log(myBase64); // myBase64 is the base64 string
-                enemySpriteUrl = myBase64;
-                return myBase64;
+            console.log('generateEnemyImage... data.data[0].url: ', data.data[0].url);
+            const imageUrl = data.data[0].url;
+            console.log('generateEnemyImage... imageUrl: ', imageUrl);
+            return new Promise((resolve) => {
+                console.log('generateEnemyImage Resolution...');
+                imageToBase64(imageUrl, (base64Image) => {
+                    console.log('generateEnemyImage... Base64 Image:', base64Image); // Log the Base64 string for debugging
+                    resolve(base64Image);
+                });
             });
-            return data.data[0].url;
         } else {
             throw new Error('No image generated');
         }
@@ -364,32 +364,30 @@ async function generateEnemyImage(newsArticle, setting) {
 }
 
 function spawnEnemies(scene) {
-    console.log('spawnEnemies... enemyImageBase64: ', enemyImageBase64);
+    console.log('spawnEnemies... ');
     if (newsData.length > 0) {
         const newsArticle = newsData[0]; // Use the first article for the enemy
-        // generateEnemyImage(newsArticle, setting).then(enemyImageUrl => {
-        //     console.log('enemyImageUrl: ', enemyImageUrl);
-        //     if (enemyImageUrl) {
-        //         scene.load.image('generatedEnemy', enemyImageUrl);
-        const imageKey = 'generatedEnemy';
-        scene.textures.addBase64(imageKey, enemyImageBase64);
-        for (let i = 0; i < 3; i++) {
-            let x = Phaser.Math.Between(50, 750);
-            let y = Phaser.Math.Between(50, 550);
-            let enemy = scene.enemies.create(x, y, imageKey); // Create enemies using the Base64 image
-            console.log('enemy: ', enemy);
-            enemy.setCollideWorldBounds(true);
-        }
-        console.log('scene.enemies: ', scene.enemies);
-        // Add enemy collisions
-        scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
-        scene.physics.add.collider(scene.enemies, scene.trees);
-        scene.physics.add.collider(scene.npcs, scene.enemies);
-        scene.physics.add.collider(scene.enemies, scene.enemies);
-        //     } else {
-        //         console.error('Failed to generate enemy image');
-        //     }
-        // });
+        console.log('spawnEnemies... Generating new enemy image... ');
+        generateEnemyImage(newsArticle, setting).then(enemyImageBase64 => {
+            console.log('spawnEnemies... enemyImageBase64: ', enemyImageBase64)
+            if (enemyImageBase64) {
+                const imageKey = 'generatedEnemy';
+                scene.textures.addBase64(imageKey, enemyImageBase64);
+                for (let i = 0; i < 3; i++) {
+                    let x = Phaser.Math.Between(50, 750);
+                    let y = Phaser.Math.Between(50, 550);
+                    let enemy = scene.enemies.create(x, y, imageKey); // Create enemies using the Base64 image
+                    enemy.setCollideWorldBounds(true);
+                }
+                // Add enemy collisions
+                scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
+                scene.physics.add.collider(scene.enemies, scene.trees);
+                scene.physics.add.collider(scene.npcs, scene.enemies);
+                scene.physics.add.collider(scene.enemies, scene.enemies);
+            } else {
+                console.error('Failed to generate enemy image');
+            }
+        });
     } else {
         console.error('No news data available to generate enemies');
     }
@@ -750,7 +748,7 @@ async function imageUrlToBase64(url) {
     });
   };
   
-  function getBase64Image(imgElementID) {
+function getBase64Image(imgElementID) {
     console.log('getBase64Image... imgElementID: ', imgElementID);
     const img = document.getElementById(imgElementID);
     console.log('getBase64Image... img: ', img);
@@ -767,7 +765,7 @@ async function imageUrlToBase64(url) {
     return formattedURL;
   }
 
-  async function fetchImageAsBase64(url) {
+async function fetchImageAsBase64(url) {
     console.log('fetchImageAsBase64... url: ', url);
     const response = await fetch(url);
     console.log('fetchImageAsBase64... response: ', response);
@@ -782,3 +780,25 @@ async function imageUrlToBase64(url) {
     });
 }
 
+function imageToBase64(url, callback) {
+    console.log('imageToBase64... url: ', url);
+    console.log('imageToBase64... callback: ', callback);
+    let img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = function() {
+        console.log('onload...'); 
+        let canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        let dataURL = canvas.toDataURL('image/png');
+        console.log('imageToBase64... Calling back with dataURL: ', dataURL);
+        callback(dataURL);
+    };
+    img.onerror = function() {
+        console.error('Error loading image');
+        callback(null);
+    };
+    img.src = url;
+}
