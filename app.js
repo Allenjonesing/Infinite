@@ -370,21 +370,19 @@ function spawnEnemies(scene) {
         //     console.log('enemyImageUrl: ', enemyImageUrl);
         //     if (enemyImageUrl) {
         //         scene.load.image('generatedEnemy', enemyImageUrl);
-                scene.load.once('complete', () => {
-                    console.log('scene.load.once complete...');
-                    for (let i = 0; i < 3; i++) {
-                        let x = Phaser.Math.Between(50, 750);
-                        let y = Phaser.Math.Between(50, 550);
-                        let enemy = scene.enemies.create(x, y, 'generatedEnemy'); // Create enemies using the initialized group
-                        enemy.setCollideWorldBounds(true);
-                    }
-                    // Add enemy collisions
-                    scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
-                    scene.physics.add.collider(scene.enemies, scene.trees);
-                    scene.physics.add.collider(scene.npcs, scene.enemies);
-                    scene.physics.add.collider(scene.enemies, scene.enemies);
-                });
-                scene.load.start();
+        const imageKey = 'generatedEnemy';
+        scene.textures.addBase64(imageKey, enemyImageBase64);
+        for (let i = 0; i < 3; i++) {
+            let x = Phaser.Math.Between(50, 750);
+            let y = Phaser.Math.Between(50, 550);
+            let enemy = scene.enemies.create(x, y, imageKey); // Create enemies using the Base64 image
+            enemy.setCollideWorldBounds(true);
+        }
+        // Add enemy collisions
+        scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
+        scene.physics.add.collider(scene.enemies, scene.trees);
+        scene.physics.add.collider(scene.npcs, scene.enemies);
+        scene.physics.add.collider(scene.enemies, scene.enemies);
         //     } else {
         //         console.error('Failed to generate enemy image');
         //     }
@@ -605,6 +603,7 @@ async function generateAIResponses(newsData, personas, setting) {
                                 const imageUrl = imageAIResponse.data[0].url;
                                 responses.push({ response: textContent, persona: persona, imageUrl: imageUrl });
                                 displayAIResponse(news.title, textContent, persona, imageUrl);
+                                enemySpriteUrl = await fetchImageAsBase64(imageUrl);
                             }
                     } catch (error) {
                         console.error('Error generating AI response:', error);
@@ -751,3 +750,14 @@ async function imageUrlToBase64(url) {
     console.log('getBase64Image... returning formattedURL: ', formattedURL);
     return formattedURL;
   }
+
+  async function fetchImageAsBase64(url) {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
