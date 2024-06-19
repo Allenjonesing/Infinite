@@ -6,6 +6,7 @@ let setting = ''; // Global variable to store the game setting
 let enemySpriteUrl = '';
 let enemyImageBase64 = '';
 let base64Image = '';
+let npcBase64image = '';
 
 class ExplorationScene extends Phaser.Scene {
     constructor() {
@@ -145,7 +146,8 @@ class BattleScene extends Phaser.Scene {
     }
 
     preload() {
-        this.textures.addBase64('npcBase64', base64Image);
+        this.textures.addBase64('npcBase64image', npcBase64image);
+        this.textures.addBase64('enemyImageBase64', enemyImageBase64);
     }
 
     async create(data) {
@@ -161,14 +163,14 @@ class BattleScene extends Phaser.Scene {
         // Generate enemy image based on news article and setting
         if (newsData.length > 0) {
             const newsArticle = newsData[0]; // Use the first article for the enemy
-            const enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
+            enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
             if (enemyImageBase64) {
-                const imageKey = 'generatedEnemy';
-                this.textures.addBase64(imageKey, enemyImageBase64);
+                //const imageKey = 'generatedEnemy';
+                //this.textures.addBase64(imageKey, enemyImageBase64);
 
                 // Display player and enemy sprites
-                this.player.sprite = this.add.sprite(100, 300, 'player');
-                this.enemy.sprite = this.add.sprite(500, 300, 'npcBase64');
+                this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
+                this.enemy.sprite = this.add.sprite(500, 300, 'enemyImageBase64');
 
                 // Initialize turn order and current turn index
                 this.turnOrder = this.calculateTurnOrder();
@@ -542,7 +544,7 @@ async function generateAIResponses(personas, setting) {
         console.log('generateAIResponses... looped news: ', news);
         const persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
         console.log('generateAIResponses... looped persona: ', persona);
-        const prompt = `As ${persona.name}, ${persona.description}, As if talking to the player of the game, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}, as it pertains to the setting chosen: ${setting}. Be sure to really, REALLY, get into character and blend the article with the setting without revealing ANY Brand names, celebrity names, etc.`;
+        const prompt = `As ${persona.name}, ${persona.description}, As if narrating from the perspective of the player of the game, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}, as it pertains to the setting chosen: ${setting}. Be sure to really, REALLY, get into character and blend the article with the setting without revealing ANY Brand names, celebrity names, etc.`;
         console.log('generateAIResponses... looped prompt: ', prompt);
         const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
 
@@ -632,7 +634,7 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
         imageElement.src = `data:image/png;base64,${imageBase64}`;;
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
-        enemyBase64Image = `data:image/png;base64,${imageBase64}`;
+        npcBase64image = `data:image/png;base64,${imageBase64}`;
     }
 
     const personaElement = document.createElement('p');
@@ -640,8 +642,6 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
     newsItem.appendChild(personaElement);
 
     newsContainer.appendChild(newsItem);
-    spawnEnemies();
-
 }
 
 async function generatePersonas(setting) {
