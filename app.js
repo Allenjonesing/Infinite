@@ -164,13 +164,14 @@ class BattleScene extends Phaser.Scene {
         if (newsData.length > 0) {
             const newsArticle = newsData[0]; // Use the first article for the enemy
             enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
+            console.log('enemyImageBase64: ', enemyImageBase64);
             if (enemyImageBase64) {
-                //const imageKey = 'generatedEnemy';
-                //this.textures.addBase64(imageKey, enemyImageBase64);
+                const imageKey = 'generatedEnemy';
+                this.textures.addBase64(imageKey, enemyImageBase64);
 
                 // Display player and enemy sprites
                 this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
-                this.enemy.sprite = this.add.sprite(500, 300, 'enemyImageBase64');
+                this.enemy.sprite = this.add.sprite(500, 300, 'generatedEnemy');
 
                 // Initialize turn order and current turn index
                 this.turnOrder = this.calculateTurnOrder();
