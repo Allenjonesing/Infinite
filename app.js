@@ -88,6 +88,9 @@ class ExplorationScene extends Phaser.Scene {
             });
         });
 
+        const newsArticle = newsData[0]; // Use the first article for the enemy
+        enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
+    
         // Spawn enemies after data is ready
         spawnEnemies(this);
     }
@@ -641,8 +644,6 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
     newsItem.appendChild(personaElement);
 
     newsContainer.appendChild(newsItem);
-    const newsArticle = newsData[0]; // Use the first article for the enemy
-    enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
 }
 
 async function generatePersonas(setting) {
