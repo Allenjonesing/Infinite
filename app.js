@@ -4,6 +4,7 @@ let target = null;
 let newsData = []; // Global variable to store news articles
 let setting = ''; // Global variable to store the game setting
 let enemySpriteUrl = '';
+let enemyImageBase64 = '';
 
 class ExplorationScene extends Phaser.Scene {
     constructor() {
@@ -641,6 +642,7 @@ function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
         enemySpriteUrl = imageUrl;
+        enemyImageBase64 = fetchImageAsBase64('npc_img');
     }
 
     const personaElement = document.createElement('p');
