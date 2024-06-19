@@ -591,9 +591,10 @@ async function generateAIResponses(personas, setting) {
                     const data = await imageResponse.json();
                     const parsedBody = JSON.parse(data.body);
                     if (parsedBody && parsedBody.base64_image) {
-                        console.log('generateEnemyImage... parsedBody.base64_image: ', parsedBody.base64_image);
-                        responses.push({ response: textContent, persona: persona, imageBase64: parsedBody.base64_image });
-                        displayAIResponse(news.title, textContent, persona, parsedBody.base64_image);
+                        const base64string =  `data:image/png;base64,${parsedBody.base64_imag}`;
+                        console.log('generateAIResponses... parsedBody.base64_image: ', parsedBody.base64_image);
+                        responses.push({ response: textContent, persona: persona, imageBase64: base64string });
+                        displayAIResponse(news.title, textContent, persona, base64string);
                     } else {
                         throw new Error('No image generated');
                     }
@@ -602,7 +603,6 @@ async function generateAIResponses(personas, setting) {
                     newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
                 }
 
-                //displayAIResponse(news.title, aiResponse.choices[0].message.content, persona);
             }
         } catch (error) {
             console.error('Error generating AI response:', error);
@@ -630,10 +630,10 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
     if (imageBase64) {
         const imageElement = document.createElement('img');
         imageElement.setAttribute("id", "enemyImage");
-        imageElement.src = `data:image/png;base64,${imageBase64}`;;
+        imageElement.src = imageBase64;;
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
-        npcBase64image = `data:image/png;base64,${imageBase64}`;
+        npcBase64image = imageBase64;
     }
 
     const personaElement = document.createElement('p');
