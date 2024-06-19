@@ -145,7 +145,7 @@ class BattleScene extends Phaser.Scene {
     preload() {
         this.load.baseURL = 'https://allenjonesing.github.io/';
         this.load.crossOrigin = 'anonymous';
-        this.load.image('generatedEnemy', getBase64Image('npc_img'));
+        this.load.image('generatedEnemy', fetchImageAsBase64('npc_img'));
     }
 
     async create(data) {
@@ -166,7 +166,7 @@ class BattleScene extends Phaser.Scene {
                 this.load.once('complete', () => {
                     // Display player and enemy sprites
                     this.player.sprite = this.add.sprite(100, 300, 'player');
-                    this.enemy.sprite = this.add.sprite(500, 300, 'generatedEnemy');
+                    this.enemy.sprite = this.add.sprite(500, 300, 'player');
 
                     // Initialize turn order and current turn index
                     this.turnOrder = this.calculateTurnOrder();
@@ -603,7 +603,6 @@ async function generateAIResponses(newsData, personas, setting) {
                                 const imageUrl = imageAIResponse.data[0].url;
                                 responses.push({ response: textContent, persona: persona, imageUrl: imageUrl });
                                 displayAIResponse(news.title, textContent, persona, imageUrl);
-                                enemySpriteUrl = await fetchImageAsBase64(imageUrl);
                             }
                     } catch (error) {
                         console.error('Error generating AI response:', error);
@@ -752,9 +751,13 @@ async function imageUrlToBase64(url) {
   }
 
   async function fetchImageAsBase64(url) {
+    console.log('fetchImageAsBase64... url: ', url);
     const response = await fetch(url);
+    console.log('fetchImageAsBase64... response: ', response);
     const blob = await response.blob();
+    console.log('fetchImageAsBase64... blob: ', blob);
     return new Promise((resolve, reject) => {
+        console.log('fetchImageAsBase64 Promise... ');
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
         reader.onerror = reject;
