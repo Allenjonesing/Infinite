@@ -479,7 +479,7 @@ async function fetchNews(personas, setting) {
         }
 
         // Limit to 5 articles
-        const structuredNews = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
+        newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
         let generatedAIResponses = await generateAIResponses(structuredNews, personas, setting);
         loadingMessage.style.display = 'none';
         newsContainer.style.display = 'block';
