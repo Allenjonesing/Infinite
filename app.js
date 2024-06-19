@@ -5,6 +5,7 @@ let newsData = []; // Global variable to store news articles
 let setting = ''; // Global variable to store the game setting
 let enemySpriteUrl = '';
 let enemyImageBase64 = '';
+let base64Image = '';
 
 class ExplorationScene extends Phaser.Scene {
     constructor() {
@@ -144,12 +145,12 @@ class BattleScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.baseURL = 'https://allenjonesing.github.io/';
-        this.load.crossOrigin = 'anonymous';
-        //this.load.image('generatedEnemy', fetchImageAsBase64('npc_img'));
+        this.textures.addBase64('npcBase64', base64Image);
     }
 
     async create(data) {
+        this.add.sprite(400, 300, 'npcBase64');
+
         this.player = data.player;
         this.enemy = data.enemy;
 
@@ -158,16 +159,16 @@ class BattleScene extends Phaser.Scene {
         this.enemy = { name: 'Enemy', health: 100, speed: 3, sprite: null, actions: ['Attack'] };
 
         // Generate enemy image based on news article and setting
-        if (newsData.length > 0) {
-            const newsArticle = newsData[0]; // Use the first article for the enemy
-            const enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
-            if (enemyImageBase64) {
-                const imageKey = 'generatedEnemy';
-                this.textures.addBase64(imageKey, enemyImageBase64);
+        // if (newsData.length > 0) {
+        //     const newsArticle = newsData[0]; // Use the first article for the enemy
+        //     const enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
+        //     if (enemyImageBase64) {
+        //         const imageKey = 'generatedEnemy';
+        //         this.textures.addBase64(imageKey, enemyImageBase64);
 
                 // Display player and enemy sprites
                 this.player.sprite = this.add.sprite(100, 300, 'player');
-                this.enemy.sprite = this.add.sprite(500, 300, imageKey);
+                this.enemy.sprite = this.add.sprite(500, 300, 'npcBase64');
 
                 // Initialize turn order and current turn index
                 this.turnOrder = this.calculateTurnOrder();
@@ -178,10 +179,10 @@ class BattleScene extends Phaser.Scene {
 
                 // Display UI elements
                 this.createUI();
-            } else {
-                console.error('Failed to generate enemy image');
-            }
-        }
+        //     } else {
+        //         console.error('Failed to generate enemy image');
+        //     }
+        // }
     }
 
     update() {
@@ -643,6 +644,9 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
         enemySpriteUrl = imageUrl;
+        console.log('enemySpriteUrl:', enemySpriteUrl);
+        base64Image = getBase64Image('npc_img');
+        console.log('base64Image:', base64Image);
     }
     
     const personaElement = document.createElement('p');
@@ -736,7 +740,7 @@ async function imageUrlToBase64(url) {
     });
   };
   
-function getBase64Image(imgElementID) {
+  function getBase64Image(imgElementID) {
     console.log('getBase64Image... imgElementID: ', imgElementID);
     const img = document.getElementById(imgElementID);
     console.log('getBase64Image... img: ', img);
@@ -747,11 +751,8 @@ function getBase64Image(imgElementID) {
     ctx.drawImage(img, 0, 0);
     var dataURL = canvas.toDataURL("image/png");
     console.log('getBase64Image... dataURL: ', dataURL);
-    var formattedURL = dataURL.replace(/^data:image\/?[A-z]*;base64,/);
-    console.log('getBase64Image... returning formattedURL: ', formattedURL);
-    console.log('getBase64Image... returning typeof formattedURL: ', typeof formattedURL);
-    return formattedURL;
-  }
+    return dataURL;
+}
 
 async function fetchImageAsBase64(url) {
     console.log('fetchImageAsBase64... url: ', url);
