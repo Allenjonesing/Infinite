@@ -152,6 +152,7 @@ class BattleScene extends Phaser.Scene {
 
     async create(data) {
         this.add.sprite(400, 300, 'npcBase64image');
+        this.add.sprite(400, 300, 'enemyImageBase64');
 
         this.player = data.player;
         this.enemy = data.enemy;
@@ -162,12 +163,10 @@ class BattleScene extends Phaser.Scene {
 
         // Generate enemy image based on news article and setting
         if (newsData.length > 0) {
-            const newsArticle = newsData[0]; // Use the first article for the enemy
-            enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
             console.log('enemyImageBase64: ', enemyImageBase64);
             if (enemyImageBase64) {
-                const imageKey = 'generatedEnemy';
-                this.textures.addBase64(imageKey, enemyImageBase64);
+                // const imageKey = 'generatedEnemy';
+                // this.textures.addBase64(imageKey, enemyImageBase64);
 
                 // Display player and enemy sprites
                 this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
@@ -642,6 +641,8 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
     newsItem.appendChild(personaElement);
 
     newsContainer.appendChild(newsItem);
+    const newsArticle = newsData[0]; // Use the first article for the enemy
+    enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
 }
 
 async function generatePersonas(setting) {
