@@ -652,7 +652,10 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
     newsItem.appendChild(personaElement);
     
     newsContainer.appendChild(newsItem);
-    base64Image = getBase64Image('npc_img');
+    base64Image = await imageToBase64(imageUrl, (base64Image) => {
+        console.log('generateEnemyImage... Base64 Image:', base64Image); // Log the Base64 string for debugging
+        resolve(base64Image);
+    });;
     console.log('base64Image:', base64Image);
 }
 
@@ -753,6 +756,7 @@ async function imageUrlToBase64(url) {
         ctx.drawImage(img, 0, 0);
         var dataURL = canvas.toDataURL();
         console.log('getBase64Image... dataURL: ', dataURL);
+        
         return dataURL;
     } else {
         console.error('No IMG element found!');
