@@ -367,7 +367,7 @@ function spawnEnemies(scene) {
         // generateEnemyImage(newsArticle, setting).then(enemyImageBase64 => {
         //     console.log('spawnEnemies... enemyImageBase64: ', enemyImageBase64)
         //     if (enemyImageBase64) {
-        const imageKey = 'generatedEnemy';
+        const imageKey = 'enemyImageBase64';
         scene.textures.addBase64(imageKey, enemyImageBase64);
         for (let i = 0; i < 3; i++) {
             let x = Phaser.Math.Between(50, 750);
@@ -591,7 +591,7 @@ async function generateAIResponses(personas, setting) {
                     const data = await imageResponse.json();
                     const parsedBody = JSON.parse(data.body);
                     if (parsedBody && parsedBody.base64_image) {
-                        const base64string =  `data:image/png;base64,${parsedBody.base64_imag}`;
+                        const base64string =  `data:image/png;base64,${parsedBody.base64_image}`;
                         console.log('generateAIResponses... parsedBody.base64_image: ', parsedBody.base64_image);
                         responses.push({ response: textContent, persona: persona, imageBase64: base64string });
                         displayAIResponse(news.title, textContent, persona, base64string);
