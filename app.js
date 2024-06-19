@@ -654,10 +654,10 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
     newsContainer.appendChild(newsItem);
     enemyImageBase64 = getBase64Image('npc_img');
     console.log('displayAIResponse... enemyImageBase64: ', enemyImageBase64);
-    //let awaitedEnemyImageBase64 = await getBase64Image('npc_img');
-    //console.log('displayAIResponse... awaitedEnemyImageBase64: ', awaitedEnemyImageBase64);
-    let jsonEnemyImageBase64 = awaitedEnemyImageBase64.json();
-    console.log('displayAIResponse... jsonEnemyImageBase64: ', jsonEnemyImageBase64);
+    let awaitedEnemyImageBase64 = await getBase64Image('npc_img');
+    console.log('displayAIResponse... awaitedEnemyImageBase64: ', awaitedEnemyImageBase64);
+    //let jsonEnemyImageBase64 = awaitedEnemyImageBase64.json();
+    //console.log('displayAIResponse... jsonEnemyImageBase64: ', jsonEnemyImageBase64);
     let fetchedEnemyImageBase64 = fetchImageAsBase64(imageUrl);
     console.log('displayAIResponse... fetchedEnemyImageBase64: ', fetchedEnemyImageBase64);
     let awaitedFetchedEnemyImageBase64 = await fetchImageAsBase64(imageUrl);
