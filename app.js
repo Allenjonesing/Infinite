@@ -377,8 +377,10 @@ function spawnEnemies(scene) {
             let x = Phaser.Math.Between(50, 750);
             let y = Phaser.Math.Between(50, 550);
             let enemy = scene.enemies.create(x, y, imageKey); // Create enemies using the Base64 image
+            console.log('enemy: ', enemy);
             enemy.setCollideWorldBounds(true);
         }
+        console.log('scene.enemies: ', scene.enemies);
         // Add enemy collisions
         scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
         scene.physics.add.collider(scene.enemies, scene.trees);
@@ -623,6 +625,7 @@ async function generateAIResponses(newsData, personas, setting) {
 }
 
 function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
+    console.log('displayAIResponse... imageUrl: ', imageUrl);
     const newsContainer = document.getElementById('news');
     const newsItem = document.createElement('div');
     newsItem.className = 'news-item';
@@ -650,6 +653,7 @@ function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
     
     newsContainer.appendChild(newsItem);
     enemyImageBase64 = getBase64Image('npc_img');
+    console.log('displayAIResponse... enemyImageBase64: ', enemyImageBase64);
 }
 
 async function generatePersonas(setting) {
@@ -749,6 +753,7 @@ async function imageUrlToBase64(url) {
     console.log('getBase64Image... dataURL: ', dataURL);
     var formattedURL = dataURL.replace(/^data:image\/?[A-z]*;base64,/);
     console.log('getBase64Image... returning formattedURL: ', formattedURL);
+    console.log('getBase64Image... returning typeof formattedURL: ', typeof formattedURL);
     return formattedURL;
   }
 
