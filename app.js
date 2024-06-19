@@ -91,8 +91,8 @@ class ExplorationScene extends Phaser.Scene {
         const newsArticle = newsData[0]; // Use the first article for the enemy
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
         console.log('create... enemyImageBase64: ', enemyImageBase64);
-        jsonEnemyImageBase64 = enemyImageBase64.json();
-        console.log('create... jsonEnemyImageBase64: ', jsonEnemyImageBase64);
+        //jsonEnemyImageBase64 = enemyImageBase64.json();
+        //console.log('create... jsonEnemyImageBase64: ', jsonEnemyImageBase64);
 
         // Spawn enemies after data is ready
         spawnEnemies(this);
@@ -335,7 +335,6 @@ class BattleScene extends Phaser.Scene {
 
 async function generateEnemyImage(newsArticle, setting) {
     return new Promise(async function (resolve, reject) {
-        resolve('start of new Promise');
         console.log('generateEnemyImage... newsArticle: ', newsArticle);
         const prompt = `Generate an image of an enemy based on the following news article and setting:\n\nTitle: ${newsArticle.title}\nDescription: ${newsArticle.description}\nSetting: ${setting}`;
         const encodedPrompt = encodeURIComponent(prompt);
