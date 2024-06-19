@@ -751,7 +751,7 @@ async function imageUrlToBase64(url) {
         canvas.height = img.height;
         var ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0);
-        var dataURL = canvas.toDataURL("image/png");
+        var dataURL = canvas.toDataURL();
         console.log('getBase64Image... dataURL: ', dataURL);
         return dataURL;
     } else {
