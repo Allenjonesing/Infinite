@@ -645,8 +645,6 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
         newsItem.appendChild(imageElement);
         enemySpriteUrl = imageUrl;
         console.log('enemySpriteUrl:', enemySpriteUrl);
-        base64Image = getBase64Image('npc_img');
-        console.log('base64Image:', base64Image);
     }
     
     const personaElement = document.createElement('p');
@@ -654,6 +652,8 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
     newsItem.appendChild(personaElement);
     
     newsContainer.appendChild(newsItem);
+    base64Image = getBase64Image('npc_img');
+    console.log('base64Image:', base64Image);
 }
 
 async function generatePersonas(setting) {
@@ -744,14 +744,20 @@ async function imageUrlToBase64(url) {
     console.log('getBase64Image... imgElementID: ', imgElementID);
     const img = document.getElementById(imgElementID);
     console.log('getBase64Image... img: ', img);
-    var canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = img.height;
-    var ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0);
-    var dataURL = canvas.toDataURL("image/png");
-    console.log('getBase64Image... dataURL: ', dataURL);
-    return dataURL;
+    if (img) {
+
+        var canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        var dataURL = canvas.toDataURL("image/png");
+        console.log('getBase64Image... dataURL: ', dataURL);
+        return dataURL;
+    } else {
+        console.error('No IMG element found!');
+        return 'ERROR';
+    }
 }
 
 async function fetchImageAsBase64(url) {
