@@ -624,7 +624,7 @@ async function generateAIResponses(newsData, personas, setting) {
     return responses;
 }
 
-function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
+async function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
     console.log('displayAIResponse... imageUrl: ', imageUrl);
     const newsContainer = document.getElementById('news');
     const newsItem = document.createElement('div');
@@ -654,6 +654,12 @@ function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
     newsContainer.appendChild(newsItem);
     enemyImageBase64 = getBase64Image('npc_img');
     console.log('displayAIResponse... enemyImageBase64: ', enemyImageBase64);
+    let awaitedEnemyImageBase64 = await getBase64Image('npc_img');
+    console.log('displayAIResponse... awaitedEnemyImageBase64: ', awaitedEnemyImageBase64);
+    let fetchedEnemyImageBase64 = fetchImageAsBase64('npc_img');
+    console.log('displayAIResponse... fetchedEnemyImageBase64: ', fetchedEnemyImageBase64);
+    let awaitedFetchedEnemyImageBase64 = await getBase64Image('npc_img');
+    console.log('displayAIResponse... awaitedFetchedEnemyImageBase64: ', awaitedFetchedEnemyImageBase64);
 }
 
 async function generatePersonas(setting) {
@@ -771,3 +777,4 @@ async function imageUrlToBase64(url) {
         reader.readAsDataURL(blob);
     });
 }
+
