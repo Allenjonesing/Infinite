@@ -656,10 +656,14 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
     console.log('displayAIResponse... enemyImageBase64: ', enemyImageBase64);
     let awaitedEnemyImageBase64 = await getBase64Image('npc_img');
     console.log('displayAIResponse... awaitedEnemyImageBase64: ', awaitedEnemyImageBase64);
-    let fetchedEnemyImageBase64 = fetchImageAsBase64('npc_img');
+    let jsonEnemyImageBase64 = awaitedEnemyImageBase64.json();
+    console.log('displayAIResponse... jsonEnemyImageBase64: ', jsonEnemyImageBase64);
+    let fetchedEnemyImageBase64 = fetchImageAsBase64(imageUrl);
     console.log('displayAIResponse... fetchedEnemyImageBase64: ', fetchedEnemyImageBase64);
-    let awaitedFetchedEnemyImageBase64 = await getBase64Image('npc_img');
+    let awaitedFetchedEnemyImageBase64 = await fetchImageAsBase64(imageUrl);
     console.log('displayAIResponse... awaitedFetchedEnemyImageBase64: ', awaitedFetchedEnemyImageBase64);
+    let jsonFetchedEnemyImageBase64 = awaitedFetchedEnemyImageBase64.json();
+    console.log('displayAIResponse... jsonFetchedEnemyImageBase64: ', jsonFetchedEnemyImageBase64);
 }
 
 async function generatePersonas(setting) {
