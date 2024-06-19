@@ -642,14 +642,14 @@ function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
         enemySpriteUrl = imageUrl;
-        enemyImageBase64 = getBase64Image('npc_img');
     }
-
+    
     const personaElement = document.createElement('p');
     personaElement.textContent = `Persona: ${persona.name}`;
     newsItem.appendChild(personaElement);
-
+    
     newsContainer.appendChild(newsItem);
+    enemyImageBase64 = getBase64Image('npc_img');
 }
 
 async function generatePersonas(setting) {
