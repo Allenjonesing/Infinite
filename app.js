@@ -151,7 +151,7 @@ class BattleScene extends Phaser.Scene {
     }
 
     async create(data) {
-        this.add.sprite(400, 300, 'npcBase64');
+        this.add.sprite(400, 300, 'npcBase64image');
 
         this.player = data.player;
         this.enemy = data.enemy;
