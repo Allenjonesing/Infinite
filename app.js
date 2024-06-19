@@ -480,7 +480,7 @@ async function fetchNews(personas, setting) {
 
         // Limit to 5 articles
         newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
-        let generatedAIResponses = await generateAIResponses(structuredNews, personas, setting);
+        let generatedAIResponses = await generateAIResponses(personas, setting);
         loadingMessage.style.display = 'none';
         newsContainer.style.display = 'block';
         return generatedAIResponses;
@@ -503,7 +503,7 @@ function structureNewsData(articles) {
     });
 }
 
-async function generateAIResponses(newsData, personas, setting) {
+async function generateAIResponses(personas, setting) {
     console.log('generateAIResponses... newsData: ', newsData);
     console.log('generateAIResponses... personas: ', personas);
     console.log('generateAIResponses... personas.personas: ', personas.personas);
