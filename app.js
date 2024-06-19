@@ -90,7 +90,10 @@ class ExplorationScene extends Phaser.Scene {
 
         const newsArticle = newsData[0]; // Use the first article for the enemy
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
-    
+        console.log('create... enemyImageBase64: ', enemyImageBase64);
+        jsonEnemyImageBase64 = enemyImageBase64.json();
+        console.log('create... jsonEnemyImageBase64: ', jsonEnemyImageBase64);
+
         // Spawn enemies after data is ready
         spawnEnemies(this);
     }
@@ -331,35 +334,38 @@ class BattleScene extends Phaser.Scene {
 }
 
 async function generateEnemyImage(newsArticle, setting) {
-    console.log('generateEnemyImage... newsArticle: ', newsArticle);
-    const prompt = `Generate an image of an enemy based on the following news article and setting:\n\nTitle: ${newsArticle.title}\nDescription: ${newsArticle.description}\nSetting: ${setting}`;
-    const encodedPrompt = encodeURIComponent(prompt);
+    return new Promise(async function (resolve, reject) {
+        resolve('start of new Promise');
+        console.log('generateEnemyImage... newsArticle: ', newsArticle);
+        const prompt = `Generate an image of an enemy based on the following news article and setting:\n\nTitle: ${newsArticle.title}\nDescription: ${newsArticle.description}\nSetting: ${setting}`;
+        const encodedPrompt = encodeURIComponent(prompt);
 
-    try {
-        const imageResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodedPrompt}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ prompt: prompt, generateImage: true })
-        });
+        try {
+            const imageResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodedPrompt}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ prompt: prompt, generateImage: true })
+            });
 
-        if (!imageResponse.ok) {
-            throw new Error('Network response was not ok');
+            if (!imageResponse.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await imageResponse.json();
+            const parsedBody = JSON.parse(data.body);
+            if (parsedBody && parsedBody.base64_image) {
+                console.log('generateEnemyImage... parsedBody.base64_image: ', parsedBody.base64_image);
+                resolve(`data:image/png;base64,${parsedBody.base64_image}`);
+            } else {
+                reject(new Error('No image generated'));
+            }
+        } catch (error) {
+            console.error('Error generating enemy image:', error);
+            reject(new Error('No image generated'));
         }
-
-        const data = await imageResponse.json();
-        const parsedBody = JSON.parse(data.body);
-        if (parsedBody && parsedBody.base64_image) {
-            console.log('generateEnemyImage... parsedBody.base64_image: ', parsedBody.base64_image);
-            return  `data:image/png;base64,${parsedBody.base64_image}`;
-        } else {
-            throw new Error('No image generated');
-        }
-    } catch (error) {
-        console.error('Error generating enemy image:', error);
-        return null;
-    }
+    });
 }
 
 function spawnEnemies(scene) {
@@ -594,7 +600,7 @@ async function generateAIResponses(personas, setting) {
                     const data = await imageResponse.json();
                     const parsedBody = JSON.parse(data.body);
                     if (parsedBody && parsedBody.base64_image) {
-                        const base64string =  `data:image/png;base64,${parsedBody.base64_image}`;
+                        const base64string = `data:image/png;base64,${parsedBody.base64_image}`;
                         console.log('generateAIResponses... parsedBody.base64_image: ', parsedBody.base64_image);
                         responses.push({ response: textContent, persona: persona, imageBase64: base64string });
                         displayAIResponse(news.title, textContent, persona, base64string);
