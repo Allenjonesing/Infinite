@@ -159,12 +159,12 @@ class BattleScene extends Phaser.Scene {
         this.enemy = { name: 'Enemy', health: 100, speed: 3, sprite: null, actions: ['Attack'] };
 
         // Generate enemy image based on news article and setting
-        // if (newsData.length > 0) {
-        //     const newsArticle = newsData[0]; // Use the first article for the enemy
-        //     const enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
-        //     if (enemyImageBase64) {
-        //         const imageKey = 'generatedEnemy';
-        //         this.textures.addBase64(imageKey, enemyImageBase64);
+        if (newsData.length > 0) {
+            const newsArticle = newsData[0]; // Use the first article for the enemy
+            const enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
+            if (enemyImageBase64) {
+                const imageKey = 'generatedEnemy';
+                this.textures.addBase64(imageKey, enemyImageBase64);
 
                 // Display player and enemy sprites
                 this.player.sprite = this.add.sprite(100, 300, 'player');
@@ -179,10 +179,10 @@ class BattleScene extends Phaser.Scene {
 
                 // Display UI elements
                 this.createUI();
-        //     } else {
-        //         console.error('Failed to generate enemy image');
-        //     }
-        // }
+            } else {
+                console.error('Failed to generate enemy image');
+            }
+        }
     }
 
     update() {
@@ -331,7 +331,7 @@ async function generateEnemyImage(newsArticle, setting) {
     const encodedPrompt = encodeURIComponent(prompt);
 
     try {
-        const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodedPrompt}`, {
+        const imageResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodedPrompt}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -339,22 +339,16 @@ async function generateEnemyImage(newsArticle, setting) {
             body: JSON.stringify({ prompt: prompt, generateImage: true })
         });
 
-        if (!response.ok) {
+        if (!imageResponse.ok) {
             throw new Error('Network response was not ok');
         }
 
-        const data = await response.json();
-        if (data && data.data && data.data.length > 0) {
-            console.log('generateEnemyImage... data.data[0].url: ', data.data[0].url);
-            const imageUrl = data.data[0].url;
-            console.log('generateEnemyImage... imageUrl: ', imageUrl);
-            return new Promise((resolve) => {
-                console.log('generateEnemyImage Resolution...');
-                imageToBase64(imageUrl, (base64Image) => {
-                    console.log('generateEnemyImage... Base64 Image:', base64Image); // Log the Base64 string for debugging
-                    resolve(base64Image);
-                });
-            });
+        const data = await imageResponse.json();
+        const parsedBody = JSON.parse(data.body);
+        if (parsedBody && parsedBody.base64_image) {
+            console.log('generateEnemyImage... parsedBody.base64_image: ', parsedBody.base64_image);
+            responses.push({ response: textContent, persona: persona, imageBase64: parsedBody.base64_image });
+            displayAIResponse(news.title, textContent, persona, parsedBody.base64_image);
         } else {
             throw new Error('No image generated');
         }
@@ -372,19 +366,19 @@ function spawnEnemies(scene) {
         // generateEnemyImage(newsArticle, setting).then(enemyImageBase64 => {
         //     console.log('spawnEnemies... enemyImageBase64: ', enemyImageBase64)
         //     if (enemyImageBase64) {
-                const imageKey = 'generatedEnemy';
-                scene.textures.addBase64(imageKey, enemyImageBase64);
-                for (let i = 0; i < 3; i++) {
-                    let x = Phaser.Math.Between(50, 750);
-                    let y = Phaser.Math.Between(50, 550);
-                    let enemy = scene.enemies.create(x, y, imageKey); // Create enemies using the Base64 image
-                    enemy.setCollideWorldBounds(true);
-                }
-                // Add enemy collisions
-                scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
-                scene.physics.add.collider(scene.enemies, scene.trees);
-                scene.physics.add.collider(scene.npcs, scene.enemies);
-                scene.physics.add.collider(scene.enemies, scene.enemies);
+        const imageKey = 'generatedEnemy';
+        scene.textures.addBase64(imageKey, enemyImageBase64);
+        for (let i = 0; i < 3; i++) {
+            let x = Phaser.Math.Between(50, 750);
+            let y = Phaser.Math.Between(50, 550);
+            let enemy = scene.enemies.create(x, y, imageKey); // Create enemies using the Base64 image
+            enemy.setCollideWorldBounds(true);
+        }
+        // Add enemy collisions
+        scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
+        scene.physics.add.collider(scene.enemies, scene.trees);
+        scene.physics.add.collider(scene.npcs, scene.enemies);
+        scene.physics.add.collider(scene.enemies, scene.enemies);
         //     } else {
         //         console.error('Failed to generate enemy image');
         //     }
@@ -419,16 +413,16 @@ async function connectToDb() {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        
+
         const jsonData = await response.json();
-        
+
         if (!jsonData) {
             throw new Error('No Data gathered!');
         }
 
         // Parsing the stringified JSON data in the body
         const bodyData = JSON.parse(jsonData.body);
-        
+
         if (!bodyData) {
             throw new Error('No body found in the response!');
         }
@@ -466,16 +460,16 @@ async function fetchNews(personas, setting) {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        
+
         const jsonData = await response.json();
-        
+
         if (!jsonData) {
             throw new Error('No Data gathered!');
         }
 
         // Parsing the stringified JSON data in the body
         const bodyData = JSON.parse(jsonData.body);
-        
+
         if (!bodyData) {
             throw new Error('No body found in the response!');
         }
@@ -564,55 +558,51 @@ async function generateAIResponses(newsData, personas, setting) {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            
+
             const aiResponse = await response.json(); // This converts the response body to JSON
-            
-            if (aiResponse 
-                && aiResponse.choices 
-                && aiResponse.choices.length 
-                && aiResponse.choices[0] 
+
+            if (aiResponse
+                && aiResponse.choices
+                && aiResponse.choices.length
+                && aiResponse.choices[0]
                 && aiResponse.choices[0].message
-                && aiResponse.choices[0].message.content )
-                {
-                    const textContent = aiResponse.choices[0].message.content;
-                    //responses.push({ response: aiResponse.choices[0].message.content, persona: persona });
-                    
-                    const imgPrompt = `Generate an image of ${persona.name}, ${persona.description} in the setting chosen: ${setting}.`;
-                    console.log('generateAIResponses...  imgPrompt: ', imgPrompt);
-                    const encodedPrompt = encodeURIComponent(imgPrompt); // Encoding the prompt
-            
-                    try {
-                        const imageResponse  = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodedPrompt}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ prompt: imgPrompt, generateImage: true  })
-                        })
-            
-                        if (!imageResponse .ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        
-                        const imageAIResponse = await imageResponse.json(); // This converts the response body to JSON
-                        
-                        if (imageAIResponse 
-                            && imageAIResponse.data 
-                            && imageAIResponse.data.length 
-                            && imageAIResponse.data[0] 
-                            && imageAIResponse.data[0].url) 
-                            {
-                                const imageUrl = imageAIResponse.data[0].url;
-                                responses.push({ response: textContent, persona: persona, imageUrl: imageUrl });
-                                displayAIResponse(news.title, textContent, persona, imageUrl);
-                            }
-                    } catch (error) {
-                        console.error('Error generating AI response:', error);
-                        newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
+                && aiResponse.choices[0].message.content) {
+                const textContent = aiResponse.choices[0].message.content;
+                //responses.push({ response: aiResponse.choices[0].message.content, persona: persona });
+
+                const imgPrompt = `Generate an image of ${persona.name}, ${persona.description} in the setting chosen: ${setting}.`;
+                console.log('generateAIResponses...  imgPrompt: ', imgPrompt);
+                const encodedPrompt = encodeURIComponent(imgPrompt); // Encoding the prompt
+
+                try {
+                    const imageResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodedPrompt}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ prompt: imgPrompt, generateImage: true })
+                    })
+
+                    if (!imageResponse.ok) {
+                        throw new Error('Network response was not ok');
                     }
-            
-                    //displayAIResponse(news.title, aiResponse.choices[0].message.content, persona);
+
+                    const data = await imageResponse.json();
+                    const parsedBody = JSON.parse(data.body);
+                    if (parsedBody && parsedBody.base64_image) {
+                        console.log('generateEnemyImage... parsedBody.base64_image: ', parsedBody.base64_image);
+                        responses.push({ response: textContent, persona: persona, imageBase64: parsedBody.base64_image });
+                        displayAIResponse(news.title, textContent, persona, parsedBody.base64_image);
+                    } else {
+                        throw new Error('No image generated');
+                    }
+                } catch (error) {
+                    console.error('Error generating AI response:', error);
+                    newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
                 }
+
+                //displayAIResponse(news.title, aiResponse.choices[0].message.content, persona);
+            }
         } catch (error) {
             console.error('Error generating AI response:', error);
             newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
@@ -623,8 +613,7 @@ async function generateAIResponses(newsData, personas, setting) {
     return responses;
 }
 
-async function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
-    console.log('displayAIResponse... imageUrl: ', imageUrl);
+async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
     const newsContainer = document.getElementById('news');
     const newsItem = document.createElement('div');
     newsItem.className = 'news-item';
@@ -637,26 +626,22 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
     contentElement.textContent = aiResponse;
     newsItem.appendChild(contentElement);
 
-    if (imageUrl) {
+    if (imageBase64) {
         const imageElement = document.createElement('img');
-        imageElement.setAttribute("id", "npc_img");
-        imageElement.src = imageUrl;
+        imageElement.setAttribute("id", "enemyImage");
+        imageElement.src = `data:image/png;base64,${imageBase64}`;;
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
-        enemySpriteUrl = imageUrl;
-        console.log('enemySpriteUrl:', enemySpriteUrl);
+        enemyBase64Image = `data:image/png;base64,${imageBase64}`;
     }
-    
+
     const personaElement = document.createElement('p');
     personaElement.textContent = `Persona: ${persona.name}`;
     newsItem.appendChild(personaElement);
-    
+
     newsContainer.appendChild(newsItem);
-    base64Image = await imageToBase64(imageUrl, (base64Image) => {
-        console.log('generateEnemyImage... Base64 Image:', base64Image); // Log the Base64 string for debugging
-        resolve(base64Image);
-    });;
-    console.log('base64Image:', base64Image);
+    spawnEnemies();
+
 }
 
 async function generatePersonas(setting) {
@@ -673,21 +658,20 @@ async function generatePersonas(setting) {
             },
             body: JSON.stringify({ prompt: prompt })
         })
-        
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const aiResponse = await response.json(); // This converts the response body to JSON
 
-        if (aiResponse 
-            && aiResponse.choices 
-            && aiResponse.choices.length 
-            && aiResponse.choices[0] 
+        if (aiResponse
+            && aiResponse.choices
+            && aiResponse.choices.length
+            && aiResponse.choices[0]
             && aiResponse.choices[0].message
-            && aiResponse.choices[0].message.content )
-            {
-                parsedPersonas = parsePersonas(aiResponse.choices[0].message.content);
-            }
+            && aiResponse.choices[0].message.content) {
+            parsedPersonas = parsePersonas(aiResponse.choices[0].message.content);
+        }
     } catch (error) {
         console.error('Error generating AI response:', error);
         newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
@@ -711,10 +695,10 @@ function parsePersonas(content) {
 function toDataUrl(url, callback) {
     console.log('toDataUrl...');
     var xhr = new XMLHttpRequest();
-    xhr.onload = function() {
+    xhr.onload = function () {
         console.log('onload...');
         var reader = new FileReader();
-        reader.onloadend = function() {
+        reader.onloadend = function () {
             console.log('onloadend...');
             callback(reader.result);
         }
@@ -733,17 +717,17 @@ async function imageUrlToBase64(url) {
     return new Promise((resolve, reject) => {
         console.log('Promise...');
         const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      reader.onloadend = () => {
-        console.log('onloadend... reader.result: ', reader.result);
-        const base64data = reader.result;
-        resolve(base64data);
-      };
-      reader.onerror = reject;
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+            console.log('onloadend... reader.result: ', reader.result);
+            const base64data = reader.result;
+            resolve(base64data);
+        };
+        reader.onerror = reject;
     });
-  };
-  
-  function getBase64Image(imgElementID) {
+};
+
+function getBase64Image(imgElementID) {
     console.log('getBase64Image... imgElementID: ', imgElementID);
     const img = document.getElementById(imgElementID);
     console.log('getBase64Image... img: ', img);
@@ -756,7 +740,7 @@ async function imageUrlToBase64(url) {
         ctx.drawImage(img, 0, 0);
         var dataURL = canvas.toDataURL();
         console.log('getBase64Image... dataURL: ', dataURL);
-        
+
         return dataURL;
     } else {
         console.error('No IMG element found!');
@@ -784,8 +768,8 @@ function imageToBase64(url, callback) {
     console.log('imageToBase64... callback: ', callback);
     let img = new Image();
     img.crossOrigin = 'Anonymous';
-    img.onload = function() {
-        console.log('onload...'); 
+    img.onload = function () {
+        console.log('onload...');
         let canvas = document.createElement('canvas');
         canvas.width = img.width;
         canvas.height = img.height;
@@ -795,7 +779,7 @@ function imageToBase64(url, callback) {
         console.log('imageToBase64... Calling back with dataURL: ', dataURL);
         callback(dataURL);
     };
-    img.onerror = function() {
+    img.onerror = function () {
         console.error('Error loading image');
         callback(null);
     };
