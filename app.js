@@ -145,7 +145,7 @@ class BattleScene extends Phaser.Scene {
     preload() {
         this.load.baseURL = 'https://allenjonesing.github.io/';
         this.load.crossOrigin = 'anonymous';
-        this.load.image('generatedEnemy', enemySpriteUrl);
+        this.load.image('generatedEnemy', getBase64Image('npc_img'));
     }
 
     async create(data) {
@@ -157,12 +157,12 @@ class BattleScene extends Phaser.Scene {
         this.enemy = { name: 'Enemy', health: 100, speed: 3, sprite: null, actions: ['Attack'] };
 
         // Generate enemy image based on news article and setting
-        if (newsData.length > 0) {
-            const newsArticle = newsData[0]; // Use the first article for the enemy
-            const enemyImageUrl = await generateEnemyImage(newsArticle, setting);
-            console.log('enemyImageUrl: ', enemyImageUrl);
-            if (enemyImageUrl) {
-                this.load.image('generatedEnemy', enemyImageUrl);
+        // if (newsData.length > 0) {
+        //     const newsArticle = newsData[0]; // Use the first article for the enemy
+        //     const enemyImageUrl = await generateEnemyImage(newsArticle, setting);
+        //     console.log('enemyImageUrl: ', enemyImageUrl);
+        //     if (enemyImageUrl) {
+        //         this.load.image('generatedEnemy', enemyImageUrl);
                 this.load.once('complete', () => {
                     // Display player and enemy sprites
                     this.player.sprite = this.add.sprite(100, 300, 'player');
@@ -179,10 +179,10 @@ class BattleScene extends Phaser.Scene {
                     this.createUI();
                 });
                 this.load.start();
-            } else {
-                console.error('Failed to generate enemy image');
-            }
-        }
+        //     } else {
+        //         console.error('Failed to generate enemy image');
+        //     }
+        // }
     }
 
     update() {
@@ -637,6 +637,7 @@ function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
 
     if (imageUrl) {
         const imageElement = document.createElement('img');
+        imageElement.setAttribute("id", "npc_img");
         imageElement.src = imageUrl;
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
@@ -734,3 +735,13 @@ async function imageUrlToBase64(url) {
     });
   };
   
+  function getBase64Image(imgElementID) {
+    const img = document.getElementById(imgElementID);
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    var dataURL = canvas.toDataURL("image/png");
+    return dataURL.replace(/^data:image\/?[A-z]*;base64,/);
+  }
