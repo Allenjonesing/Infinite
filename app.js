@@ -368,9 +368,9 @@ function spawnEnemies(scene) {
     if (newsData.length > 0) {
         const newsArticle = newsData[0]; // Use the first article for the enemy
         console.log('spawnEnemies... Generating new enemy image... ');
-        generateEnemyImage(newsArticle, setting).then(enemyImageBase64 => {
-            console.log('spawnEnemies... enemyImageBase64: ', enemyImageBase64)
-            if (enemyImageBase64) {
+        // generateEnemyImage(newsArticle, setting).then(enemyImageBase64 => {
+        //     console.log('spawnEnemies... enemyImageBase64: ', enemyImageBase64)
+        //     if (enemyImageBase64) {
                 const imageKey = 'generatedEnemy';
                 scene.textures.addBase64(imageKey, enemyImageBase64);
                 for (let i = 0; i < 3; i++) {
@@ -384,10 +384,10 @@ function spawnEnemies(scene) {
                 scene.physics.add.collider(scene.enemies, scene.trees);
                 scene.physics.add.collider(scene.npcs, scene.enemies);
                 scene.physics.add.collider(scene.enemies, scene.enemies);
-            } else {
-                console.error('Failed to generate enemy image');
-            }
-        });
+        //     } else {
+        //         console.error('Failed to generate enemy image');
+        //     }
+        // });
     } else {
         console.error('No news data available to generate enemies');
     }
