@@ -167,7 +167,7 @@ class BattleScene extends Phaser.Scene {
                 this.load.once('complete', () => {
                     // Display player and enemy sprites
                     this.player.sprite = this.add.sprite(100, 300, 'player');
-                    this.enemy.sprite = this.add.sprite(500, 300, 'player');
+                    this.enemy.sprite = this.add.sprite(500, 300, 'generatedEnemy');
 
                     // Initialize turn order and current turn index
                     this.turnOrder = this.calculateTurnOrder();
