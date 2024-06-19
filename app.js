@@ -366,11 +366,12 @@ function spawnEnemies(scene) {
     console.log('spawnEnemies...');
     if (newsData.length > 0) {
         const newsArticle = newsData[0]; // Use the first article for the enemy
-        generateEnemyImage(newsArticle, setting).then(enemyImageUrl => {
-            console.log('enemyImageUrl: ', enemyImageUrl);
-            if (enemyImageUrl) {
-                scene.load.image('generatedEnemy', enemyImageUrl);
+        // generateEnemyImage(newsArticle, setting).then(enemyImageUrl => {
+        //     console.log('enemyImageUrl: ', enemyImageUrl);
+        //     if (enemyImageUrl) {
+        //         scene.load.image('generatedEnemy', enemyImageUrl);
                 scene.load.once('complete', () => {
+                    console.log('scene.load.once complete...');
                     for (let i = 0; i < 3; i++) {
                         let x = Phaser.Math.Between(50, 750);
                         let y = Phaser.Math.Between(50, 550);
@@ -384,10 +385,10 @@ function spawnEnemies(scene) {
                     scene.physics.add.collider(scene.enemies, scene.enemies);
                 });
                 scene.load.start();
-            } else {
-                console.error('Failed to generate enemy image');
-            }
-        });
+        //     } else {
+        //         console.error('Failed to generate enemy image');
+        //     }
+        // });
     } else {
         console.error('No news data available to generate enemies');
     }
@@ -736,12 +737,17 @@ async function imageUrlToBase64(url) {
   };
   
   function getBase64Image(imgElementID) {
+    console.log('getBase64Image... imgElementID: ', imgElementID);
     const img = document.getElementById(imgElementID);
+    console.log('getBase64Image... img: ', img);
     var canvas = document.createElement("canvas");
     canvas.width = img.width;
     canvas.height = img.height;
     var ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0);
     var dataURL = canvas.toDataURL("image/png");
-    return dataURL.replace(/^data:image\/?[A-z]*;base64,/);
+    console.log('getBase64Image... dataURL: ', dataURL);
+    var formattedURL = dataURL.replace(/^data:image\/?[A-z]*;base64,/);
+    console.log('getBase64Image... returning formattedURL: ', formattedURL);
+    return formattedURL;
   }
