@@ -364,7 +364,7 @@ async function generateEnemyImage(newsArticle, setting) {
 }
 
 function spawnEnemies(scene) {
-    console.log('spawnEnemies...');
+    console.log('spawnEnemies... enemyImageBase64: ', enemyImageBase64);
     if (newsData.length > 0) {
         const newsArticle = newsData[0]; // Use the first article for the enemy
         // generateEnemyImage(newsArticle, setting).then(enemyImageUrl => {
@@ -642,7 +642,7 @@ function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
         enemySpriteUrl = imageUrl;
-        enemyImageBase64 = fetchImageAsBase64('npc_img');
+        enemyImageBase64 = fetchImageAsBase64(imageUrl);
     }
 
     const personaElement = document.createElement('p');
