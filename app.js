@@ -642,7 +642,7 @@ function displayAIResponse(newsTitle, aiResponse, persona, imageUrl) {
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
         enemySpriteUrl = imageUrl;
-        enemyImageBase64 = fetchImageAsBase64(imageUrl);
+        enemyImageBase64 = getBase64Image('npc_img');
     }
 
     const personaElement = document.createElement('p');
