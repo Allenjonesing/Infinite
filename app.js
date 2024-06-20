@@ -19,8 +19,15 @@ class ExplorationScene extends Phaser.Scene {
 
     async create() {
         // Fetch news data and generate AI responses
-        newsData = await fetchNews(personas);
+        newsData = await fetchNews();
         const personas = await generatePersonas(setting);
+        // Automatically set the setting based on the first news article
+        setting = `A fictional version of ${newsData[0].location}`;
+
+        await generateAIResponses(personas, setting);
+        loadingMessage.style.display = 'none';
+        newsContainer.style.display = 'block';
+
 
         // Create player
         this.player = this.physics.add.sprite(400, 300, 'player');
@@ -360,7 +367,7 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-async function fetchNews(personas) {
+async function fetchNews() {
     const loadingMessage = document.getElementById('loading');
     const newsContainer = document.getElementById('news');
 
@@ -393,13 +400,7 @@ async function fetchNews(personas) {
         }
 
         newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
-        // Automatically set the setting based on the first news article
-        setting = `A fictional version of ${newsData[0].location}`;
-
-        let generatedAIResponses = await generateAIResponses(personas, setting);
-        loadingMessage.style.display = 'none';
-        newsContainer.style.display = 'block';
-        return generatedAIResponses;
+        return newsData;
     } catch (error) {
         console.error('Error fetching news:', error);
         newsContainer.innerHTML = `<div class="error-message">Error fetching news: ${error.message}</div>`;
