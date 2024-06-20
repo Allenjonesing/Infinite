@@ -229,8 +229,8 @@ class BattleScene extends Phaser.Scene {
     createUI() {
         this.playerHealthText = this.add.text(50, 20, `Health: ${this.player.health}`, { fontSize: '20px', fill: '#fff' });
         this.playerManaText = this.add.text(50, 50, `Mana: ${this.player.mana}`, { fontSize: '20px', fill: '#fff' });
-        this.enemyHealthText = this.add.text(450, 20, `Health: ${this.enemy.health}`, { fontSize: '20px', fill: '#fff' });
-
+        this.enemyHealthText = this.add.text(650, 20, `Health: ${this.enemy.health}`, { fontSize: '20px', fill: '#fff' });
+    
         this.actions = this.add.group();
         for (let i = 0; i < this.player.actions.length; i++) {
             let actionText = this.add.text(50, 100 + i * 50, this.player.actions[i], { fontSize: '20px', fill: '#fff', backgroundColor: '#000', padding: { left: 10, right: 10, top: 5, bottom: 5 } });
@@ -238,17 +238,17 @@ class BattleScene extends Phaser.Scene {
             actionText.on('pointerdown', () => this.handlePlayerAction(this.player.actions[i], this.chooseElement()));
             this.actions.add(actionText);
         }
-
-        this.turnOrderText = this.add.text(650, 20, 'Turn Order:', { fontSize: '20px', fill: '#fff' });
+    
+        this.turnOrderText = this.add.text(650, 100, 'Turn Order:', { fontSize: '20px', fill: '#fff' });
         this.updateTurnOrderDisplay();
-
+    
         // Help bar at the top
         this.helpText = this.add.text(200, 20, '', { fontSize: '20px', fill: '#fff' });
-
+    
         // Add initial description
         this.helpText.setText('A battle has started! Choose your actions wisely.');
     }
-
+    
     chooseElement() {
         const elements = ['fire', 'ice', 'water', 'lightning'];
         return elements[Math.floor(Math.random() * elements.length)];
@@ -331,46 +331,43 @@ class BattleScene extends Phaser.Scene {
 
     enemyAction() {
         const performEnemyAction = () => {
-            if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
-                if (!this.isCooldown) {
-                    let damage = 0;
-                    let critical = false;
-                    const action = this.enemy.actions[Math.floor(Math.random() * this.enemy.actions.length)];
-                    if (action === 'Attack') {
-                        damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
+            if (this.turnOrder[this.currentTurnIndex].name === 'Enemy' && !this.isCooldown) {
+                let damage = 0;
+                let critical = false;
+                const action = this.enemy.actions[Math.floor(Math.random() * this.enemy.actions.length)];
+                if (action === 'Attack') {
+                    damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
+                    critical = Math.random() < 0.1;
+                    if (critical) {
+                        damage = this.calculateDamage(this.enemy.atk, 0, this.enemy.luk, this.player.eva);
+                    }
+                    this.showDamageIndicator(this.player.sprite, damage, critical);
+                } else if (action === 'Magic Attack') {
+                    const elements = ['fire', 'ice', 'water', 'lightning'];
+                    const elementType = elements[Math.floor(Math.random() * elements.length)];
+                    if (this.enemy.mana >= 10) {
+                        damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.enemy.element[elementType], this.player.element[elementType], this.enemy.luk, this.player.eva);
                         critical = Math.random() < 0.1;
                         if (critical) {
-                            damage = this.calculateDamage(this.enemy.atk, 0, this.enemy.luk, this.player.eva);
+                            damage = this.calculateMagicDamage(this.enemy.magAtk, 0, this.enemy.element[elementType], this.player.element[elementType], this.enemy.luk, this.player.eva);
                         }
+                        this.enemy.mana -= 10;
                         this.showDamageIndicator(this.player.sprite, damage, critical);
-                    } else if (action === 'Magic Attack') {
-                        const elements = ['fire', 'ice', 'water', 'lightning'];
-                        const elementType = elements[Math.floor(Math.random() * elements.length)];
-                        if (this.enemy.mana >= 10) {
-                            damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.enemy.element[elementType], this.player.element[elementType], this.enemy.luk, this.player.eva);
-                            critical = Math.random() < 0.1;
-                            if (critical) {
-                                damage = this.calculateMagicDamage(this.enemy.magAtk, 0, this.enemy.element[elementType], this.player.element[elementType], this.enemy.luk, this.player.eva);
-                            }
-                            this.enemy.mana -= 10;
-                            this.showDamageIndicator(this.player.sprite, damage, critical);
-                        } else {
-                            return;
-                        }
+                    } else {
+                        return;
                     }
-                    this.player.health -= damage;
-                    this.playerHealthText.setText(`Health: ${this.player.health}`);
-                    this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
-                    this.startCooldown();
-                } else {
-                    this.time.delayedCall(200, performEnemyAction, [], this);
                 }
+                this.player.health -= damage;
+                this.playerHealthText.setText(`Health: ${this.player.health}`);
+                this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
+                this.startCooldown();
+            } else {
+                this.time.delayedCall(200, performEnemyAction, [], this);
             }
         };
         performEnemyAction();
     }
-
-
+    
     showDamageIndicator(target, damage, critical) {
         const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '20px', fill: critical ? '#ff0000' : '#ffffff' });
         this.tweens.add({
