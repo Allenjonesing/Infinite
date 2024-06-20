@@ -18,16 +18,7 @@ class ExplorationScene extends Phaser.Scene {
     }
 
     async create() {
-        // Fetch news data and generate AI responses
-        newsData = await fetchNews();
-        const personas = await generatePersonas(setting);
-        // Automatically set the setting based on the first news article
-        setting = `A fictional version of ${newsData[0].location}`;
-
-        await generateAIResponses(personas, setting);
-        loadingMessage.style.display = 'none';
-        newsContainer.style.display = 'block';
-
+        setting = prompt("Enter a setting for the game (e.g., Medieval, Futuristic, etc.):");
 
         // Create player
         this.player = this.physics.add.sprite(400, 300, 'player');
@@ -71,23 +62,28 @@ class ExplorationScene extends Phaser.Scene {
             this.player.body.setVelocity(0, 0);
         });
 
+        // Fetch news data and generate AI responses
+        const personas = await generatePersonas(setting);
+        newsData = await fetchNews(personas, setting);
 
-        this.npcs.children.iterate(async (npc, index) => {
+        this.npcs.children.iterate((npc, index) => {
             let persona = personas[index % personas.length]; // Cycle through personas
             npc.persona = persona;
             // Assign news articles to NPCs
             let newsIndex = index % newsData.length;
             npc.newsText = newsData[newsIndex].description;
-            enemyImageBase64 = await generateEnemyImage(personas[0]);
         });
 
         // Enable NPC interaction
         this.npcs.children.iterate((npc) => {
             npc.setInteractive();
             npc.on('pointerdown', () => {
-                alert(`${npc.persona.name}: ${npc.persona.description}. Here in ${setting}, we're facing a monster called ${npc.newsText}`);
+                alert(`${npc.persona}: ${npc.response}`);
             });
         });
+
+        const newsArticle = newsData[0]; // Use the first article for the enemy
+        enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
 
         // Spawn enemies after data is ready
         spawnEnemies(this);
@@ -99,19 +95,17 @@ class ExplorationScene extends Phaser.Scene {
     }
 
     update() {
-        if (this.input.activePointer.isDown) {
-            target = { x: this.input.activePointer.worldX, y: this.input.activePointer.worldY };
-        }
-
         if (target) {
             this.physics.moveTo(this.player, target.x, target.y, 100);
         }
 
+        // Enemy movement towards player
         if (this.enemies && this.enemies.children) {
             this.enemies.children.iterate((enemy) => {
                 this.physics.moveToObject(enemy, this.player, 50);
             });
 
+            // Prevent enemies from sliding after being pushed
             this.enemies.children.iterate((enemy) => {
                 if (enemy.body.speed > 0) {
                     enemy.body.setVelocity(0, 0);
@@ -119,6 +113,7 @@ class ExplorationScene extends Phaser.Scene {
             });
         }
 
+        // Prevent NPCs from sliding after being pushed
         this.npcs.children.iterate((npc) => {
             if (npc.body.speed > 0) {
                 npc.body.setVelocity(0, 0);
@@ -274,11 +269,10 @@ class BattleScene extends Phaser.Scene {
 
     startCooldown() {
         this.isCooldown = true;
-
-        this.time.delayedCall(200, () => {  // Shorter delay for quicker response
-            this.nextTurn();
-            this.updateTurnOrderDisplay();  // Ensure UI updates immediately after turn change
+        this.updateTurnOrderDisplay();
+        this.time.delayedCall(2000, () => {
             this.isCooldown = false;
+            this.nextTurn();
         }, [], this);
     }
 
@@ -302,8 +296,8 @@ class BattleScene extends Phaser.Scene {
     }
 }
 
-async function generateEnemyImage(persona) {
-    const prompt = `Generate an image of the moster described by this Persona: `;
+async function generateEnemyImage(newsArticle, setting) {
+    const prompt = `Generate an image of an enemy based on the following news article and setting:\n\nTitle: ${newsArticle.title}\nDescription: ${newsArticle.description}\nSetting: ${setting}`;
     const encodedPrompt = encodeURIComponent(prompt);
 
     try {
@@ -367,7 +361,7 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-async function fetchNews() {
+async function fetchNews(personas, setting) {
     const loadingMessage = document.getElementById('loading');
     const newsContainer = document.getElementById('news');
 
@@ -400,7 +394,10 @@ async function fetchNews() {
         }
 
         newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
-        return newsData;
+        let generatedAIResponses = await generateAIResponses(personas, setting);
+        loadingMessage.style.display = 'none';
+        newsContainer.style.display = 'block';
+        return generatedAIResponses;
     } catch (error) {
         console.error('Error fetching news:', error);
         newsContainer.innerHTML = `<div class="error-message">Error fetching news: ${error.message}</div>`;
@@ -430,7 +427,7 @@ async function generateAIResponses(personas, setting) {
     for (let i = 0; i < newsData.length; i++) {
         const news = newsData[i];
         const persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
-        const prompt = `As ${persona.name}, ${persona.description}, as it pertains to the setting chosen: ${setting}. Make up how the following news article brought about about monsters: news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
+        const prompt = `As ${persona.name}, ${persona.description}, as it pertains to the setting chosen: ${setting}. Discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
 
         try {
             const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodeURIComponent(prompt)}`, {
@@ -517,7 +514,7 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
 }
 
 async function generatePersonas(setting) {
-    const prompt = `Generate a short (5-10 word) and detailed fictional personas for a ${setting} setting in JSON format. The persona should have a name and a description.`;
+    const prompt = `Generate 5 short (5-10 word) and detailed fictional personas for a ${setting} setting in JSON format. Each persona should have a name and a description.`;
     const encodedPrompt = encodeURIComponent(prompt);
     let parsedPersonas = [];
 
