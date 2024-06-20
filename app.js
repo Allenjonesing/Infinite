@@ -268,20 +268,24 @@ class BattleScene extends Phaser.Scene {
     }
 
     handlePlayerAction(action) {
+        console.log('handlePlayerAction...');
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
             if (action === 'Attack') {
                 const damage = Math.max(0, this.player.atk - this.enemy.def);
                 this.enemy.health -= damage;
                 this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
                 this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
+                this.player.isDefending = false;
             } else if (action === 'Defend') {
                 this.player.def += 5; // Temporary defense boost
+                this.player.isDefending = true;
             }
             this.startCooldown();
         }
     }
 
     enemyAction() {
+        console.log('enemyAction...');
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
             const damage = Math.max(0, this.enemy.atk - this.player.def);
             this.player.health -= damage;
@@ -292,6 +296,7 @@ class BattleScene extends Phaser.Scene {
     }
 
     startCooldown() {
+        console.log('startCooldown...');
         this.isCooldown = true;
 
         this.time.delayedCall(200, () => {  // Shorter delay for quicker response
@@ -302,8 +307,10 @@ class BattleScene extends Phaser.Scene {
     }
 
     nextTurn() {
-        if (this.turnOrder[this.currentTurnIndex].name === 'Player') {
+        console.log('nextTurn...');
+        if (this.turnOrder[this.currentTurnIndex].name === 'Player' && this.player.isDefending) {
             this.player.def -= 5; // Reset defense boost after turn
+            this.player.isDefending = false;
         }
 
         this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
