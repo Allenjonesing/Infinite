@@ -271,27 +271,25 @@ class BattleScene extends Phaser.Scene {
     }
 
     handlePlayerAction(action) {
-        console.log('handlePlayerAction...');
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
             if (action === 'Attack') {
-                const damage = Math.max(0, this.player.atk - this.enemy.def);
+                let damage = Math.random() < 0.1 ? this.player.atk : Math.max(1, this.player.atk - this.enemy.def + Phaser.Math.Between(-2, 2));
                 this.enemy.health -= damage;
                 this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
                 this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
-                this.player.isDefending = false;
             } else if (action === 'Defend') {
-                this.player.def += 5; // Temporary defense boost
+                this.player.def *= 2; // Temporary defense boost
                 this.player.isDefending = true;
             }
             this.startCooldown();
         }
     }
-
+    
     enemyAction() {
         if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
             const performEnemyAction = () => {
                 if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
-                    const damage = Math.max(0, this.enemy.atk - this.player.def);
+                    let damage = Math.random() < 0.1 ? this.enemy.atk : Math.max(1, this.enemy.atk - this.player.def + Phaser.Math.Between(-2, 2));
                     this.player.health -= damage;
                     this.playerHealthText.setText(`Health: ${this.player.health}`);
                     this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
@@ -304,7 +302,7 @@ class BattleScene extends Phaser.Scene {
             performEnemyAction();
         }
     }
-    
+        
     startCooldown() {
         this.isCooldown = true;
     
@@ -318,7 +316,7 @@ class BattleScene extends Phaser.Scene {
     nextTurn() {
         console.log('nextTurn...');
         if (this.turnOrder[this.currentTurnIndex].name === 'Player' && this.player.isDefending) {
-            this.player.def -= 5; // Reset defense boost after turn
+            this.player.def /= 2; // Reset defense boost after turn
             this.player.isDefending = false;
         }
 
