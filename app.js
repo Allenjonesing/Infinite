@@ -375,8 +375,8 @@ function spawnEnemies(scene) {
         // generateEnemyImage(newsArticle, setting).then(enemyImageBase64 => {
         //     console.log('spawnEnemies... enemyImageBase64: ', enemyImageBase64)
         //     if (enemyImageBase64) {
-        const imageKey = 'enemyImageBase64';
-        scene.textures.addBase64(imageKey, enemyImageBase64);
+        scene.textures.addBase64('enemyImageBase64', enemyImageBase64);
+        scene.textures.addBase64('npcBase64image', npcBase64image);
         for (let i = 0; i < 3; i++) {
             let x = Phaser.Math.Between(50, 750);
             let y = Phaser.Math.Between(50, 550);
@@ -642,7 +642,6 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
         npcBase64image = imageBase64;
-        this.textures.addBase64('npcBase64image', npcBase64image);
     }
 
     const personaElement = document.createElement('p');
