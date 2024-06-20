@@ -5,7 +5,7 @@ let newsData = []; // Global variable to store news articles
 let setting = ''; // Global variable to store the game setting
 let enemyImageBase64 = '';
 let npcBase64image = '';
-let monsterDescriptionResponse = '';
+let monsterDescription = '';
 let personas;
 
 class ExplorationScene extends Phaser.Scene {
@@ -296,7 +296,7 @@ class BattleScene extends Phaser.Scene {
 }
 
 async function generateEnemyImage(newsArticle, setting) {
-    const prompt = `Generate an image of an enemy based on the following description:${monsterDescriptionResponse}`;
+    const prompt = `Generate an image of an enemy based on the following description:${monsterDescription}`;
     const encodedPrompt = encodeURIComponent(prompt);
 
     try {
@@ -425,7 +425,7 @@ async function generateAIResponses() {
     for (let i = 0; i < newsData.length; i++) {
         const news = newsData[i];
 
-        const prompt = `Describe in 10-20 words a fictional version of following news article with no likeness to real people or brand names:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
+        var prompt = `Describe in 10-20 words a fictional version of following news article with no likeness to real people or brand names:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
 
         try {
             const settingResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodeURIComponent(prompt)}`, {
@@ -448,7 +448,7 @@ async function generateAIResponses() {
                 personas = await generatePersonas(textContent);
                 let foundPersonas = personas.characters && Array.isArray(personas.characters) ? personas.characters : personas;
                 const persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
-                const prompt = `As ${persona.name}, ${persona.description}, in the setting chosen: ${setting}. Describe a Monster that we'll be faced to fight due to a made up reason that makes sense.`;
+                prompt = `As ${persona.name}, ${persona.description}, in the setting chosen: ${setting}. Describe a Monster that we'll be faced to fight due to a made up reason that makes sense.`;
 
                 try {
                     const monsterDescriptionResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodeURIComponent(prompt)}`, {
@@ -466,7 +466,7 @@ async function generateAIResponses() {
                     const monsterDescriptionResponseJson = await monsterDescriptionResponse.json();
 
                     if (monsterDescriptionResponseJson && monsterDescriptionResponseJson.choices && monsterDescriptionResponseJson.choices[0] && monsterDescriptionResponseJson.choices[0].message && monsterDescriptionResponseJson.choices[0].message.content) {
-                        monsterDescriptionResponse = monsterDescriptionResponseJson.choices[0].message.content;
+                        monsterDescription = monsterDescriptionResponseJson.choices[0].message.content;
                         const imgPrompt = `Generate an image of ${persona.name}, ${persona.description} in the setting chosen: ${setting}.`;
 
                         try {
@@ -486,8 +486,8 @@ async function generateAIResponses() {
                             const parsedBody = JSON.parse(data.body);
                             if (parsedBody && parsedBody.base64_image) {
                                 const base64string = `data:image/png;base64,${parsedBody.base64_image}`;
-                                responses.push({ response: monsterDescriptionResponse, persona: persona, imageBase64: base64string });
-                                displayAIResponse(news.title, monsterDescriptionResponse, persona, base64string);
+                                responses.push({ response: monsterDescription, persona: persona, imageBase64: base64string });
+                                displayAIResponse(news.title, monsterDescription, persona, base64string);
                             } else {
                                 throw new Error('No image generated');
                             }
