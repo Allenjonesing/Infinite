@@ -150,11 +150,18 @@ class BattleScene extends Phaser.Scene {
         this.player = {
             name: 'Player',
             health: playerStats.health,
-            speed: playerStats.speed,
+            mana: playerStats.mana,
             atk: playerStats.atk,
             def: playerStats.def,
+            spd: playerStats.spd,
+            eva: playerStats.eva,
+            magAtk: playerStats.magAtk,
+            magDef: playerStats.magDef,
+            luk: playerStats.luk,
+            wis: playerStats.wis,
             sprite: null,
-            actions: ['Attack', 'Defend']
+            actions: ['Attack', 'Defend', 'Magic Attack'],
+            element: playerStats.element // Example element multipliers
         };
 
         console.log('create... this.player: ', this.player);
@@ -164,11 +171,18 @@ class BattleScene extends Phaser.Scene {
         this.enemy = {
             name: 'Enemy',
             health: enemyStats.health,
-            speed: enemyStats.speed,
+            mana: enemyStats.mana,
             atk: enemyStats.atk,
             def: enemyStats.def,
+            spd: enemyStats.spd,
+            eva: enemyStats.eva,
+            magAtk: enemyStats.magAtk,
+            magDef: enemyStats.magDef,
+            luk: enemyStats.luk,
+            wis: enemyStats.wis,
             sprite: null,
-            actions: ['Attack']
+            actions: ['Attack', 'Defend', 'Magic Attack'],
+            element: enemyStats.element // Example element multipliers
         };
         console.log('create... this.enemy: ', this.enemy);
 
@@ -213,22 +227,25 @@ class BattleScene extends Phaser.Scene {
     }
 
     createUI() {
-        // Display health bars and actions
         this.playerHealthText = this.add.text(50, 50, `Health: ${this.player.health}`, { fontSize: '20px', fill: '#fff' });
+        this.playerManaText = this.add.text(50, 80, `Mana: ${this.player.mana}`, { fontSize: '20px', fill: '#fff' });
         this.enemyHealthText = this.add.text(450, 50, `Health: ${this.enemy.health}`, { fontSize: '20px', fill: '#fff' });
 
-        // Display action buttons for the player
         this.actions = this.add.group();
         for (let i = 0; i < this.player.actions.length; i++) {
-            let actionText = this.add.text(50, 100 + i * 30, this.player.actions[i], { fontSize: '20px', fill: '#fff' });
+            let actionText = this.add.text(50, 130 + i * 30, this.player.actions[i], { fontSize: '20px', fill: '#fff' });
             actionText.setInteractive();
-            actionText.on('pointerdown', () => this.handlePlayerAction(this.player.actions[i]));
+            actionText.on('pointerdown', () => this.handlePlayerAction(this.player.actions[i], this.chooseElement()));
             this.actions.add(actionText);
         }
 
-        // Display turn order list
         this.turnOrderText = this.add.text(600, 50, 'Turn Order:', { fontSize: '20px', fill: '#fff' });
         this.updateTurnOrderDisplay();
+    }
+
+    chooseElement() {
+        const elements = ['fire', 'ice', 'water', 'lightning'];
+        return elements[Math.floor(Math.random() * elements.length)];
     }
 
     calculateTurnOrder() {
@@ -270,26 +287,49 @@ class BattleScene extends Phaser.Scene {
         });
     }
 
-    handlePlayerAction(action) {
+    handlePlayerAction(action, elementType = null) {
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
+            let damage = 0;
             if (action === 'Attack') {
-                let damage = Math.random() < 0.1 ? this.player.atk : Math.max(1, this.player.atk - this.enemy.def + Phaser.Math.Between(-2, 2));
-                this.enemy.health -= damage;
-                this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
-                this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
+                damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.luk, this.enemy.eva);
+            } else if (action === 'Magic Attack') {
+                if (this.player.mana >= 10) { // Assume each magic attack costs 10 mana
+                    damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.player.element[elementType], this.enemy.element[elementType], this.player.luk, this.enemy.eva);
+                    this.player.mana -= 10;
+                } else {
+                    alert("Not enough mana!");
+                    return;
+                }
             } else if (action === 'Defend') {
                 this.player.def *= 2; // Temporary defense boost
                 this.player.isDefending = true;
+
             }
+            this.enemy.health -= damage;
+            this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
+            this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
             this.startCooldown();
         }
     }
-    
+
     enemyAction() {
         if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
             const performEnemyAction = () => {
                 if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
-                    let damage = Math.random() < 0.1 ? this.enemy.atk : Math.max(1, this.enemy.atk - this.player.def + Phaser.Math.Between(-2, 2));
+                    let damage = 0;
+                    const action = this.enemy.actions[Math.floor(Math.random() * this.enemy.actions.length)];
+                    if (action === 'Attack') {
+                        damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
+                    } else if (action === 'Magic Attack') {
+                        const elements = ['fire', 'ice', 'water', 'lightning'];
+                        const elementType = elements[Math.floor(Math.random() * elements.length)];
+                        if (this.enemy.mana >= 10) {
+                            damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.enemy.element[elementType], this.player.element[elementType], this.enemy.luk, this.player.eva);
+                            this.enemy.mana -= 10;
+                        } else {
+                            return;
+                        }
+                    }
                     this.player.health -= damage;
                     this.playerHealthText.setText(`Health: ${this.player.health}`);
                     this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
@@ -298,21 +338,42 @@ class BattleScene extends Phaser.Scene {
                     this.time.delayedCall(200, performEnemyAction, [], this);
                 }
             };
-    
+
             performEnemyAction();
         }
     }
-        
+
+    calculateDamage(atk, def, luk, eva) {
+        let baseDamage = Math.max(1, atk - def + Phaser.Math.Between(-2, 2));
+        let criticalHit = Math.random() < (0.1 + luk * 0.01);
+        if (criticalHit) {
+            baseDamage *= 2;
+        }
+        let evaded = Math.random() < (eva * 0.01);
+        return evaded ? 0 : baseDamage;
+    }
+
+    calculateMagicDamage(magAtk, magDef, attackerElement, defenderElement, luk, eva) {
+        let baseDamage = Math.max(1, magAtk - magDef + Phaser.Math.Between(-2, 2));
+        baseDamage *= attackerElement * defenderElement; // Elemental multiplier
+        let criticalHit = Math.random() < (0.1 + luk * 0.01);
+        if (criticalHit) {
+            baseDamage *= 2;
+        }
+        let evaded = Math.random() < (eva * 0.01);
+        return evaded ? 0 : baseDamage;
+    }
+
     startCooldown() {
         this.isCooldown = true;
-    
+
         this.time.delayedCall(1000, () => {  // Delay of 1 second for a more natural response
             this.isCooldown = false;
             this.nextTurn();
             this.updateTurnOrderDisplay();  // Ensure UI updates immediately after turn change
         }, [], this);
     }
-    
+
     nextTurn() {
         console.log('nextTurn...');
         if (this.turnOrder[this.currentTurnIndex].name === 'Player' && this.player.isDefending) {
@@ -615,9 +676,9 @@ async function generatePersonas(setting) {
 
 async function fetchEnemyStats() {
     console.log('fetchEnemyStats...');
-    const prompt = `Generate stats for an enemy based on this description: ${monsterDescription}. They must be in JSON like {health,speed,atk,def}, where health is 10-500, and speed/atk/def are each 1-50. Balance the stats so that if one is high, another is low. If the monster is larger, the health, atk, and def will be high, for example.`;
+    const prompt = `Generate stats for an enemy based on this description: ${monsterDescription}. They must be in  JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 10-1000, mana is 10-500, atk through wis are each 1-100, and the 4 elements are each a float between 0.0 and 3.0. Balance the stats so that if one is high, another is low.`;
     const encodedPrompt = encodeURIComponent(prompt);
-    
+
     try {
         const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
             method: 'POST',
@@ -626,11 +687,11 @@ async function fetchEnemyStats() {
             },
             body: JSON.stringify({ prompt: prompt })
         });
-        
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        
+
         console.log('fetchEnemyStats... response: ', response);
         const data = await response.json();
         console.log('fetchEnemyStats... data: ', data);
@@ -647,9 +708,9 @@ async function fetchEnemyStats() {
 
 async function fetchPlayerStats() {
     console.log('fetchPlayerStats...');
-    const prompt = `Generate stats for the player based on this description: ${persona.name}, ${persona.description}. They must be in JSON like {health,speed,atk,def}, where health is 10-500, and speed/atk/def are each 1-50. Balance the stats so that if one is high, another is low. If the player is smarter, the speed and def will be high, for example.`;
+    const prompt = `Generate stats for the player based on this description: ${persona.name}, ${persona.description}. They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 10-1000, mana is 10-500, atk through wis are each 1-100, and the 4 elements are each a float between 0.0 and 3.0. Balance the stats so that if one is high, another is low.`;
     const encodedPrompt = encodeURIComponent(prompt);
-    
+
     try {
         const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
             method: 'POST',
@@ -658,11 +719,11 @@ async function fetchPlayerStats() {
             },
             body: JSON.stringify({ prompt: prompt })
         });
-        
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        
+
         console.log('fetchPlayerStats... response: ', response);
         const data = await response.json();
         console.log('fetchPlayerStats... data: ', data);
