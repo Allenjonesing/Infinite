@@ -263,7 +263,11 @@ class BattleScene extends Phaser.Scene {
         this.add.graphics().lineStyle(2, 0xff0000).strokeRect(440, 90, 200, 75);
 
         // Add border around action buttons
-        this.add.graphics().lineStyle(2, 0xffff00).strokeRect(190, 490, 520, 60);
+        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(190, 490, 520, 60);
+
+        // Initially hide the action buttons and box
+        this.actions.children.each(action => action.setVisible(false));
+        this.actionBox.setVisible(false);
     }
 
     chooseElement() {
@@ -350,9 +354,10 @@ class BattleScene extends Phaser.Scene {
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
             this.playerManaText.setText(`Mana: ${this.player.mana}`);
             this.startCooldown();
+            this.hidePlayerActions();
         }
     }
-        
+
     enemyAction() {
         const performEnemyAction = () => {
             console.log('performEnemyAction called');
@@ -404,7 +409,7 @@ class BattleScene extends Phaser.Scene {
         console.log('Enemy action started');
         performEnemyAction();
     }
-        
+
     showDamageIndicator(target, damage, critical) {
         const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '60px', fill: critical ? '#ff0000' : '#ffffff', fontStyle: 'bold' });
         this.tweens.add({
@@ -458,11 +463,25 @@ class BattleScene extends Phaser.Scene {
         }
 
         this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
-        if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
-            this.enemyAction();
+
+        if (this.turnOrder[this.currentTurnIndex].name === 'Player') {
+            this.showPlayerActions();
         } else {
-            this.updateTurnOrderDisplay();
+            this.hidePlayerActions();
+            this.enemyAction();
         }
+        this.updateTurnOrderDisplay();
+    }
+
+    showPlayerActions() {
+        this.actions.children.each(action => action.setVisible(true));
+        this.actionBox.setVisible(true);
+        this.helpText.setText('Your turn! Choose your action wisely.');
+    }
+
+    hidePlayerActions() {
+        this.actions.children.each(action => action.setVisible(false));
+        this.actionBox.setVisible(false);
     }
 
     playAttackAnimation(attacker, defender) {
@@ -494,17 +513,17 @@ class BattleScene extends Phaser.Scene {
                 color = 0xffffff; // Default to white
                 break;
         }
-    
+
         let magicBall = this.add.circle(attacker.x, attacker.y, 30, color);
         this.physics.add.existing(magicBall);
         this.physics.moveTo(magicBall, defender.x > 400 ? defender.x + 200 : defender.x, defender.y, 300);
-    
-        this.time.delayedCall(1250, () => {
+
+        this.time.delayedCall(750, () => {
             magicBall.destroy();
             this.showDamageIndicator(defender, damage, critical);
         });
     }
-    
+
 }
 
 async function generateEnemyImage(newsArticle, setting) {
@@ -731,7 +750,7 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
     titleElement.textContent = `Based on the News Article: ${newsTitle}`;
     newsItem.appendChild(titleElement);
 
-    
+
     const personaElement = document.createElement('h5');
     personaElement.textContent = `You will be playing as: ${persona.name}, ${persona.description}`;
     newsItem.appendChild(personaElement);
@@ -744,11 +763,11 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
         newsItem.appendChild(imageElement);
         npcBase64image = imageBase64;
     }
-    
+
     const contentElement = document.createElement('h4');
     contentElement.textContent = `You will be fighting: ${aiResponse}`;
     newsItem.appendChild(contentElement);
-    
+
     newsContainer.appendChild(newsItem);
 }
 
