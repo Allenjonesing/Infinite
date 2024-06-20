@@ -5,6 +5,8 @@ let newsData = []; // Global variable to store news articles
 let setting = ''; // Global variable to store the game setting
 let enemyImageBase64 = '';
 let npcBase64image = '';
+let monsterDescriptionResponse = '';
+let personas;
 
 class ExplorationScene extends Phaser.Scene {
     constructor() {
@@ -18,8 +20,6 @@ class ExplorationScene extends Phaser.Scene {
     }
 
     async create() {
-        setting = prompt("Enter a setting for the game (e.g., Medieval, Futuristic, etc.):");
-
         // Create player
         this.player = this.physics.add.sprite(400, 300, 'player');
         this.player.setCollideWorldBounds(true);
@@ -63,8 +63,7 @@ class ExplorationScene extends Phaser.Scene {
         });
 
         // Fetch news data and generate AI responses
-        const personas = await generatePersonas(setting);
-        newsData = await fetchNews(personas, setting);
+        newsData = await fetchNews();
 
         this.npcs.children.iterate((npc, index) => {
             let persona = personas[index % personas.length]; // Cycle through personas
@@ -297,7 +296,7 @@ class BattleScene extends Phaser.Scene {
 }
 
 async function generateEnemyImage(newsArticle, setting) {
-    const prompt = `Generate an image of an enemy based on the following news article and setting:\n\nTitle: ${newsArticle.title}\nDescription: ${newsArticle.description}\nSetting: ${setting}`;
+    const prompt = `Generate an image of an enemy based on the following description:${monsterDescriptionResponse}`;
     const encodedPrompt = encodeURIComponent(prompt);
 
     try {
@@ -361,7 +360,7 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-async function fetchNews(personas, setting) {
+async function fetchNews() {
     const loadingMessage = document.getElementById('loading');
     const newsContainer = document.getElementById('news');
 
@@ -394,7 +393,7 @@ async function fetchNews(personas, setting) {
         }
 
         newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
-        let generatedAIResponses = await generateAIResponses(personas, setting);
+        let generatedAIResponses = await generateAIResponses();
         loadingMessage.style.display = 'none';
         newsContainer.style.display = 'block';
         return generatedAIResponses;
@@ -417,20 +416,19 @@ function structureNewsData(articles) {
     });
 }
 
-async function generateAIResponses(personas, setting) {
+async function generateAIResponses() {
     const newsContainer = document.getElementById('news');
     newsContainer.innerHTML = ''; // Clear previous content
     const responses = [];
 
-    let foundPersonas = personas.personas && Array.isArray(personas.personas) ? personas.personas : personas;
 
     for (let i = 0; i < newsData.length; i++) {
         const news = newsData[i];
-        const persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
-        const prompt = `As ${persona.name}, ${persona.description}, as it pertains to the setting chosen: ${setting}. Discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
+
+        const prompt = `Describe in 10-20 words a fictional version of following news article with no likeness to real people or brand names:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
 
         try {
-            const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodeURIComponent(prompt)}`, {
+            const settingResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodeURIComponent(prompt)}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -438,37 +436,65 @@ async function generateAIResponses(personas, setting) {
                 body: JSON.stringify({ prompt: prompt })
             });
 
-            if (!response.ok) {
+            if (!settingResponse.ok) {
                 throw new Error('Network response was not ok');
             }
 
-            const aiResponse = await response.json();
+            const settingResponseJson = await settingResponse.json();
 
-            if (aiResponse && aiResponse.choices && aiResponse.choices[0] && aiResponse.choices[0].message && aiResponse.choices[0].message.content) {
-                const textContent = aiResponse.choices[0].message.content;
-                const imgPrompt = `Generate an image of ${persona.name}, ${persona.description} in the setting chosen: ${setting}.`;
+            if (settingResponseJson && settingResponseJson.choices && settingResponseJson.choices[0] && settingResponseJson.choices[0].message && settingResponseJson.choices[0].message.content) {
+                const textContent = settingResponseJson.choices[0].message.content;
+
+                personas = await generatePersonas(textContent);
+                let foundPersonas = personas.personas && Array.isArray(personas.personas) ? personas.personas : personas;
+                const persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
+                const prompt = `As ${persona.name}, ${persona.description}, in the setting chosen: ${setting}. Describe a Monster that we'll be faced to fight due to a made up reason that makes sense.`;
 
                 try {
-                    const imageResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodeURIComponent(imgPrompt)}`, {
+                    const monsterDescriptionResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodeURIComponent(prompt)}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ prompt: imgPrompt, generateImage: true })
+                        body: JSON.stringify({ prompt: prompt })
                     });
 
-                    if (!imageResponse.ok) {
+                    if (!monsterDescriptionResponse.ok) {
                         throw new Error('Network response was not ok');
                     }
 
-                    const data = await imageResponse.json();
-                    const parsedBody = JSON.parse(data.body);
-                    if (parsedBody && parsedBody.base64_image) {
-                        const base64string = `data:image/png;base64,${parsedBody.base64_image}`;
-                        responses.push({ response: textContent, persona: persona, imageBase64: base64string });
-                        displayAIResponse(news.title, textContent, persona, base64string);
-                    } else {
-                        throw new Error('No image generated');
+                    const monsterDescriptionResponseJson = await monsterDescriptionResponse.json();
+
+                    if (monsterDescriptionResponseJson && monsterDescriptionResponseJson.choices && monsterDescriptionResponseJson.choices[0] && monsterDescriptionResponseJson.choices[0].message && monsterDescriptionResponseJson.choices[0].message.content) {
+                        monsterDescriptionResponse = monsterDescriptionResponseJson.choices[0].message.content;
+                        const imgPrompt = `Generate an image of ${persona.name}, ${persona.description} in the setting chosen: ${setting}.`;
+
+                        try {
+                            const imageResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodeURIComponent(imgPrompt)}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ prompt: imgPrompt, generateImage: true })
+                            });
+
+                            if (!imageResponse.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+
+                            const data = await imageResponse.json();
+                            const parsedBody = JSON.parse(data.body);
+                            if (parsedBody && parsedBody.base64_image) {
+                                const base64string = `data:image/png;base64,${parsedBody.base64_image}`;
+                                responses.push({ response: monsterDescriptionResponse, persona: persona, imageBase64: base64string });
+                                displayAIResponse(news.title, monsterDescriptionResponse, persona, base64string);
+                            } else {
+                                throw new Error('No image generated');
+                            }
+                        } catch (error) {
+                            console.error('Error generating AI response:', error);
+                            newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
+                        }
                     }
                 } catch (error) {
                     console.error('Error generating AI response:', error);
@@ -479,9 +505,9 @@ async function generateAIResponses(personas, setting) {
             console.error('Error generating AI response:', error);
             newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
         }
-    }
 
-    return responses;
+        return responses;
+    }
 }
 
 async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
@@ -514,7 +540,7 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
 }
 
 async function generatePersonas(setting) {
-    const prompt = `Generate 5 short (5-10 word) and detailed fictional personas for a ${setting} setting in JSON format. Each persona should have a name and a description.`;
+    const prompt = `Generate 5 short (5-10 word) and detailed fictional character (Ensure no likeness to real people/places/brands) for a ${setting} setting in JSON format. Each persona should have a name and a description.`;
     const encodedPrompt = encodeURIComponent(prompt);
     let parsedPersonas = [];
 
