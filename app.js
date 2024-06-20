@@ -191,7 +191,7 @@ class BattleScene extends Phaser.Scene {
         if (newsData.length > 0) {
             if (enemyImageBase64) {
                 this.player.sprite = this.add.sprite(150, 300, 'npcBase64image');
-                this.enemy.sprite = this.add.sprite(650, 300, 'enemyImageBase64');
+                this.enemy.sprite = this.add.sprite(550, 300, 'enemyImageBase64');
 
                 // Initialize turn order and current turn index
                 this.turnOrder = this.calculateTurnOrder();
@@ -260,7 +260,7 @@ class BattleScene extends Phaser.Scene {
 
         // Add borders around health and mana areas
         this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(40, 90, 200, 75);
-        this.add.graphics().lineStyle(2, 0xff0000).strokeRect(450, 90, 200, 75);
+        this.add.graphics().lineStyle(2, 0xff0000).strokeRect(440, 90, 200, 75);
 
         // Add border around action buttons
         this.add.graphics().lineStyle(2, 0xffff00).strokeRect(190, 490, 520, 60);
