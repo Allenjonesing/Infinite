@@ -84,15 +84,13 @@ class ExplorationScene extends Phaser.Scene {
         this.npcs.children.iterate((npc) => {
             npc.setInteractive();
             npc.on('pointerdown', () => {
-                alert(`${npc.persona}: ${npc.response}`);
+                alert(`${npc.persona.name}: ${npc.newsText}`);
             });
         });
 
         const newsArticle = newsData[0]; // Use the first article for the enemy
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
         console.log('create... enemyImageBase64: ', enemyImageBase64);
-        //jsonEnemyImageBase64 = enemyImageBase64.json();
-        //console.log('create... jsonEnemyImageBase64: ', jsonEnemyImageBase64);
 
         // Spawn enemies after data is ready
         spawnEnemies(this);
@@ -128,9 +126,7 @@ class ExplorationScene extends Phaser.Scene {
                 npc.body.setVelocity(0, 0);
             }
         });
-
     }
-
 }
 
 // Additional functions for handling damage and other game logic
@@ -157,9 +153,6 @@ class BattleScene extends Phaser.Scene {
     }
 
     async create(data) {
-        //this.add.sprite(400, 300, 'npcBase64image');
-        //this.add.sprite(400, 300, 'enemyImageBase64');
-
         this.player = data.player;
         this.enemy = data.enemy;
 
@@ -171,9 +164,6 @@ class BattleScene extends Phaser.Scene {
         if (newsData.length > 0) {
             console.log('enemyImageBase64: ', enemyImageBase64);
             if (enemyImageBase64) {
-                // const imageKey = 'generatedEnemy';
-                // this.textures.addBase64(imageKey, enemyImageBase64);
-
                 // Display player and enemy sprites
                 this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
                 this.enemy.sprite = this.add.sprite(500, 300, 'enemyImageBase64');
@@ -372,11 +362,7 @@ function spawnEnemies(scene) {
     if (newsData.length > 0) {
         const newsArticle = newsData[0]; // Use the first article for the enemy
         console.log('spawnEnemies... Generating new enemy image... ');
-        // generateEnemyImage(newsArticle, setting).then(enemyImageBase64 => {
-        //     console.log('spawnEnemies... enemyImageBase64: ', enemyImageBase64)
-        //     if (enemyImageBase64) {
         const imageKey = 'enemyImageBase64';
-        //scene.textures.addBase64(imageKey, enemyImageBase64);
         for (let i = 0; i < 3; i++) {
             let x = Phaser.Math.Between(50, 750);
             let y = Phaser.Math.Between(50, 550);
@@ -388,10 +374,6 @@ function spawnEnemies(scene) {
         scene.physics.add.collider(scene.enemies, scene.trees);
         scene.physics.add.collider(scene.npcs, scene.enemies);
         scene.physics.add.collider(scene.enemies, scene.enemies);
-        //     } else {
-        //         console.error('Failed to generate enemy image');
-        //     }
-        // });
     } else {
         console.error('No news data available to generate enemies');
     }
@@ -521,38 +503,24 @@ async function generateAIResponses(personas, setting) {
     const responses = [];
 
     let foundPersonas = [];
-    console.log('generateAIResponses... newsData: ', newsData);
     if (personas) {
-        console.log('generateAIResponses... personas: ', personas);
-        console.log('generateAIResponses... personas.personas: ', personas.personas);
-        console.log('generateAIResponses... typeof personas.personas: ', typeof personas.personas);
-        console.log('generateAIResponses... typeof personas: ', typeof personas);
-        console.log('generateAIResponses... personas.length: ', personas.length);
         if (personas.personas && personas.personas.length && typeof personas.personas == 'object') {
-            console.log('foundPersonas = personas.personas...');
             foundPersonas = personas.personas;
         } else if (personas.length && typeof personas == 'object') {
-            console.log('foundPersonas = personas...');
             foundPersonas = personas;
         } else {
             // Failsafe
-            console.log('Failsafe...');
             foundPersonas = ['Bob the Loser', 'John the terrible', 'No Work Terk', 'Jery the dim', 'Jimmy the reclaimer'];
         }
     } else {
         // MEGA Failsafe
-        console.log('Mega Failsafe...');
         foundPersonas = ['Bob the Loser', 'John the terrible', 'No Work Terk', 'Jery the dim', 'Jimmy the reclaimer'];
     }
-    console.log('generateAIResponses... foundPersonas: ', foundPersonas);
 
     for (let i = 0; i < newsData.length; i++) {
         const news = newsData[i];
-        console.log('generateAIResponses... looped news: ', news);
         const persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
-        console.log('generateAIResponses... looped persona: ', persona);
         const prompt = `As ${persona.name}, ${persona.description}, As if narrating from the perspective of the player of the game, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}, as it pertains to the setting chosen: ${setting}. Be sure to really, REALLY, get into character and blend the article with the setting without revealing ANY Brand names, celebrity names, etc.`;
-        console.log('generateAIResponses... looped prompt: ', prompt);
         const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
 
         try {
@@ -562,7 +530,7 @@ async function generateAIResponses(personas, setting) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ prompt: prompt })
-            })
+            });
 
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -577,10 +545,8 @@ async function generateAIResponses(personas, setting) {
                 && aiResponse.choices[0].message
                 && aiResponse.choices[0].message.content) {
                 const textContent = aiResponse.choices[0].message.content;
-                //responses.push({ response: aiResponse.choices[0].message.content, persona: persona });
 
                 const imgPrompt = `Generate an image of ${persona.name}, ${persona.description} in the setting chosen: ${setting}.`;
-                console.log('generateAIResponses...  imgPrompt: ', imgPrompt);
                 const encodedPrompt = encodeURIComponent(imgPrompt); // Encoding the prompt
 
                 try {
@@ -590,7 +556,7 @@ async function generateAIResponses(personas, setting) {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ prompt: imgPrompt, generateImage: true })
-                    })
+                    });
 
                     if (!imageResponse.ok) {
                         throw new Error('Network response was not ok');
@@ -600,7 +566,6 @@ async function generateAIResponses(personas, setting) {
                     const parsedBody = JSON.parse(data.body);
                     if (parsedBody && parsedBody.base64_image) {
                         const base64string = `data:image/png;base64,${parsedBody.base64_image}`;
-                        console.log('generateAIResponses... parsedBody.base64_image: ', parsedBody.base64_image);
                         responses.push({ response: textContent, persona: persona, imageBase64: base64string });
                         displayAIResponse(news.title, textContent, persona, base64string);
                     } else {
@@ -610,7 +575,6 @@ async function generateAIResponses(personas, setting) {
                     console.error('Error generating AI response:', error);
                     newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
                 }
-
             }
         } catch (error) {
             console.error('Error generating AI response:', error);
@@ -618,7 +582,6 @@ async function generateAIResponses(personas, setting) {
         }
     }
 
-    console.log('generateAIResponses... returning responses: ', responses);
     return responses;
 }
 
@@ -638,7 +601,7 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
     if (imageBase64) {
         const imageElement = document.createElement('img');
         imageElement.setAttribute("id", "enemyImage");
-        imageElement.src = imageBase64;;
+        imageElement.src = imageBase64;
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
         npcBase64image = imageBase64;
@@ -652,7 +615,6 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
 }
 
 async function generatePersonas(setting) {
-    console.log('generatePersonas... setting: ', setting);
     const prompt = `Generate 5 short (5-10 word) and detailed fictional personas for a ${setting} setting in JSON format. Each persona should have a name and a description.`;
     const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
     let parsedPersonas = [];
@@ -664,7 +626,7 @@ async function generatePersonas(setting) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ prompt: prompt })
-        })
+        });
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -681,17 +643,15 @@ async function generatePersonas(setting) {
         }
     } catch (error) {
         console.error('Error generating AI response:', error);
-        newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
+        const newsContainer = document.getElementById('news');
+        newsContainer.innerHTML += `<div class="error-message">Error generating personas: ${error.message}</div>`;
     }
 
-    console.log('generatePersonas... Returning parsedPersonas: ', parsedPersonas);
     return parsedPersonas;
 }
 
 function parsePersonas(content) {
-    console.log('parsePersonas... content: ', content);
     try {
-        console.log('parsePersonas... JSON.parse(content) ', JSON.parse(content));
         return JSON.parse(content);
     } catch (error) {
         console.error('Error parsing personas:', error);
@@ -699,96 +659,13 @@ function parsePersonas(content) {
     }
 }
 
-function toDataUrl(url, callback) {
-    console.log('toDataUrl...');
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-        console.log('onload...');
-        var reader = new FileReader();
-        reader.onloadend = function () {
-            console.log('onloadend...');
-            callback(reader.result);
-        }
-        reader.readAsDataURL(xhr.response);
-    };
-    xhr.open('GET', url);
-    xhr.responseType = 'blob';
-    xhr.send();
-    console.log('toDataUrl Complete...');
-}
-
-async function imageUrlToBase64(url) {
-    console.log('imageUrlToBase64... url: ', url);
-    const data = await fetch(url);
-    const blob = await data.blob();
-    return new Promise((resolve, reject) => {
-        console.log('Promise...');
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = () => {
-            console.log('onloadend... reader.result: ', reader.result);
-            const base64data = reader.result;
-            resolve(base64data);
-        };
-        reader.onerror = reject;
-    });
-};
-
-function getBase64Image(imgElementID) {
-    console.log('getBase64Image... imgElementID: ', imgElementID);
-    const img = document.getElementById(imgElementID);
-    console.log('getBase64Image... img: ', img);
-    if (img) {
-
-        var canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        var ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-        var dataURL = canvas.toDataURL();
-        console.log('getBase64Image... dataURL: ', dataURL);
-
-        return dataURL;
-    } else {
-        console.error('No IMG element found!');
-        return 'ERROR';
-    }
-}
-
 async function fetchImageAsBase64(url) {
-    console.log('fetchImageAsBase64... url: ', url);
     const response = await fetch(url);
-    console.log('fetchImageAsBase64... response: ', response);
     const blob = await response.blob();
-    console.log('fetchImageAsBase64... blob: ', blob);
     return new Promise((resolve, reject) => {
-        console.log('fetchImageAsBase64 Promise... ');
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
         reader.onerror = reject;
         reader.readAsDataURL(blob);
     });
-}
-
-function imageToBase64(url, callback) {
-    console.log('imageToBase64... url: ', url);
-    console.log('imageToBase64... callback: ', callback);
-    let img = new Image();
-    img.crossOrigin = 'Anonymous';
-    img.onload = function () {
-        console.log('onload...');
-        let canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        let ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        let dataURL = canvas.toDataURL('image/png');
-        console.log('imageToBase64... Calling back with dataURL: ', dataURL);
-        callback(dataURL);
-    };
-    img.onerror = function () {
-        console.error('Error loading image');
-        callback(null);
-    };
-    img.src = url;
 }
