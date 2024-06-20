@@ -152,20 +152,28 @@ class BattleScene extends Phaser.Scene {
         console.log('preload... enemyImageBase64:', enemyImageBase64);
     
         if (npcBase64image) {
-            this.textures.addBase64('npcBase64image', npcBase64image);
-            console.log('preload... NPC Base64 image added successfully');
+            try {
+                this.textures.addBase64('npcBase64image', npcBase64image);
+                console.log('preload... NPC Base64 image added successfully');
+            } catch (error) {
+                console.error('preload... Error adding NPC Base64 image:', error);
+            }
         } else {
             console.error('preload... NPC Base64 image is missing');
         }
     
         if (enemyImageBase64) {
-            this.textures.addBase64('enemyImageBase64', enemyImageBase64);
-            console.log('preload... Enemy Base64 image added successfully');
+            try {
+                this.textures.addBase64('enemyImageBase64', enemyImageBase64);
+                console.log('preload... Enemy Base64 image added successfully');
+            } catch (error) {
+                console.error('preload... Error adding Enemy Base64 image:', error);
+            }
         } else {
             console.error('preload... Enemy Base64 image is missing');
         }
     }
-        
+                
     async create(data) {
         this.player = data.player;
         this.enemy = data.enemy;
@@ -178,17 +186,25 @@ class BattleScene extends Phaser.Scene {
         console.log('create... Enemy Base64 image:', enemyImageBase64);
     
         if (npcBase64image && this.textures.exists('npcBase64image')) {
-            this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
-            console.log('create... NPC sprite added successfully');
+            try {
+                this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
+                console.log('create... NPC sprite added successfully');
+            } catch (error) {
+                console.error('create... Error adding NPC sprite:', error);
+            }
         } else {
-            console.error('create... Failed to add NPC sprite');
+            console.error('create... Failed to add NPC sprite. Base64 image or texture does not exist.');
         }
     
         if (enemyImageBase64 && this.textures.exists('enemyImageBase64')) {
-            this.enemy.sprite = this.add.sprite(500, 300, 'enemyImageBase64');
-            console.log('create... Enemy sprite added successfully');
+            try {
+                this.enemy.sprite = this.add.sprite(500, 300, 'enemyImageBase64');
+                console.log('create... Enemy sprite added successfully');
+            } catch (error) {
+                console.error('create... Error adding Enemy sprite:', error);
+            }
         } else {
-            console.error('create... Failed to add Enemy sprite');
+            console.error('create... Failed to add Enemy sprite. Base64 image or texture does not exist.');
         }
     
         // Initialize turn order and current turn index
@@ -201,7 +217,7 @@ class BattleScene extends Phaser.Scene {
         // Display UI elements
         this.createUI();
     }
-
+        
     update() {
         if (this.player.health <= 0) {
             this.endBattle('lose');
@@ -378,11 +394,13 @@ async function generateEnemyImage(newsArticle, setting) {
 }
 
 function spawnEnemies(scene) {
-    console.log('spawnEnemies... enemyImageBase64: ', enemyImageBase64);
+    console.log('spawnEnemies... ');
     if (newsData.length > 0) {
         const newsArticle = newsData[0]; // Use the first article for the enemy
+        console.log('spawnEnemies... Generating new enemy image... ');
         const imageKey = 'enemyImageBase64';
         if (enemyImageBase64 && scene.textures.exists(imageKey)) {
+            console.log('spawnEnemies... enemyImageBase64:', enemyImageBase64);
             for (let i = 0; i < 3; i++) {
                 let x = Phaser.Math.Between(50, 750);
                 let y = Phaser.Math.Between(50, 550);
