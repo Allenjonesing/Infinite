@@ -446,7 +446,7 @@ async function generateAIResponses() {
                 const textContent = settingResponseJson.choices[0].message.content;
 
                 personas = await generatePersonas(textContent);
-                let foundPersonas = personas.personas && Array.isArray(personas.personas) ? personas.personas : personas;
+                let foundPersonas = personas.characters && Array.isArray(personas.characters) ? personas.characters : personas;
                 const persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
                 const prompt = `As ${persona.name}, ${persona.description}, in the setting chosen: ${setting}. Describe a Monster that we'll be faced to fight due to a made up reason that makes sense.`;
 
