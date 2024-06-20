@@ -285,20 +285,8 @@ class BattleScene extends Phaser.Scene {
     }
 
     enemyAction() {
-        console.log('enemyAction... this.isCooldown: ', this.isCooldown);
-        console.log('enemyAction... this.turnOrder: ', this.turnOrder);
-        console.log('enemyAction... this.turnOrder[this.currentTurnIndex]: ', this.turnOrder[this.currentTurnIndex]);
-        console.log('enemyAction... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
-        if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
-            const damage = Math.max(0, this.enemy.atk - this.player.def);
-            this.player.health -= damage;
-            this.playerHealthText.setText(`Health: ${this.player.health}`);
-            this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
-            this.startCooldown();
-        } else {
-            console.warn("(!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Enemy'): ", (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Enemy'))
-            this.time.delayedCall(200, () => {
-                console.log('enemyAction delayedCall... this.isCooldown: ', this.isCooldown);
+        if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
+            const performEnemyAction = () => {
                 if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
                     const damage = Math.max(0, this.enemy.atk - this.player.def);
                     this.player.health -= damage;
@@ -306,25 +294,24 @@ class BattleScene extends Phaser.Scene {
                     this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                     this.startCooldown();
                 } else {
-                    console.error("(!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Enemy'): ", (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Enemy'))
+                    this.time.delayedCall(200, performEnemyAction, [], this);
                 }
-            });
+            };
+    
+            performEnemyAction();
         }
     }
-
+    
     startCooldown() {
         this.isCooldown = true;
-        console.log('startCooldown... this.isCooldown: ', this.isCooldown);
-
-        this.time.delayedCall(200, () => {  // Shorter delay for quicker response
-            console.log('startCooldown delayedCall... this.isCooldown: ', this.isCooldown);
+    
+        this.time.delayedCall(1000, () => {  // Delay of 1 second for a more natural response
+            this.isCooldown = false;
             this.nextTurn();
             this.updateTurnOrderDisplay();  // Ensure UI updates immediately after turn change
-            this.isCooldown = false;
-            console.log('startCooldown delayedCall... this.isCooldown: ', this.isCooldown);
         }, [], this);
     }
-
+    
     nextTurn() {
         console.log('nextTurn...');
         if (this.turnOrder[this.currentTurnIndex].name === 'Player' && this.player.isDefending) {
