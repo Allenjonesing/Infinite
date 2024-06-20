@@ -185,39 +185,55 @@ class BattleScene extends Phaser.Scene {
         console.log('create... NPC Base64 image:', npcBase64image);
         console.log('create... Enemy Base64 image:', enemyImageBase64);
     
-        if (npcBase64image && this.textures.exists('npcBase64image')) {
-            try {
-                this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
-                console.log('create... NPC sprite added successfully');
-            } catch (error) {
-                console.error('create... Error adding NPC sprite:', error);
-            }
+        if (npcBase64image) {
+            this.textures.addBase64('npcBase64image', npcBase64image);
+            console.log('create... NPC Base64 image added');
         } else {
-            console.error('create... Failed to add NPC sprite. Base64 image or texture does not exist.');
+            console.error('create... NPC Base64 image is missing');
         }
     
-        if (enemyImageBase64 && this.textures.exists('enemyImageBase64')) {
-            try {
-                this.enemy.sprite = this.add.sprite(500, 300, 'enemyImageBase64');
-                console.log('create... Enemy sprite added successfully');
-            } catch (error) {
-                console.error('create... Error adding Enemy sprite:', error);
-            }
+        if (enemyImageBase64) {
+            this.textures.addBase64('enemyImageBase64', enemyImageBase64);
+            console.log('create... Enemy Base64 image added');
         } else {
-            console.error('create... Failed to add Enemy sprite. Base64 image or texture does not exist.');
+            console.error('create... Enemy Base64 image is missing');
         }
     
-        // Initialize turn order and current turn index
-        this.turnOrder = this.calculateTurnOrder();
-        this.currentTurnIndex = 0;
-    
-        // Cooldown flag
-        this.isCooldown = false;
-    
-        // Display UI elements
-        this.createUI();
+        // Use a custom timer to check when all Base64 images have been loaded
+        this.loadTimer = this.time.addEvent({
+            delay: 500,
+            callback: this.checkTexturesLoaded,
+            callbackScope: this,
+            loop: true
+        });
     }
-            
+    
+    checkTexturesLoaded() {
+        if (this.textures.exists('npcBase64image') && this.textures.exists('enemyImageBase64')) {
+            console.log('All Base64 textures are loaded.');
+    
+            this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
+            console.log('Player sprite added successfully');
+    
+            this.enemy.sprite = this.add.sprite(500, 300, 'enemyImageBase64');
+            console.log('Enemy sprite added successfully');
+    
+            this.loadTimer.remove(false); // Stop the timer once textures are loaded
+    
+            // Initialize turn order and current turn index
+            this.turnOrder = this.calculateTurnOrder();
+            this.currentTurnIndex = 0;
+    
+            // Cooldown flag
+            this.isCooldown = false;
+    
+            // Display UI elements
+            this.createUI();
+        } else {
+            console.log('Waiting for Base64 textures to load...');
+        }
+    }
+                
     update() {
         if (this.player.health <= 0) {
             this.endBattle('lose');
@@ -400,7 +416,6 @@ function spawnEnemies(scene) {
         console.log('spawnEnemies... Generating new enemy image... ', newsArticle);
         const imageKey = 'enemyImageBase64';
 
-        // Ensure texture is added here first
         if (enemyImageBase64) {
             try {
                 scene.textures.addBase64(imageKey, enemyImageBase64);
