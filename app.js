@@ -383,7 +383,7 @@ class BattleScene extends Phaser.Scene {
                         this.showDamageIndicator(this.player.sprite, damage, critical);
                         this.helpText.setText(`Enemy uses ${elementType} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                     } else {
-                        console.log('Not enough mana for Magic Attack');
+                        console.log('Not enough Mana for Magic Attack');
                         return;
                     }
                 }
