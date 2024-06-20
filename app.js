@@ -378,13 +378,11 @@ async function generateEnemyImage(newsArticle, setting) {
 }
 
 function spawnEnemies(scene) {
-    console.log('spawnEnemies... ');
+    console.log('spawnEnemies... enemyImageBase64: ', enemyImageBase64);
     if (newsData.length > 0) {
         const newsArticle = newsData[0]; // Use the first article for the enemy
-        console.log('spawnEnemies... Generating new enemy image... ');
         const imageKey = 'enemyImageBase64';
         if (enemyImageBase64 && scene.textures.exists(imageKey)) {
-            console.log('spawnEnemies... enemyImageBase64:', enemyImageBase64);
             for (let i = 0; i < 3; i++) {
                 let x = Phaser.Math.Between(50, 750);
                 let y = Phaser.Math.Between(50, 550);
