@@ -190,8 +190,8 @@ class BattleScene extends Phaser.Scene {
         // Generate enemy image based on news article and setting
         if (newsData.length > 0) {
             if (enemyImageBase64) {
-                this.player.sprite = this.add.sprite(200, 300, 'npcBase64image');
-                this.enemy.sprite = this.add.sprite(600, 300, 'enemyImageBase64');
+                this.player.sprite = this.add.sprite(150, 300, 'npcBase64image');
+                this.enemy.sprite = this.add.sprite(650, 300, 'enemyImageBase64');
 
                 // Initialize turn order and current turn index
                 this.turnOrder = this.calculateTurnOrder();
@@ -241,11 +241,11 @@ class BattleScene extends Phaser.Scene {
         this.playerManaText = this.add.text(50, 130, `Mana: ${this.player.mana}`, { fontSize: '20px', fill: '#fff' });
 
         // Enemy health and mana
-        this.enemyHealthText = this.add.text(550, 100, `Health: ${this.enemy.health}`, { fontSize: '20px', fill: '#fff' });
-        this.enemyManaText = this.add.text(550, 130, `Mana: ${this.enemy.mana}`, { fontSize: '20px', fill: '#fff' });
+        this.enemyHealthText = this.add.text(450, 100, `Health: ${this.enemy.health}`, { fontSize: '20px', fill: '#fff' });
+        this.enemyManaText = this.add.text(450, 130, `Mana: ${this.enemy.mana}`, { fontSize: '20px', fill: '#fff' });
 
         // Turn order list
-        this.turnOrderText = this.add.text(700, 80, 'Turn List', { fontSize: '20px', fill: '#fff' });
+        this.turnOrderText = this.add.text(675, 80, 'Turn List', { fontSize: '20px', fill: '#fff' });
         this.updateTurnOrderDisplay();
 
         // Action buttons at the bottom
@@ -298,7 +298,7 @@ class BattleScene extends Phaser.Scene {
             this.turnOrderList.destroy();
         }
 
-        let orderText = 'Turn List\n';
+        let orderText = '';
         for (let i = 0; i < 10; i++) {
             orderText += `${this.turnOrder[(this.currentTurnIndex + i) % this.turnOrder.length].name}\n`;
         }
@@ -406,12 +406,12 @@ class BattleScene extends Phaser.Scene {
     }
         
     showDamageIndicator(target, damage, critical) {
-        const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '50px', fill: critical ? '#ff0000' : '#ffffff' });
+        const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '60px', fill: critical ? '#ff0000' : '#ffffff', fontStyle: 'bold' });
         this.tweens.add({
             targets: damageText,
-            y: target.y - 100,
+            y: target.y - 250,
             alpha: { from: 1, to: 0 },
-            duration: 1000,
+            duration: 2500,
             ease: 'Power1',
             onComplete: () => {
                 damageText.destroy();
@@ -497,9 +497,9 @@ class BattleScene extends Phaser.Scene {
     
         let magicBall = this.add.circle(attacker.x, attacker.y, 30, color);
         this.physics.add.existing(magicBall);
-        this.physics.moveTo(magicBall, defender.x, defender.y, 300);
+        this.physics.moveTo(magicBall, defender.x > 400 ? defender.x + 200 : defender.x, defender.y, 300);
     
-        this.time.delayedCall(500, () => {
+        this.time.delayedCall(1250, () => {
             magicBall.destroy();
             this.showDamageIndicator(defender, damage, critical);
         });
