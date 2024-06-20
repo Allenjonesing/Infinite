@@ -94,17 +94,19 @@ class ExplorationScene extends Phaser.Scene {
     }
 
     update() {
+        if (this.input.activePointer.isDown) {
+            target = { x: this.input.activePointer.worldX, y: this.input.activePointer.worldY };
+        }
+
         if (target) {
             this.physics.moveTo(this.player, target.x, target.y, 100);
         }
 
-        // Enemy movement towards player
         if (this.enemies && this.enemies.children) {
             this.enemies.children.iterate((enemy) => {
                 this.physics.moveToObject(enemy, this.player, 50);
             });
 
-            // Prevent enemies from sliding after being pushed
             this.enemies.children.iterate((enemy) => {
                 if (enemy.body.speed > 0) {
                     enemy.body.setVelocity(0, 0);
@@ -112,7 +114,6 @@ class ExplorationScene extends Phaser.Scene {
             });
         }
 
-        // Prevent NPCs from sliding after being pushed
         this.npcs.children.iterate((npc) => {
             if (npc.body.speed > 0) {
                 npc.body.setVelocity(0, 0);
@@ -143,8 +144,25 @@ class BattleScene extends Phaser.Scene {
         this.enemy = data.enemy;
 
         // Initialize player and enemy data
-        this.player = { name: 'Player', health: 100, speed: 5, sprite: null, actions: ['Attack', 'Defend'] };
-        this.enemy = { name: 'Enemy', health: 100, speed: 3, sprite: null, actions: ['Attack'] };
+        this.player = {
+            name: 'Player',
+            health: 100,
+            speed: 5,
+            atk: 15,
+            def: 10,
+            sprite: null,
+            actions: ['Attack', 'Defend']
+        };
+        const enemyStats = await fetchEnemyStats(`Generate stats for an enemy based on this description: ${monsterDescription}. They must be in JSON like {health,speed,atk,def}, where health is 10-500, and speed/atk/def are each 1-50.`);
+        this.enemy = {
+            name: 'Enemy',
+            health: enemyStats.health,
+            speed: enemyStats.speed,
+            atk: enemyStats.atk,
+            def: enemyStats.def,
+            sprite: null,
+            actions: ['Attack']
+        };
 
         // Generate enemy image based on news article and setting
         if (newsData.length > 0) {
@@ -247,11 +265,12 @@ class BattleScene extends Phaser.Scene {
     handlePlayerAction(action) {
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
             if (action === 'Attack') {
-                this.enemy.health -= 10;
+                const damage = Math.max(0, this.player.atk - this.enemy.def);
+                this.enemy.health -= damage;
                 this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
                 this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
             } else if (action === 'Defend') {
-                // Implement defend logic
+                this.player.def += 5; // Temporary defense boost
             }
             this.startCooldown();
         }
@@ -259,7 +278,8 @@ class BattleScene extends Phaser.Scene {
 
     enemyAction() {
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
-            this.player.health -= 10;
+            const damage = Math.max(0, this.enemy.atk - this.player.def);
+            this.player.health -= damage;
             this.playerHealthText.setText(`Health: ${this.player.health}`);
             this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
             this.startCooldown();
@@ -268,14 +288,19 @@ class BattleScene extends Phaser.Scene {
 
     startCooldown() {
         this.isCooldown = true;
-        this.updateTurnOrderDisplay();
-        this.time.delayedCall(2000, () => {
-            this.isCooldown = false;
+
+        this.time.delayedCall(200, () => {  // Shorter delay for quicker response
             this.nextTurn();
+            this.updateTurnOrderDisplay();  // Ensure UI updates immediately after turn change
+            this.isCooldown = false;
         }, [], this);
     }
 
     nextTurn() {
+        if (this.turnOrder[this.currentTurnIndex].name === 'Player') {
+            this.player.def -= 5; // Reset defense boost after turn
+        }
+
         this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
         if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
             this.enemyAction();
@@ -516,7 +541,7 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
     newsItem.className = 'news-item';
 
     const titleElement = document.createElement('h2');
-    titleElement.textContent = newsTitle;
+    titleElement.textContent = `Based on the News Article: ${newsTitle}`;
     newsItem.appendChild(titleElement);
 
     const contentElement = document.createElement('p');
@@ -533,7 +558,7 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
     }
 
     const personaElement = document.createElement('p');
-    personaElement.textContent = `Persona: ${persona.name}`;
+    personaElement.textContent = `Persona: ${persona.name}, ${persona.description}`;
     newsItem.appendChild(personaElement);
 
     newsContainer.appendChild(newsItem);
@@ -567,4 +592,32 @@ async function generatePersonas(setting) {
     }
 
     return parsedPersonas;
+}
+
+async function fetchEnemyStats(prompt) {
+    const encodedPrompt = encodeURIComponent(prompt);
+
+    try {
+        const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: prompt })
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        if (data && data.stats) {
+            return data.stats; // Ensure the API returns stats in JSON format
+        } else {
+            throw new Error('No stats generated');
+        }
+    } catch (error) {
+        console.error('Error fetching enemy stats:', error);
+        throw new Error('No stats generated');
+    }
 }
