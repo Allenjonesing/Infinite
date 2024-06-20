@@ -7,6 +7,7 @@ let enemySpriteUrl = '';
 let enemyImageBase64 = '';
 let base64Image = '';
 let npcBase64image = '';
+var counter = 0;
 
 class ExplorationScene extends Phaser.Scene {
     constructor() {
@@ -175,65 +176,92 @@ class BattleScene extends Phaser.Scene {
     }
     
     async create(data) {
-        this.player = data.player;
-        this.enemy = data.enemy;
-    
-        // Initialize player and enemy data
-        this.player = { name: 'Player', health: 100, speed: 5, sprite: null, actions: ['Attack', 'Defend'] };
-        this.enemy = { name: 'Enemy', health: 100, speed: 3, sprite: null, actions: ['Attack'] };
-    
+        
         console.log('create... NPC Base64 image:', npcBase64image);
         console.log('create... Enemy Base64 image:', enemyImageBase64);
-    
+        
         if (npcBase64image) {
-            this.textures.addBase64('npcBase64image', npcBase64image);
-            console.log('create... NPC Base64 image added');
-        } else {
-            console.error('create... NPC Base64 image is missing');
-        }
-    
-        if (enemyImageBase64) {
-            this.textures.addBase64('enemyImageBase64', enemyImageBase64);
-            console.log('create... Enemy Base64 image added');
-        } else {
-            console.error('create... Enemy Base64 image is missing');
-        }
-    
-        // Use a custom timer to check when all Base64 images have been loaded
-        this.loadTimer = this.time.addEvent({
-            delay: 500,
-            callback: this.checkTexturesLoaded,
-            callbackScope: this,
-            loop: true
-        });
-    }
-    
-    checkTexturesLoaded() {
-        if (this.textures.exists('npcBase64image') && this.textures.exists('enemyImageBase64')) {
-            console.log('All Base64 textures are loaded.');
-    
-            this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
-            console.log('Player sprite added successfully');
-    
-            this.enemy.sprite = this.add.sprite(500, 300, 'enemyImageBase64');
-            console.log('Enemy sprite added successfully');
-    
-            this.loadTimer.remove(false); // Stop the timer once textures are loaded
-    
-            // Initialize turn order and current turn index
-            this.turnOrder = this.calculateTurnOrder();
-            this.currentTurnIndex = 0;
-    
-            // Cooldown flag
-            this.isCooldown = false;
-    
-            // Display UI elements
-            this.createUI();
-        } else {
-            console.log('Waiting for Base64 textures to load...');
-        }
-    }
+            try {
+                // Handle Base 64 Image From Here Not From PreLoad                
+                this.textures.addBase64('npcBase64image', npcBase64image);
                 
+                // Loader to wait all base64 Image loaded
+                this.textures.on('onload', function() { 
+                    console.log('create... onload image:', npcBase64image);
+                    counter++;			
+                });
+                
+                // Timer check when all based64 assets have been loaded
+                this.customTimer = this.time.addEvent({ delay: 500, callback: function callback() {
+                    
+                    // Adjust counter maximum as you ecpect. For now just one based64 assets need to be loaded only
+                    if (counter === 1) {
+                        
+                        // Destroy timer to save memory
+                        this.customTimer.remove(false);
+                        
+                        // Add base64 image and position it		
+                        this.imgBase64Sprite = this.add.sprite(game.config.width / 2, game.config.height / 2, 'npcBase64image');
+                        this.player = data.player;
+                        this.player = { name: 'Player', health: 100, speed: 5, sprite: this.imgBase64Sprite, actions: ['Attack', 'Defend'] };
+                        
+                    }
+                    
+                }, callbackScope: platform, loop: true});
+                console.log('create... NPC sprite added successfully');
+            } catch (error) {
+                console.error('create... Error adding NPC sprite:', error);
+            }
+        } else {
+            console.error('create... Failed to add NPC sprite. Base64 image or texture does not exist.');
+        }
+        
+        if (enemyImageBase64 && this.textures.exists('enemyImageBase64')) {
+            try {
+                // Handle Base 64 Image From Here Not From PreLoad                
+                this.textures.addBase64('enemyImageBase64', enemyImageBase64);
+                
+                // Loader to wait all base64 Image loaded
+                this.textures.on('onload', function() { 
+                    counter++;			
+                });
+                
+                // Timer check when all based64 assets have been loaded
+                this.customTimer = this.time.addEvent({ delay: 500, callback: function callback() {
+                    
+                    // Adjust counter maximum as you ecpect. For now just one based64 assets need to be loaded only
+                    if (counter === 1) {
+                        
+                        // Destroy timer to save memory
+                        this.customTimer.remove(false);
+                        
+                        // Add base64 image and position it		
+                        this.imgBase64Sprite = this.add.sprite(game.config.width / 2, game.config.height / 2, 'enemyImageBase64');
+                        this.enemy = data.enemy;
+                        this.enemy = { name: 'Enemy', health: 100, speed: 3, sprite: this.imgBase64Sprite, actions: ['Attack'] };
+                    
+                    }
+                
+                }, callbackScope: platform, loop: true});
+                console.log('create... Enemy sprite added successfully');
+            } catch (error) {
+                console.error('create... Error adding Enemy sprite:', error);
+            }
+        } else {
+            console.error('create... Failed to add Enemy sprite. Base64 image or texture does not exist.');
+        }
+    
+        // Initialize turn order and current turn index
+        this.turnOrder = this.calculateTurnOrder();
+        this.currentTurnIndex = 0;
+    
+        // Cooldown flag
+        this.isCooldown = false;
+    
+        // Display UI elements
+        this.createUI();
+    }
+            
     update() {
         if (this.player.health <= 0) {
             this.endBattle('lose');
@@ -416,6 +444,7 @@ function spawnEnemies(scene) {
         console.log('spawnEnemies... Generating new enemy image... ', newsArticle);
         const imageKey = 'enemyImageBase64';
 
+        // Ensure texture is added here first
         if (enemyImageBase64) {
             try {
                 scene.textures.addBase64(imageKey, enemyImageBase64);
