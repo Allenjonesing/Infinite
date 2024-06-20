@@ -8,7 +8,7 @@ let npcBase64image = '';
 let monsterDescription = '';
 let personas;
 let persona;
-let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 10-1000, mana is 10-500, atk through wis are each 1-100, and the 4 elements are each a float between -1.0 and 3.0, where -1.0 is the strongest and 3 is the weakest. Fire enemies should have a Fire element rating in the negative and a high water and ice element score. Balance the stats so that if one is high, another is low. Personalize it so that the size, element, type all affect the stats.';
+let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 10-1000, mana is 10-500, atk through wis are each 1-50, and the 4 elements are each a float between -1.0 and 3.0, where -1.0 is the strongest and 3 is the weakest. Fire enemies should have a Fire element rating in the negative and a high water and ice element score. Balance the stats so that if one is high, another is low. Personalize it so that the size, element, type all affect the stats.';
 
 class ExplorationScene extends Phaser.Scene {
     constructor() {
@@ -461,16 +461,16 @@ class BattleScene extends Phaser.Scene {
         
         let baseDamage;
         if (critical) {
-            baseDamage = atk * 4 * variance;
+            baseDamage = Math.floor(atk * 4 * variance);
         } else {
-            baseDamage = (4 * atk - 2 * def) * variance;
+            baseDamage = Math.floor((4 * atk - 2 * def) * variance);
         }
     
         baseDamage = Math.max(1, baseDamage); // Ensure minimum damage is 1
         let evaded = Math.random() < (eva * 0.01);
         return evaded ? 0 : baseDamage;
     }
-    
+        
     calculateMagicDamage(magAtk, magDef, attackerElement, defenderElement, luk) {
         let criticalChance = luk / 100;
         let critical = Math.random() < criticalChance;
@@ -481,17 +481,14 @@ class BattleScene extends Phaser.Scene {
     
         let baseDamage;
         if (critical) {
-            baseDamage = magAtk * 4 * variance;
+            baseDamage = Math.floor(magAtk * 4 * variance);
         } else {
-            baseDamage = (4 * magAtk * attackerElement - 2 * magDef * defenderElement) * variance;
+            baseDamage = Math.floor((4 * magAtk * attackerElement - 2 * magDef * defenderElement) * variance);
         }
     
-        // Ensure minimum healing or damage is -1 or 1 respectively
-        baseDamage = Math.max(-1, baseDamage);
-    
-        return baseDamage;
+        return baseDamage; // Allow negative values for potential healing
     }
-        
+                
     startCooldown() {
         this.isCooldown = true;
 
