@@ -189,8 +189,8 @@ class BattleScene extends Phaser.Scene {
         // Generate enemy image based on news article and setting
         if (newsData.length > 0) {
             if (enemyImageBase64) {
-                this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
-                this.enemy.sprite = this.add.sprite(500, 300, 'enemyImageBase64');
+                this.player.sprite = this.add.sprite(100, 450, 'npcBase64image');
+                this.enemy.sprite = this.add.sprite(500, 450, 'enemyImageBase64');
 
                 // Initialize turn order and current turn index
                 this.turnOrder = this.calculateTurnOrder();
@@ -227,20 +227,26 @@ class BattleScene extends Phaser.Scene {
     }
 
     createUI() {
-        this.playerHealthText = this.add.text(50, 50, `Health: ${this.player.health}`, { fontSize: '20px', fill: '#fff' });
-        this.playerManaText = this.add.text(50, 80, `Mana: ${this.player.mana}`, { fontSize: '20px', fill: '#fff' });
-        this.enemyHealthText = this.add.text(450, 50, `Health: ${this.enemy.health}`, { fontSize: '20px', fill: '#fff' });
+        this.playerHealthText = this.add.text(50, 20, `Health: ${this.player.health}`, { fontSize: '20px', fill: '#fff' });
+        this.playerManaText = this.add.text(50, 50, `Mana: ${this.player.mana}`, { fontSize: '20px', fill: '#fff' });
+        this.enemyHealthText = this.add.text(450, 20, `Health: ${this.enemy.health}`, { fontSize: '20px', fill: '#fff' });
 
         this.actions = this.add.group();
         for (let i = 0; i < this.player.actions.length; i++) {
-            let actionText = this.add.text(50, 130 + i * 30, this.player.actions[i], { fontSize: '20px', fill: '#fff' });
+            let actionText = this.add.text(50, 100 + i * 50, this.player.actions[i], { fontSize: '20px', fill: '#fff', backgroundColor: '#000', padding: { left: 10, right: 10, top: 5, bottom: 5 } });
             actionText.setInteractive();
             actionText.on('pointerdown', () => this.handlePlayerAction(this.player.actions[i], this.chooseElement()));
             this.actions.add(actionText);
         }
 
-        this.turnOrderText = this.add.text(600, 50, 'Turn Order:', { fontSize: '20px', fill: '#fff' });
+        this.turnOrderText = this.add.text(650, 20, 'Turn Order:', { fontSize: '20px', fill: '#fff' });
         this.updateTurnOrderDisplay();
+
+        // Help bar at the top
+        this.helpText = this.add.text(200, 20, '', { fontSize: '20px', fill: '#fff' });
+
+        // Add initial description
+        this.helpText.setText('A battle has started! Choose your actions wisely.');
     }
 
     chooseElement() {
@@ -290,23 +296,28 @@ class BattleScene extends Phaser.Scene {
     handlePlayerAction(action, elementType = null) {
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
             let damage = 0;
+            let critical = false;
             if (action === 'Attack') {
                 damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.luk, this.enemy.eva);
+                critical = damage > this.player.atk;
+                this.showDamageIndicator(this.enemy.sprite, damage, critical);
             } else if (action === 'Magic Attack') {
-                if (this.player.mana >= 10) { // Assume each magic attack costs 10 mana
+                if (this.player.mana >= 10) {
                     damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.player.element[elementType], this.enemy.element[elementType], this.player.luk, this.enemy.eva);
+                    critical = damage > this.player.magAtk;
                     this.player.mana -= 10;
+                    this.showDamageIndicator(this.enemy.sprite, damage, critical);
                 } else {
-                    alert("Not enough mana!");
+                    this.helpText.setText("Not enough mana!");
                     return;
                 }
             } else if (action === 'Defend') {
-                this.player.def *= 2; // Temporary defense boost
-                this.player.isDefending = true;
-
+                this.player.def += 5; // Temporary defense boost
+                this.helpText.setText('You defend, boosting your defense for this turn.');
             }
             this.enemy.health -= damage;
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
+            this.playerManaText.setText(`Mana: ${this.player.mana}`);
             this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
             this.startCooldown();
         }
@@ -315,17 +326,22 @@ class BattleScene extends Phaser.Scene {
     enemyAction() {
         const performEnemyAction = () => {
             if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
-                if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
+                if (!this.isCooldown) {
                     let damage = 0;
+                    let critical = false;
                     const action = this.enemy.actions[Math.floor(Math.random() * this.enemy.actions.length)];
                     if (action === 'Attack') {
                         damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
+                        critical = damage > this.enemy.atk;
+                        this.showDamageIndicator(this.player.sprite, damage, critical);
                     } else if (action === 'Magic Attack') {
                         const elements = ['fire', 'ice', 'water', 'lightning'];
                         const elementType = elements[Math.floor(Math.random() * elements.length)];
                         if (this.enemy.mana >= 10) {
                             damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.enemy.element[elementType], this.player.element[elementType], this.enemy.luk, this.player.eva);
+                            critical = damage > this.enemy.magAtk;
                             this.enemy.mana -= 10;
+                            this.showDamageIndicator(this.player.sprite, damage, critical);
                         } else {
                             return;
                         }
@@ -337,12 +353,23 @@ class BattleScene extends Phaser.Scene {
                 } else {
                     this.time.delayedCall(200, performEnemyAction, [], this);
                 }
-            } else {
-                this.time.delayedCall(200, performEnemyAction, [], this);
             }
         };
         performEnemyAction();
+    }
 
+    showDamageIndicator(target, damage, critical) {
+        const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '20px', fill: critical ? '#ff0000' : '#ffffff' });
+        this.tweens.add({
+            targets: damageText,
+            y: target.y - 100,
+            alpha: { from: 1, to: 0 },
+            duration: 1000,
+            ease: 'Power1',
+            onComplete: () => {
+                damageText.destroy();
+            }
+        });
     }
 
     calculateDamage(atk, def, luk, eva) {
