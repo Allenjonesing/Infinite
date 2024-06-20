@@ -8,6 +8,7 @@ let npcBase64image = '';
 let monsterDescription = '';
 let personas;
 let persona;
+let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 10-1000, mana is 10-500, atk through wis are each 1-100, and the 4 elements are each a float between 0.0 and 3.0, where 0 is immune and 3 is very weak. Balance the stats so that if one is high, another is low. Personalize it so that the size, element, type all affect the stats.';
 
 class ExplorationScene extends Phaser.Scene {
     constructor() {
@@ -722,7 +723,7 @@ async function generatePersonas(setting) {
 
 async function fetchEnemyStats() {
     console.log('fetchEnemyStats...');
-    const prompt = `Generate stats for an enemy based on this description: ${monsterDescription}. They must be in  JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 10-1000, mana is 10-500, atk through wis are each 1-100, and the 4 elements are each a float between 0.0 and 3.0. Balance the stats so that if one is high, another is low.`;
+    const prompt = `Generate stats for an enemy based on this description: ${monsterDescription}. ${statRequirements}`;
     const encodedPrompt = encodeURIComponent(prompt);
 
     try {
@@ -754,7 +755,7 @@ async function fetchEnemyStats() {
 
 async function fetchPlayerStats() {
     console.log('fetchPlayerStats...');
-    const prompt = `Generate stats for the player based on this description: ${persona.name}, ${persona.description}. They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 10-1000, mana is 10-500, atk through wis are each 1-100, and the 4 elements are each a float between 0.0 and 3.0. Balance the stats so that if one is high, another is low.`;
+    const prompt = `Generate stats for the player based on this description: ${persona.name}, ${persona.description}. ${statRequirements}`;
     const encodedPrompt = encodeURIComponent(prompt);
 
     try {
