@@ -206,6 +206,8 @@ class BattleScene extends Phaser.Scene {
                 // Check whose turn it is and start the action immediately if it's the enemy's turn
                 if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
                     this.enemyAction();
+                } else {
+                    this.showPlayerActions();
                 }
             } else {
                 console.error('Failed to generate enemy image');
