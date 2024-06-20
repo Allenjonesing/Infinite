@@ -152,8 +152,8 @@ class BattleScene extends Phaser.Scene {
     }
 
     preload() {
-        this.textures.addBase64('npcBase64image', npcBase64image);
-        this.textures.addBase64('enemyImageBase64', enemyImageBase64);
+        //this.textures.addBase64('npcBase64image', npcBase64image);
+        //this.textures.addBase64('enemyImageBase64', enemyImageBase64);
     }
 
     async create(data) {
@@ -642,6 +642,7 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
         npcBase64image = imageBase64;
+        this.textures.addBase64('npcBase64image', npcBase64image);
     }
 
     const personaElement = document.createElement('p');
