@@ -380,7 +380,7 @@ function spawnEnemies(scene) {
         for (let i = 0; i < 3; i++) {
             let x = Phaser.Math.Between(50, 750);
             let y = Phaser.Math.Between(50, 550);
-            let enemy = scene.enemies.create(x, y, imageKey); // Create enemies using the Base64 image
+            let enemy = scene.enemies.create(x, y, 'enemyImageBase64'); // Create enemies using the Base64 image
             enemy.setCollideWorldBounds(true);
         }
         // Add enemy collisions
