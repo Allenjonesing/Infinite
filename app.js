@@ -442,7 +442,11 @@ class BattleScene extends Phaser.Scene {
     }
 
     showDamageIndicator(target, damage, critical) {
-        const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '60px', fill: critical ? '#ff0000' : '#ffffff', fontStyle: 'bold' });
+        let fontColor = critical ? '#ff0000' : '#f0d735';
+        if (damage < 0) {
+            fontColor = '#0cc43d'
+        }
+        const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '60px', fill: , fontStyle: 'bold' });
         this.tweens.add({
             targets: damageText,
             y: target.y - 250,
