@@ -157,8 +157,8 @@ class BattleScene extends Phaser.Scene {
     }
 
     async create(data) {
-        //this.add.sprite(400, 300, 'npcBase64image');
-        //this.add.sprite(400, 300, 'enemyImageBase64');
+        this.add.sprite(400, 300, 'npcBase64image');
+        this.add.sprite(400, 300, 'enemyImageBase64');
 
         this.player = data.player;
         this.enemy = data.enemy;
@@ -176,7 +176,7 @@ class BattleScene extends Phaser.Scene {
 
                 // Display player and enemy sprites
                 this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
-                this.enemy.sprite = this.add.sprite(500, 300, 'enemyImageBase64');
+                this.enemy.sprite = this.add.sprite(500, 300, 'generatedEnemy');
 
                 // Initialize turn order and current turn index
                 this.turnOrder = this.calculateTurnOrder();
@@ -376,7 +376,7 @@ function spawnEnemies(scene) {
         //     console.log('spawnEnemies... enemyImageBase64: ', enemyImageBase64)
         //     if (enemyImageBase64) {
         const imageKey = 'enemyImageBase64';
-        //scene.textures.addBase64(imageKey, enemyImageBase64);
+        scene.textures.addBase64(imageKey, enemyImageBase64);
         for (let i = 0; i < 3; i++) {
             let x = Phaser.Math.Between(50, 750);
             let y = Phaser.Math.Between(50, 550);
