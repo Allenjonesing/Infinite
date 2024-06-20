@@ -326,6 +326,7 @@ class BattleScene extends Phaser.Scene {
                 }
                 this.showDamageIndicator(this.enemy.sprite, damage, critical);
                 this.helpText.setText(`Player attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
             } else if (action === 'Magic Attack') {
                 if (this.player.mana >= 10) {
                     damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.player.element[elementType], this.enemy.element[elementType], this.player.luk, this.enemy.eva);
@@ -334,8 +335,8 @@ class BattleScene extends Phaser.Scene {
                         damage = this.calculateMagicDamage(this.player.magAtk, 0, this.player.element[elementType], this.enemy.element[elementType], this.player.luk, this.enemy.eva);
                     }
                     this.player.mana -= 10;
-                    this.showDamageIndicator(this.enemy.sprite, damage, critical);
                     this.helpText.setText(`Player uses ${elementType} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                    this.playMagicAttackAnimation(this.player.sprite, this.enemy.sprite, elementType, damage, critical);
                 } else {
                     this.helpText.setText("Not enough mana!");
                     return;
@@ -347,11 +348,10 @@ class BattleScene extends Phaser.Scene {
             this.enemy.health -= damage;
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
             this.playerManaText.setText(`Mana: ${this.player.mana}`);
-            this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
             this.startCooldown();
         }
     }
-    
+        
     enemyAction() {
         const performEnemyAction = () => {
             console.log('performEnemyAction called');
@@ -369,6 +369,7 @@ class BattleScene extends Phaser.Scene {
                     }
                     this.showDamageIndicator(this.player.sprite, damage, critical);
                     this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                    this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                 } else if (action === 'Magic Attack') {
                     const elements = ['fire', 'ice', 'water', 'lightning'];
                     const elementType = elements[Math.floor(Math.random() * elements.length)];
@@ -380,16 +381,15 @@ class BattleScene extends Phaser.Scene {
                             damage = this.calculateMagicDamage(this.enemy.magAtk, 0, this.enemy.element[elementType], this.player.element[elementType], this.enemy.luk, this.player.eva);
                         }
                         this.enemy.mana -= 10;
-                        this.showDamageIndicator(this.player.sprite, damage, critical);
                         this.helpText.setText(`Enemy uses ${elementType} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                        this.playMagicAttackAnimation(this.enemy.sprite, this.player.sprite, elementType, damage, critical);
                     } else {
-                        console.log('Not enough Mana for Magic Attack');
+                        console.log('Not enough mana for Magic Attack');
                         return;
                     }
                 }
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
-                this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                 this.startCooldown();
             } else {
                 console.log('Enemy turn but in cooldown or not enemy turn');
@@ -399,7 +399,7 @@ class BattleScene extends Phaser.Scene {
         console.log('Enemy action started');
         performEnemyAction();
     }
-    
+        
     showDamageIndicator(target, damage, critical) {
         const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '20px', fill: critical ? '#ff0000' : '#ffffff' });
         this.tweens.add({
@@ -465,6 +465,37 @@ class BattleScene extends Phaser.Scene {
             ease: 'Power1'
         });
     }
+
+    playMagicAttackAnimation(attacker, defender, elementType, damage, critical) {
+        let color;
+        switch (elementType) {
+            case 'fire':
+                color = 0xff4500; // Orange
+                break;
+            case 'ice':
+                color = 0x00ffff; // Cyan
+                break;
+            case 'water':
+                color = 0x1e90ff; // DodgerBlue
+                break;
+            case 'lightning':
+                color = 0xffff00; // Yellow
+                break;
+            default:
+                color = 0xffffff; // Default to white
+                break;
+        }
+    
+        let magicBall = this.add.circle(attacker.x, attacker.y, 10, color);
+        this.physics.add.existing(magicBall);
+        this.physics.moveTo(magicBall, defender.x, defender.y, 300);
+    
+        this.time.delayedCall(500, () => {
+            magicBall.destroy();
+            this.showDamageIndicator(defender, damage, critical);
+        });
+    }
+    
 }
 
 async function generateEnemyImage(newsArticle, setting) {
