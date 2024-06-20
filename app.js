@@ -165,7 +165,7 @@ class BattleScene extends Phaser.Scene {
             console.error('preload... Enemy Base64 image is missing');
         }
     }
-    
+        
     async create(data) {
         this.player = data.player;
         this.enemy = data.enemy;
@@ -201,7 +201,8 @@ class BattleScene extends Phaser.Scene {
         // Display UI elements
         this.createUI();
     }
-        update() {
+
+    update() {
         if (this.player.health <= 0) {
             this.endBattle('lose');
         } else if (this.enemy.health <= 0) {
