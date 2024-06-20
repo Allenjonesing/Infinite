@@ -448,7 +448,7 @@ async function generateAIResponses() {
                 personas = await generatePersonas(textContent);
                 let foundPersonas = personas.characters && Array.isArray(personas.characters) ? personas.characters : personas;
                 const persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
-                prompt = `As ${persona.name}, ${persona.description}, in the setting chosen: ${setting}. Describe a Monster that we'll be faced to fight due to a made up reason that makes sense.`;
+                prompt = `As ${persona.name}, ${persona.description}, in the setting chosen: ${setting}. Describe in 10-20 words a Monster that we'll be faced to fight due to a made up reason that makes sense.`;
 
                 try {
                     const monsterDescriptionResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodeURIComponent(prompt)}`, {
