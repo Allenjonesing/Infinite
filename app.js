@@ -190,8 +190,8 @@ class BattleScene extends Phaser.Scene {
         // Generate enemy image based on news article and setting
         if (newsData.length > 0) {
             if (enemyImageBase64) {
-                this.player.sprite = this.add.sprite(100, 450, 'npcBase64image');
-                this.enemy.sprite = this.add.sprite(500, 450, 'enemyImageBase64');
+                this.player.sprite = this.add.sprite(200, 300, 'npcBase64image');
+                this.enemy.sprite = this.add.sprite(600, 300, 'enemyImageBase64');
 
                 // Initialize turn order and current turn index
                 this.turnOrder = this.calculateTurnOrder();
@@ -234,7 +234,7 @@ class BattleScene extends Phaser.Scene {
 
     createUI() {
         // Help text at the top
-        this.helpText = this.add.text(20, 20, 'Help Text Goes Here! Plenty of room for a lot of it...', { fontSize: '18px', fill: '#fff' });
+        this.helpText = this.add.text(20, 20, 'A battle has begun...', { fontSize: '18px', fill: '#fff' });
 
         // Player health and mana
         this.playerHealthText = this.add.text(50, 100, `Health: ${this.player.health}`, { fontSize: '20px', fill: '#fff' });
@@ -259,8 +259,8 @@ class BattleScene extends Phaser.Scene {
         }
 
         // Add borders around health and mana areas
-        this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(40, 90, 200, 100);
-        this.add.graphics().lineStyle(2, 0xff0000).strokeRect(540, 90, 200, 100);
+        this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(40, 90, 200, 75);
+        this.add.graphics().lineStyle(2, 0xff0000).strokeRect(450, 90, 200, 75);
 
         // Add border around action buttons
         this.add.graphics().lineStyle(2, 0xffff00).strokeRect(190, 490, 520, 60);
@@ -342,7 +342,8 @@ class BattleScene extends Phaser.Scene {
                     return;
                 }
             } else if (action === 'Defend') {
-                this.player.def += 5; // Temporary defense boost
+                this.player.def *= 2; // Temporary defense boost
+                this.player.isDefending = true; // Temporary defense boost
                 this.helpText.setText('Player defends, boosting defense for this turn.');
             }
             this.enemy.health -= damage;
@@ -387,6 +388,10 @@ class BattleScene extends Phaser.Scene {
                         console.log('Not enough mana for Magic Attack');
                         return;
                     }
+                } else if (action === 'Defend') {
+                    this.enemy.def *= 2; // Temporary defense boost
+                    this.enemy.isDefending = true; // Temporary defense boost
+                    this.helpText.setText('Enemy defends, boosting defense for this turn.');
                 }
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
@@ -401,7 +406,7 @@ class BattleScene extends Phaser.Scene {
     }
         
     showDamageIndicator(target, damage, critical) {
-        const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '20px', fill: critical ? '#ff0000' : '#ffffff' });
+        const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '50px', fill: critical ? '#ff0000' : '#ffffff' });
         this.tweens.add({
             targets: damageText,
             y: target.y - 100,
@@ -447,6 +452,10 @@ class BattleScene extends Phaser.Scene {
             this.player.def /= 2; // Reset defense boost after turn
             this.player.isDefending = false;
         }
+        if (this.turnOrder[this.currentTurnIndex].name === 'Enemy' && this.enemy.isDefending) {
+            this.enemy.def /= 2; // Reset defense boost after turn
+            this.enemy.isDefending = false;
+        }
 
         this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
         if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
@@ -486,7 +495,7 @@ class BattleScene extends Phaser.Scene {
                 break;
         }
     
-        let magicBall = this.add.circle(attacker.x, attacker.y, 10, color);
+        let magicBall = this.add.circle(attacker.x, attacker.y, 30, color);
         this.physics.add.existing(magicBall);
         this.physics.moveTo(magicBall, defender.x, defender.y, 300);
     
