@@ -153,7 +153,7 @@ class BattleScene extends Phaser.Scene {
             sprite: null,
             actions: ['Attack', 'Defend']
         };
-        const enemyStats = await fetchEnemyStats(`Generate stats for an enemy based on this description: ${monsterDescription}. They must be in JSON like {health,speed,atk,def}, where health is 10-500, and speed/atk/def are each 1-50.`);
+        const enemyStats = await fetchEnemyStats();
         this.enemy = {
             name: 'Enemy',
             health: enemyStats.health,
@@ -594,7 +594,8 @@ async function generatePersonas(setting) {
     return parsedPersonas;
 }
 
-async function fetchEnemyStats(prompt) {
+async function fetchEnemyStats() {
+    const prompt = `Generate stats for an enemy based on this description: ${monsterDescription}. They must be in JSON like {health,speed,atk,def}, where health is 10-500, and speed/atk/def are each 1-50.`;
     const encodedPrompt = encodeURIComponent(prompt);
 
     try {
@@ -611,8 +612,8 @@ async function fetchEnemyStats(prompt) {
         }
 
         const data = await response.json();
-        if (data && data.stats) {
-            return data.stats; // Ensure the API returns stats in JSON format
+        if (aiResponse && aiResponse.choices && aiResponse.choices[0] && aiResponse.choices[0].message && aiResponse.choices[0].message.content) {
+            return JSON.parse(aiResponse.choices[0].message.content);
         } else {
             throw new Error('No stats generated');
         }
