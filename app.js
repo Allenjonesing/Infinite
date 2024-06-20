@@ -727,27 +727,28 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
     const newsItem = document.createElement('div');
     newsItem.className = 'news-item';
 
-    const titleElement = document.createElement('h2');
+    const titleElement = document.createElement('h3');
     titleElement.textContent = `Based on the News Article: ${newsTitle}`;
     newsItem.appendChild(titleElement);
 
-    const contentElement = document.createElement('p');
-    contentElement.textContent = aiResponse;
-    newsItem.appendChild(contentElement);
+    
+    const personaElement = document.createElement('h5');
+    personaElement.textContent = `You will be playing as: ${persona.name}, ${persona.description}`;
+    newsItem.appendChild(personaElement);
 
     if (imageBase64) {
         const imageElement = document.createElement('img');
-        imageElement.setAttribute("id", "enemyImage");
+        imageElement.setAttribute("id", "playerImage");
         imageElement.src = imageBase64;
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
         npcBase64image = imageBase64;
     }
-
-    const personaElement = document.createElement('p');
-    personaElement.textContent = `Persona: ${persona.name}, ${persona.description}`;
-    newsItem.appendChild(personaElement);
-
+    
+    const contentElement = document.createElement('h4');
+    contentElement.textContent = `You will be fighting: ${aiResponse}`;
+    newsItem.appendChild(contentElement);
+    
     newsContainer.appendChild(newsItem);
 }
 
