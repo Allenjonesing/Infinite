@@ -216,10 +216,16 @@ class BattleScene extends Phaser.Scene {
     }
 
     update() {
-        if (this.player.health <= 0) {
-            this.endBattle('lose');
-        } else if (this.enemy.health <= 0) {
-            this.endBattle('win');
+        if (battleEnded == false) {
+            if (this.player.health <= 0) {
+                battleEnded = true;
+                this.helpText.setText('You Lost! Please wait for the window to reload...');
+                this.endBattle('lose');
+            } else if (this.enemy.health <= 0) {
+                battleEnded = true;
+                this.helpText.setText('You Won! Please wait for the window to reload...');
+                this.endBattle('win');
+            }
         }
     }
 
