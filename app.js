@@ -8,7 +8,7 @@ let npcBase64image = '';
 let monsterDescription = '';
 let personas;
 let persona;
-let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 10-1000, mana is 10-500, atk through wis are each 1-50, and the 4 elements are each a float between -1.0 and 3.0, where -1.0 is the strongest and 3 is the weakest.';
+let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 100-10000, mana is 10-1000, atk through wis are each 1-50, and the 4 elements are each a float between -1.0 and 3.0, where -1.0 is the strongest (Given to those of that element) and 3 is the weakest (Given to those that oppose  this element).';
 let battleEnded = false;
 
 class ExplorationScene extends Phaser.Scene {
@@ -490,11 +490,13 @@ class BattleScene extends Phaser.Scene {
     
         let baseDamage;
         if (critical) {
-            baseDamage = Math.floor((4 * magAtk * attackerElement * defenderElement) * variance)
+            baseDamage = Math.floor((2 * magAtk) * variance)
         } else {
-            baseDamage = Math.floor((4 * magAtk * attackerElement - 2 * magDef * defenderElement) * variance);
+            baseDamage = Math.floor((2 * magAtk - magDef) * variance);
         }
     
+        baseDamage *= attackerElement * defenderElement;
+
         return baseDamage; // Allow negative values for potential healing
     }
                 
