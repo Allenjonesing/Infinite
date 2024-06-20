@@ -7,6 +7,7 @@ let enemyImageBase64 = '';
 let npcBase64image = '';
 let monsterDescription = '';
 let personas;
+let persona;
 
 class ExplorationScene extends Phaser.Scene {
     constructor() {
@@ -144,12 +145,14 @@ class BattleScene extends Phaser.Scene {
         this.enemy = data.enemy;
 
         // Initialize player and enemy data
+        const playerStats = await fetchPlayerStats();
+        console.log('create... playerStats: ', playerStats);
         this.player = {
             name: 'Player',
-            health: 100,
-            speed: 5,
-            atk: 15,
-            def: 10,
+            health: playerStats.health,
+            speed: playerStats.speed,
+            atk: playerStats.atk,
+            def: playerStats.def,
             sprite: null,
             actions: ['Attack', 'Defend']
         };
@@ -490,7 +493,7 @@ async function generateAIResponses() {
 
                 personas = await generatePersonas(textContent);
                 let foundPersonas = personas.characters && Array.isArray(personas.characters) ? personas.characters : personas;
-                const persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
+                persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
                 prompt = `As ${persona.name}, ${persona.description}, in the setting chosen: ${setting}. Describe in 10-20 words a Monster that we'll be faced to fight due to a made up reason that makes sense.`;
 
                 try {
@@ -614,7 +617,7 @@ async function generatePersonas(setting) {
 
 async function fetchEnemyStats() {
     console.log('fetchEnemyStats...');
-    const prompt = `Generate stats for an enemy based on this description: ${monsterDescription}. They must be in JSON like {health,speed,atk,def}, where health is 10-500, and speed/atk/def are each 1-50.`;
+    const prompt = `Generate stats for an enemy based on this description: ${monsterDescription}. They must be in JSON like {health,speed,atk,def}, where health is 10-500, and speed/atk/def are each 1-50. Balance the stats so that if one is high, another is low. If the monster is larger, the health, atk, and def will be high, for example.`;
     const encodedPrompt = encodeURIComponent(prompt);
     
     try {
@@ -640,6 +643,38 @@ async function fetchEnemyStats() {
         }
     } catch (error) {
         console.error('Error fetching enemy stats:', error);
+        throw new Error('No stats generated');
+    }
+}
+
+async function fetchPlayerStats() {
+    console.log('fetchPlayerStats...');
+    const prompt = `Generate stats for the player based on this description: ${persona.name}, ${persona.description}. They must be in JSON like {health,speed,atk,def}, where health is 10-500, and speed/atk/def are each 1-50. Balance the stats so that if one is high, another is low. If the player is smarter, the speed and def will be high, for example.`;
+    const encodedPrompt = encodeURIComponent(prompt);
+    
+    try {
+        const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: prompt })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        console.log('fetchPlayerStats... response: ', response);
+        const data = await response.json();
+        console.log('fetchPlayerStats... data: ', data);
+        if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+            return JSON.parse(data.choices[0].message.content);
+        } else {
+            throw new Error('No stats generated');
+        }
+    } catch (error) {
+        console.error('Error fetching player stats:', error);
         throw new Error('No stats generated');
     }
 }
