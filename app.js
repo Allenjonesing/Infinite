@@ -237,8 +237,10 @@ class BattleScene extends Phaser.Scene {
             // Handle defeat logic
         }
 
-        // Refresh the whole page after the battle ends
-        location.reload();
+        this.time.delayedCall(5000, () => {
+            // Refresh the whole page after the battle ends
+            location.reload();
+        }, [], this);
     }
 
     createUI() {
@@ -486,7 +488,7 @@ class BattleScene extends Phaser.Scene {
     
         let baseDamage;
         if (critical) {
-            baseDamage = Math.floor(magAtk * 4 * variance);
+            baseDamage = Math.floor((4 * magAtk * attackerElement * defenderElement) * variance)
         } else {
             baseDamage = Math.floor((4 * magAtk * attackerElement - 2 * magDef * defenderElement) * variance);
         }
