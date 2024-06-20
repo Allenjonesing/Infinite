@@ -153,7 +153,11 @@ class BattleScene extends Phaser.Scene {
             sprite: null,
             actions: ['Attack', 'Defend']
         };
+
+        console.log('create... this.player: ', this.player);
+
         const enemyStats = await fetchEnemyStats();
+        console.log('create... enemyStats: ', enemyStats);
         this.enemy = {
             name: 'Enemy',
             health: enemyStats.health,
@@ -163,6 +167,7 @@ class BattleScene extends Phaser.Scene {
             sprite: null,
             actions: ['Attack']
         };
+        console.log('create... this.enemy: ', this.enemy);
 
         // Generate enemy image based on news article and setting
         if (newsData.length > 0) {
@@ -595,9 +600,10 @@ async function generatePersonas(setting) {
 }
 
 async function fetchEnemyStats() {
+    console.log('fetchEnemyStats...');
     const prompt = `Generate stats for an enemy based on this description: ${monsterDescription}. They must be in JSON like {health,speed,atk,def}, where health is 10-500, and speed/atk/def are each 1-50.`;
     const encodedPrompt = encodeURIComponent(prompt);
-
+    
     try {
         const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
             method: 'POST',
@@ -606,14 +612,16 @@ async function fetchEnemyStats() {
             },
             body: JSON.stringify({ prompt: prompt })
         });
-
+        
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-
+        
+        console.log('fetchEnemyStats... response: ', response);
         const data = await response.json();
-        if (aiResponse && aiResponse.choices && aiResponse.choices[0] && aiResponse.choices[0].message && aiResponse.choices[0].message.content) {
-            return JSON.parse(aiResponse.choices[0].message.content);
+        console.log('fetchEnemyStats... data: ', data);
+        if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+            return JSON.parse(data.choices[0].message.content);
         } else {
             throw new Error('No stats generated');
         }
