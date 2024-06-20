@@ -173,7 +173,7 @@ class BattleScene extends Phaser.Scene {
             console.error('preload... Enemy Base64 image is missing');
         }
     }
-                
+    
     async create(data) {
         this.player = data.player;
         this.enemy = data.enemy;
@@ -217,7 +217,7 @@ class BattleScene extends Phaser.Scene {
         // Display UI elements
         this.createUI();
     }
-        
+            
     update() {
         if (this.player.health <= 0) {
             this.endBattle('lose');
@@ -399,8 +399,17 @@ function spawnEnemies(scene) {
         const newsArticle = newsData[0]; // Use the first article for the enemy
         console.log('spawnEnemies... Generating new enemy image... ');
         const imageKey = 'enemyImageBase64';
-        if (enemyImageBase64 && scene.textures.exists(imageKey)) {
-            console.log('spawnEnemies... enemyImageBase64:', enemyImageBase64);
+
+        // Ensure texture is added here first
+        if (enemyImageBase64) {
+            scene.textures.addBase64(imageKey, enemyImageBase64);
+            console.log('spawnEnemies... enemyImageBase64 added:', enemyImageBase64);
+        } else {
+            console.error('spawnEnemies... Enemy Base64 image is missing');
+            return;
+        }
+
+        if (scene.textures.exists(imageKey)) {
             for (let i = 0; i < 3; i++) {
                 let x = Phaser.Math.Between(50, 750);
                 let y = Phaser.Math.Between(50, 550);
@@ -414,7 +423,7 @@ function spawnEnemies(scene) {
             scene.physics.add.collider(scene.npcs, scene.enemies);
             scene.physics.add.collider(scene.enemies, scene.enemies);
         } else {
-            console.error('spawnEnemies... Enemy Base64 image is missing or not added as a texture');
+            console.error('spawnEnemies... Failed to verify enemy texture existence');
         }
     } else {
         console.error('No news data available to generate enemies');
