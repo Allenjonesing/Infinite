@@ -7,7 +7,6 @@ let enemySpriteUrl = '';
 let enemyImageBase64 = '';
 let base64Image = '';
 let npcBase64image = '';
-var counter = 0;
 
 class ExplorationScene extends Phaser.Scene {
     constructor() {
@@ -85,13 +84,15 @@ class ExplorationScene extends Phaser.Scene {
         this.npcs.children.iterate((npc) => {
             npc.setInteractive();
             npc.on('pointerdown', () => {
-                alert(`${npc.persona.name}: ${npc.newsText}`);
+                alert(`${npc.persona}: ${npc.response}`);
             });
         });
 
         const newsArticle = newsData[0]; // Use the first article for the enemy
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
         console.log('create... enemyImageBase64: ', enemyImageBase64);
+        //jsonEnemyImageBase64 = enemyImageBase64.json();
+        //console.log('create... jsonEnemyImageBase64: ', jsonEnemyImageBase64);
 
         // Spawn enemies after data is ready
         spawnEnemies(this);
@@ -99,7 +100,7 @@ class ExplorationScene extends Phaser.Scene {
 
     startBattle(player, enemy) {
         // Transition to the battle scene, passing necessary data
-        this.scene.start('BattleScene', { player: this.player, enemy: enemy });
+        this.scene.start('BattleScene', { player: player, enemy: enemy });
     }
 
     update() {
@@ -127,7 +128,9 @@ class ExplorationScene extends Phaser.Scene {
                 npc.body.setVelocity(0, 0);
             }
         });
+
     }
+
 }
 
 // Additional functions for handling damage and other game logic
@@ -149,119 +152,47 @@ class BattleScene extends Phaser.Scene {
     }
 
     preload() {
-        console.log('preload... npcBase64image:', npcBase64image);
-        console.log('preload... enemyImageBase64:', enemyImageBase64);
-    
-        if (npcBase64image) {
-            try {
-                this.textures.addBase64('npcBase64image', npcBase64image);
-                console.log('preload... NPC Base64 image added successfully');
-            } catch (error) {
-                console.error('preload... Error adding NPC Base64 image:', error);
-            }
-        } else {
-            console.error('preload... NPC Base64 image is missing');
-        }
-    
-        if (enemyImageBase64) {
-            try {
-                this.textures.addBase64('enemyImageBase64', enemyImageBase64);
-                console.log('preload... Enemy Base64 image added successfully');
-            } catch (error) {
-                console.error('preload... Error adding Enemy Base64 image:', error);
-            }
-        } else {
-            console.error('preload... Enemy Base64 image is missing');
-        }
+        this.textures.addBase64('npcBase64image', npcBase64image);
+        this.textures.addBase64('enemyImageBase64', enemyImageBase64);
     }
-    
+
     async create(data) {
-        
-        console.log('create... NPC Base64 image:', npcBase64image);
-        console.log('create... Enemy Base64 image:', enemyImageBase64);
-        
-        if (npcBase64image) {
-            try {
-                // Handle Base 64 Image From Here Not From PreLoad                
-                this.textures.addBase64('npcBase64image', npcBase64image);
-                
-                // Loader to wait all base64 Image loaded
-                this.textures.on('onload', function() { 
-                    console.log('create... onload image:', npcBase64image);
-                    counter++;			
-                });
-                
-                // Timer check when all based64 assets have been loaded
-                this.customTimer = this.time.addEvent({ delay: 500, callback: function callback() {
-                    
-                    // Adjust counter maximum as you ecpect. For now just one based64 assets need to be loaded only
-                    if (counter === 1) {
-                        
-                        // Destroy timer to save memory
-                        this.customTimer.remove(false);
-                        
-                        // Add base64 image and position it		
-                        this.imgBase64Sprite = this.add.sprite(game.config.width / 2, game.config.height / 2, 'npcBase64image');
-                        this.player = data.player;
-                        this.player = { name: 'Player', health: 100, speed: 5, sprite: this.imgBase64Sprite, actions: ['Attack', 'Defend'] };
-                        
-                    }
-                    
-                }, callbackScope: platform, loop: true});
-                console.log('create... NPC sprite added successfully');
-            } catch (error) {
-                console.error('create... Error adding NPC sprite:', error);
+        //this.add.sprite(400, 300, 'npcBase64image');
+        //this.add.sprite(400, 300, 'enemyImageBase64');
+
+        this.player = data.player;
+        this.enemy = data.enemy;
+
+        // Initialize player and enemy data
+        this.player = { name: 'Player', health: 100, speed: 5, sprite: null, actions: ['Attack', 'Defend'] };
+        this.enemy = { name: 'Enemy', health: 100, speed: 3, sprite: null, actions: ['Attack'] };
+
+        // Generate enemy image based on news article and setting
+        if (newsData.length > 0) {
+            console.log('enemyImageBase64: ', enemyImageBase64);
+            if (enemyImageBase64) {
+                // const imageKey = 'generatedEnemy';
+                // this.textures.addBase64(imageKey, enemyImageBase64);
+
+                // Display player and enemy sprites
+                this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
+                this.enemy.sprite = this.add.sprite(500, 300, 'enemyImageBase64');
+
+                // Initialize turn order and current turn index
+                this.turnOrder = this.calculateTurnOrder();
+                this.currentTurnIndex = 0;
+
+                // Cooldown flag
+                this.isCooldown = false;
+
+                // Display UI elements
+                this.createUI();
+            } else {
+                console.error('Failed to generate enemy image');
             }
-        } else {
-            console.error('create... Failed to add NPC sprite. Base64 image or texture does not exist.');
         }
-        
-        if (enemyImageBase64 && this.textures.exists('enemyImageBase64')) {
-            try {
-                // Handle Base 64 Image From Here Not From PreLoad                
-                this.textures.addBase64('enemyImageBase64', enemyImageBase64);
-                
-                // Loader to wait all base64 Image loaded
-                this.textures.on('onload', function() { 
-                    counter++;			
-                });
-                
-                // Timer check when all based64 assets have been loaded
-                this.customTimer = this.time.addEvent({ delay: 500, callback: function callback() {
-                    
-                    // Adjust counter maximum as you ecpect. For now just one based64 assets need to be loaded only
-                    if (counter === 1) {
-                        
-                        // Destroy timer to save memory
-                        this.customTimer.remove(false);
-                        
-                        // Add base64 image and position it		
-                        this.imgBase64Sprite = this.add.sprite(game.config.width / 2, game.config.height / 2, 'enemyImageBase64');
-                        this.enemy = data.enemy;
-                        this.enemy = { name: 'Enemy', health: 100, speed: 3, sprite: this.imgBase64Sprite, actions: ['Attack'] };
-                    
-                    }
-                
-                }, callbackScope: platform, loop: true});
-                console.log('create... Enemy sprite added successfully');
-            } catch (error) {
-                console.error('create... Error adding Enemy sprite:', error);
-            }
-        } else {
-            console.error('create... Failed to add Enemy sprite. Base64 image or texture does not exist.');
-        }
-    
-        // Initialize turn order and current turn index
-        this.turnOrder = this.calculateTurnOrder();
-        this.currentTurnIndex = 0;
-    
-        // Cooldown flag
-        this.isCooldown = false;
-    
-        // Display UI elements
-        this.createUI();
     }
-            
+
     update() {
         if (this.player.health <= 0) {
             this.endBattle('lose');
@@ -427,7 +358,6 @@ async function generateEnemyImage(newsArticle, setting) {
                 console.log('generateEnemyImage... parsedBody.base64_image: ', parsedBody.base64_image);
                 resolve(`data:image/png;base64,${parsedBody.base64_image}`);
             } else {
-                console.error('generateEnemyImage... No image generated');
                 reject(new Error('No image generated'));
             }
         } catch (error) {
@@ -441,49 +371,27 @@ function spawnEnemies(scene) {
     console.log('spawnEnemies... ');
     if (newsData.length > 0) {
         const newsArticle = newsData[0]; // Use the first article for the enemy
-        console.log('spawnEnemies... Generating new enemy image... ', newsArticle);
+        console.log('spawnEnemies... Generating new enemy image... ');
+        // generateEnemyImage(newsArticle, setting).then(enemyImageBase64 => {
+        //     console.log('spawnEnemies... enemyImageBase64: ', enemyImageBase64)
+        //     if (enemyImageBase64) {
         const imageKey = 'enemyImageBase64';
-
-        // Ensure texture is added here first
-        if (enemyImageBase64) {
-            try {
-                scene.textures.addBase64(imageKey, enemyImageBase64);
-                console.log('spawnEnemies... enemyImageBase64 added:', enemyImageBase64);
-
-                // Immediately check if the texture is added
-                if (scene.textures.exists(imageKey)) {
-                    console.log('Texture added and verified immediately.');
-                } else {
-                    console.error('Texture not found immediately after adding.');
-                }
-
-                // Log all texture keys to debug
-                console.log('All texture keys:', scene.textures.getTextureKeys());
-            } catch (error) {
-                console.error('spawnEnemies... Error adding enemy Base64 image:', error);
-                return;
-            }
-        } else {
-            console.error('spawnEnemies... Enemy Base64 image is missing');
-            return;
+        //scene.textures.addBase64(imageKey, enemyImageBase64);
+        for (let i = 0; i < 3; i++) {
+            let x = Phaser.Math.Between(50, 750);
+            let y = Phaser.Math.Between(50, 550);
+            let enemy = scene.enemies.create(x, y, imageKey); // Create enemies using the Base64 image
+            enemy.setCollideWorldBounds(true);
         }
-
-        if (scene.textures.exists(imageKey)) {
-            for (let i = 0; i < 3; i++) {
-                let x = Phaser.Math.Between(50, 750);
-                let y = Phaser.Math.Between(50, 550);
-                let enemy = scene.enemies.create(x, y, imageKey); // Create enemies using the Base64 image
-                enemy.setCollideWorldBounds(true);
-                console.log('spawnEnemies... Enemy sprite added at', x, y);
-            }
-            // Add enemy collisions
-            scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
-            scene.physics.add.collider(scene.enemies, scene.trees);
-            scene.physics.add.collider(scene.npcs, scene.enemies);
-            scene.physics.add.collider(scene.enemies, scene.enemies);
-        } else {
-            console.error('spawnEnemies... Failed to verify enemy texture existence');
-        }
+        // Add enemy collisions
+        scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
+        scene.physics.add.collider(scene.enemies, scene.trees);
+        scene.physics.add.collider(scene.npcs, scene.enemies);
+        scene.physics.add.collider(scene.enemies, scene.enemies);
+        //     } else {
+        //         console.error('Failed to generate enemy image');
+        //     }
+        // });
     } else {
         console.error('No news data available to generate enemies');
     }
@@ -613,24 +521,38 @@ async function generateAIResponses(personas, setting) {
     const responses = [];
 
     let foundPersonas = [];
+    console.log('generateAIResponses... newsData: ', newsData);
     if (personas) {
+        console.log('generateAIResponses... personas: ', personas);
+        console.log('generateAIResponses... personas.personas: ', personas.personas);
+        console.log('generateAIResponses... typeof personas.personas: ', typeof personas.personas);
+        console.log('generateAIResponses... typeof personas: ', typeof personas);
+        console.log('generateAIResponses... personas.length: ', personas.length);
         if (personas.personas && personas.personas.length && typeof personas.personas == 'object') {
+            console.log('foundPersonas = personas.personas...');
             foundPersonas = personas.personas;
         } else if (personas.length && typeof personas == 'object') {
+            console.log('foundPersonas = personas...');
             foundPersonas = personas;
         } else {
             // Failsafe
+            console.log('Failsafe...');
             foundPersonas = ['Bob the Loser', 'John the terrible', 'No Work Terk', 'Jery the dim', 'Jimmy the reclaimer'];
         }
     } else {
         // MEGA Failsafe
+        console.log('Mega Failsafe...');
         foundPersonas = ['Bob the Loser', 'John the terrible', 'No Work Terk', 'Jery the dim', 'Jimmy the reclaimer'];
     }
+    console.log('generateAIResponses... foundPersonas: ', foundPersonas);
 
     for (let i = 0; i < newsData.length; i++) {
         const news = newsData[i];
+        console.log('generateAIResponses... looped news: ', news);
         const persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
+        console.log('generateAIResponses... looped persona: ', persona);
         const prompt = `As ${persona.name}, ${persona.description}, As if narrating from the perspective of the player of the game, discuss the following news article:\n\nTitle: ${news.title}\nDescription: ${news.description}, as it pertains to the setting chosen: ${setting}. Be sure to really, REALLY, get into character and blend the article with the setting without revealing ANY Brand names, celebrity names, etc.`;
+        console.log('generateAIResponses... looped prompt: ', prompt);
         const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
 
         try {
@@ -640,7 +562,7 @@ async function generateAIResponses(personas, setting) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ prompt: prompt })
-            });
+            })
 
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -655,8 +577,10 @@ async function generateAIResponses(personas, setting) {
                 && aiResponse.choices[0].message
                 && aiResponse.choices[0].message.content) {
                 const textContent = aiResponse.choices[0].message.content;
+                //responses.push({ response: aiResponse.choices[0].message.content, persona: persona });
 
                 const imgPrompt = `Generate an image of ${persona.name}, ${persona.description} in the setting chosen: ${setting}.`;
+                console.log('generateAIResponses...  imgPrompt: ', imgPrompt);
                 const encodedPrompt = encodeURIComponent(imgPrompt); // Encoding the prompt
 
                 try {
@@ -666,7 +590,7 @@ async function generateAIResponses(personas, setting) {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ prompt: imgPrompt, generateImage: true })
-                    });
+                    })
 
                     if (!imageResponse.ok) {
                         throw new Error('Network response was not ok');
@@ -676,6 +600,7 @@ async function generateAIResponses(personas, setting) {
                     const parsedBody = JSON.parse(data.body);
                     if (parsedBody && parsedBody.base64_image) {
                         const base64string = `data:image/png;base64,${parsedBody.base64_image}`;
+                        console.log('generateAIResponses... parsedBody.base64_image: ', parsedBody.base64_image);
                         responses.push({ response: textContent, persona: persona, imageBase64: base64string });
                         displayAIResponse(news.title, textContent, persona, base64string);
                     } else {
@@ -685,6 +610,7 @@ async function generateAIResponses(personas, setting) {
                     console.error('Error generating AI response:', error);
                     newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
                 }
+
             }
         } catch (error) {
             console.error('Error generating AI response:', error);
@@ -692,6 +618,7 @@ async function generateAIResponses(personas, setting) {
         }
     }
 
+    console.log('generateAIResponses... returning responses: ', responses);
     return responses;
 }
 
@@ -711,7 +638,7 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
     if (imageBase64) {
         const imageElement = document.createElement('img');
         imageElement.setAttribute("id", "enemyImage");
-        imageElement.src = imageBase64;
+        imageElement.src = imageBase64;;
         imageElement.alt = 'Generated image';
         newsItem.appendChild(imageElement);
         npcBase64image = imageBase64;
@@ -725,6 +652,7 @@ async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
 }
 
 async function generatePersonas(setting) {
+    console.log('generatePersonas... setting: ', setting);
     const prompt = `Generate 5 short (5-10 word) and detailed fictional personas for a ${setting} setting in JSON format. Each persona should have a name and a description.`;
     const encodedPrompt = encodeURIComponent(prompt); // Encoding the prompt
     let parsedPersonas = [];
@@ -736,7 +664,7 @@ async function generatePersonas(setting) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ prompt: prompt })
-        });
+        })
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -753,15 +681,17 @@ async function generatePersonas(setting) {
         }
     } catch (error) {
         console.error('Error generating AI response:', error);
-        const newsContainer = document.getElementById('news');
-        newsContainer.innerHTML += `<div class="error-message">Error generating personas: ${error.message}</div>`;
+        newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
     }
 
+    console.log('generatePersonas... Returning parsedPersonas: ', parsedPersonas);
     return parsedPersonas;
 }
 
 function parsePersonas(content) {
+    console.log('parsePersonas... content: ', content);
     try {
+        console.log('parsePersonas... JSON.parse(content) ', JSON.parse(content));
         return JSON.parse(content);
     } catch (error) {
         console.error('Error parsing personas:', error);
@@ -769,13 +699,96 @@ function parsePersonas(content) {
     }
 }
 
-async function fetchImageAsBase64(url) {
-    const response = await fetch(url);
-    const blob = await response.blob();
+function toDataUrl(url, callback) {
+    console.log('toDataUrl...');
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+        console.log('onload...');
+        var reader = new FileReader();
+        reader.onloadend = function () {
+            console.log('onloadend...');
+            callback(reader.result);
+        }
+        reader.readAsDataURL(xhr.response);
+    };
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+    xhr.send();
+    console.log('toDataUrl Complete...');
+}
+
+async function imageUrlToBase64(url) {
+    console.log('imageUrlToBase64... url: ', url);
+    const data = await fetch(url);
+    const blob = await data.blob();
     return new Promise((resolve, reject) => {
+        console.log('Promise...');
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+            console.log('onloadend... reader.result: ', reader.result);
+            const base64data = reader.result;
+            resolve(base64data);
+        };
+        reader.onerror = reject;
+    });
+};
+
+function getBase64Image(imgElementID) {
+    console.log('getBase64Image... imgElementID: ', imgElementID);
+    const img = document.getElementById(imgElementID);
+    console.log('getBase64Image... img: ', img);
+    if (img) {
+
+        var canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        var dataURL = canvas.toDataURL();
+        console.log('getBase64Image... dataURL: ', dataURL);
+
+        return dataURL;
+    } else {
+        console.error('No IMG element found!');
+        return 'ERROR';
+    }
+}
+
+async function fetchImageAsBase64(url) {
+    console.log('fetchImageAsBase64... url: ', url);
+    const response = await fetch(url);
+    console.log('fetchImageAsBase64... response: ', response);
+    const blob = await response.blob();
+    console.log('fetchImageAsBase64... blob: ', blob);
+    return new Promise((resolve, reject) => {
+        console.log('fetchImageAsBase64 Promise... ');
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
         reader.onerror = reject;
         reader.readAsDataURL(blob);
     });
+}
+
+function imageToBase64(url, callback) {
+    console.log('imageToBase64... url: ', url);
+    console.log('imageToBase64... callback: ', callback);
+    let img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = function () {
+        console.log('onload...');
+        let canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        let dataURL = canvas.toDataURL('image/png');
+        console.log('imageToBase64... Calling back with dataURL: ', dataURL);
+        callback(dataURL);
+    };
+    img.onerror = function () {
+        console.error('Error loading image');
+        callback(null);
+    };
+    img.src = url;
 }
