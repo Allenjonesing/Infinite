@@ -219,22 +219,24 @@ class BattleScene extends Phaser.Scene {
     update() {
         if (battleEnded == false) {
             if (this.player.health <= 0) {
-                battleEnded = true;
-                this.helpText.setText('You Lost! Please wait for the window to reload...');
                 this.endBattle('lose');
             } else if (this.enemy.health <= 0) {
                 battleEnded = true;
-                this.helpText.setText('You Won! Please wait for the window to reload...');
                 this.endBattle('win');
             }
         }
     }
-
+    
     endBattle(result) {
+        battleEnded = true;
         if (result === 'win') {
             // Handle victory logic
+            this.helpText.setText('You Won! Please wait for the window to reload...');
+            this.enemy.sprite.destroy(); // Remove enemy sprite
         } else {
             // Handle defeat logic
+            this.helpText.setText('You Lost! Please wait for the window to reload...');
+            this.player.sprite.destroy(); // Remove player sprite
         }
 
         this.time.delayedCall(5000, () => {
