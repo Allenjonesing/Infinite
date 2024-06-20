@@ -8,7 +8,7 @@ let npcBase64image = '';
 let monsterDescription = '';
 let personas;
 let persona;
-let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 10-1000, mana is 10-500, atk through wis are each 1-50, and the 4 elements are each a float between -1.0 and 3.0, where -1.0 is the strongest and 3 is the weakest. Fire enemies should have a Fire element rating in the negative and a high water and ice element score. Balance the stats so that if one is high, another is low. Personalize it so that the size, element, type all affect the stats.';
+let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 10-1000, mana is 10-500, atk through wis are each 1-50, and the 4 elements are each a float between -1.0 and 3.0, where -1.0 is the strongest and 3 is the weakest.';
 let battleEnded = false;
 
 class ExplorationScene extends Phaser.Scene {
@@ -446,7 +446,7 @@ class BattleScene extends Phaser.Scene {
         if (damage < 0) {
             fontColor = '#0cc43d'
         }
-        const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '60px', fill: , fontStyle: 'bold' });
+        const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '60px', fill: fontColor, fontStyle: 'bold' });
         this.tweens.add({
             targets: damageText,
             y: target.y - 250,
