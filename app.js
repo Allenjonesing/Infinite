@@ -237,41 +237,41 @@ class BattleScene extends Phaser.Scene {
     createUI() {
         // Help text at the top
         this.helpText = this.add.text(20, 20, 'A battle has begun...', { fontSize: '18px', fill: '#fff' });
-
+    
         // Player health and mana
         this.playerHealthText = this.add.text(50, 100, `Health: ${this.player.health}`, { fontSize: '20px', fill: '#fff' });
         this.playerManaText = this.add.text(50, 130, `Mana: ${this.player.mana}`, { fontSize: '20px', fill: '#fff' });
-
+        
         // Enemy health and mana
         this.enemyHealthText = this.add.text(450, 100, `Health: ${this.enemy.health}`, { fontSize: '20px', fill: '#fff' });
         this.enemyManaText = this.add.text(450, 130, `Mana: ${this.enemy.mana}`, { fontSize: '20px', fill: '#fff' });
-
+    
         // Turn order list
         this.turnOrderText = this.add.text(675, 80, 'Turn List', { fontSize: '20px', fill: '#fff' });
         this.updateTurnOrderDisplay();
-
+    
         // Action buttons at the bottom
         this.actions = this.add.group();
         const actionNames = ['Attack', 'Defend', 'Magic Attack'];
         for (let i = 0; i < actionNames.length; i++) {
             let actionText = this.add.text(200 + i * 150, 500, actionNames[i], { fontSize: '20px', fill: '#fff', backgroundColor: '#000', padding: { left: 10, right: 10, top: 5, bottom: 5 } });
             actionText.setInteractive();
-            actionText.on('pointerdown', () => this.handlePlayerAction(actionNames[i], this.chooseElement()));
+            actionText.on('pointerdown', () => this.handlePlayerAction(actionNames[i]));
             this.actions.add(actionText);
         }
-
+    
         // Add borders around health and mana areas
         this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(40, 90, 200, 75);
         this.add.graphics().lineStyle(2, 0xff0000).strokeRect(440, 90, 200, 75);
-
+    
         // Add border around action buttons
         this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(190, 490, 520, 60);
-
+    
         // Initially hide the action buttons and box
         this.actions.children.each(action => action.setVisible(false));
         this.actionBox.setVisible(false);
     }
-
+    
     chooseElement() {
         const elements = ['fire', 'ice', 'water', 'lightning'];
         return elements[Math.floor(Math.random() * elements.length)];
@@ -322,6 +322,11 @@ class BattleScene extends Phaser.Scene {
 
     handlePlayerAction(action, elementType = null) {
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
+            if (action === 'Magic Attack' && !elementType) {
+                this.showElementSelection();
+                return;
+            }
+    
             let damage = 0;
             let critical = false;
             if (action === 'Attack') {
@@ -359,7 +364,24 @@ class BattleScene extends Phaser.Scene {
             this.hidePlayerActions();
         }
     }
-
+    
+    showElementSelection() {
+        const elements = ['fire', 'ice', 'water', 'lightning'];
+        this.elementButtons = this.add.group();
+    
+        for (let i = 0; i < elements.length; i++) {
+            let elementText = this.add.text(200 + i * 150, 550, elements[i], { fontSize: '20px', fill: '#fff', backgroundColor: '#000', padding: { left: 10, right: 10, top: 5, bottom: 5 } });
+            elementText.setInteractive();
+            elementText.on('pointerdown', () => {
+                this.handlePlayerAction('Magic Attack', elements[i]);
+                this.elementButtons.clear(true, true);
+            });
+            this.elementButtons.add(elementText);
+        }
+    
+        this.helpText.setText('Choose an element for your Magic Attack:');
+    }
+    
     enemyAction() {
         const performEnemyAction = () => {
             console.log('performEnemyAction called');
