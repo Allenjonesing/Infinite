@@ -299,12 +299,18 @@ class BattleScene extends Phaser.Scene {
             let critical = false;
             if (action === 'Attack') {
                 damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.luk, this.enemy.eva);
-                critical = damage > this.player.atk;
+                critical = Math.random() < 0.1;
+                if (critical) {
+                    damage = this.calculateDamage(this.player.atk, 0, this.player.luk, this.enemy.eva);
+                }
                 this.showDamageIndicator(this.enemy.sprite, damage, critical);
             } else if (action === 'Magic Attack') {
                 if (this.player.mana >= 10) {
                     damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.player.element[elementType], this.enemy.element[elementType], this.player.luk, this.enemy.eva);
-                    critical = damage > this.player.magAtk;
+                    critical = Math.random() < 0.1;
+                    if (critical) {
+                        damage = this.calculateMagicDamage(this.player.magAtk, 0, this.player.element[elementType], this.enemy.element[elementType], this.player.luk, this.enemy.eva);
+                    }
                     this.player.mana -= 10;
                     this.showDamageIndicator(this.enemy.sprite, damage, critical);
                 } else {
@@ -332,14 +338,20 @@ class BattleScene extends Phaser.Scene {
                     const action = this.enemy.actions[Math.floor(Math.random() * this.enemy.actions.length)];
                     if (action === 'Attack') {
                         damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
-                        critical = damage > this.enemy.atk;
+                        critical = Math.random() < 0.1;
+                        if (critical) {
+                            damage = this.calculateDamage(this.enemy.atk, 0, this.enemy.luk, this.player.eva);
+                        }
                         this.showDamageIndicator(this.player.sprite, damage, critical);
                     } else if (action === 'Magic Attack') {
                         const elements = ['fire', 'ice', 'water', 'lightning'];
                         const elementType = elements[Math.floor(Math.random() * elements.length)];
                         if (this.enemy.mana >= 10) {
                             damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.enemy.element[elementType], this.player.element[elementType], this.enemy.luk, this.player.eva);
-                            critical = damage > this.enemy.magAtk;
+                            critical = Math.random() < 0.1;
+                            if (critical) {
+                                damage = this.calculateMagicDamage(this.enemy.magAtk, 0, this.enemy.element[elementType], this.player.element[elementType], this.enemy.luk, this.player.eva);
+                            }
                             this.enemy.mana -= 10;
                             this.showDamageIndicator(this.player.sprite, damage, critical);
                         } else {
@@ -358,6 +370,7 @@ class BattleScene extends Phaser.Scene {
         performEnemyAction();
     }
 
+
     showDamageIndicator(target, damage, critical) {
         const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '20px', fill: critical ? '#ff0000' : '#ffffff' });
         this.tweens.add({
@@ -373,22 +386,18 @@ class BattleScene extends Phaser.Scene {
     }
 
     calculateDamage(atk, def, luk, eva) {
-        let baseDamage = Math.max(1, atk - def + Phaser.Math.Between(-2, 2));
-        let criticalHit = Math.random() < (0.1 + luk * 0.01);
-        if (criticalHit) {
-            baseDamage *= 2;
-        }
+        let critical = Math.random() < 0.1; // 10% chance for critical hit
+        let baseDamage = atk - (critical ? 0 : def) + Phaser.Math.Between(-2, 2);
+        baseDamage = Math.max(1, baseDamage); // Ensure minimum damage is 1
         let evaded = Math.random() < (eva * 0.01);
         return evaded ? 0 : baseDamage;
     }
 
     calculateMagicDamage(magAtk, magDef, attackerElement, defenderElement, luk, eva) {
-        let baseDamage = Math.max(1, magAtk - magDef + Phaser.Math.Between(-2, 2));
+        let critical = Math.random() < 0.1; // 10% chance for critical hit
+        let baseDamage = magAtk - (critical ? 0 : magDef) + Phaser.Math.Between(-2, 2);
+        baseDamage = Math.max(1, baseDamage); // Ensure minimum damage is 1
         baseDamage *= attackerElement * defenderElement; // Elemental multiplier
-        let criticalHit = Math.random() < (0.1 + luk * 0.01);
-        if (criticalHit) {
-            baseDamage *= 2;
-        }
         let evaded = Math.random() < (eva * 0.01);
         return evaded ? 0 : baseDamage;
     }
