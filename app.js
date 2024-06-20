@@ -397,13 +397,28 @@ function spawnEnemies(scene) {
     console.log('spawnEnemies... ');
     if (newsData.length > 0) {
         const newsArticle = newsData[0]; // Use the first article for the enemy
-        console.log('spawnEnemies... Generating new enemy image... ');
+        console.log('spawnEnemies... Generating new enemy image... ', newsArticle);
         const imageKey = 'enemyImageBase64';
 
         // Ensure texture is added here first
         if (enemyImageBase64) {
-            scene.textures.addBase64(imageKey, enemyImageBase64);
-            console.log('spawnEnemies... enemyImageBase64 added:', enemyImageBase64);
+            try {
+                scene.textures.addBase64(imageKey, enemyImageBase64);
+                console.log('spawnEnemies... enemyImageBase64 added:', enemyImageBase64);
+
+                // Immediately check if the texture is added
+                if (scene.textures.exists(imageKey)) {
+                    console.log('Texture added and verified immediately.');
+                } else {
+                    console.error('Texture not found immediately after adding.');
+                }
+
+                // Log all texture keys to debug
+                console.log('All texture keys:', scene.textures.getTextureKeys());
+            } catch (error) {
+                console.error('spawnEnemies... Error adding enemy Base64 image:', error);
+                return;
+            }
         } else {
             console.error('spawnEnemies... Enemy Base64 image is missing');
             return;
