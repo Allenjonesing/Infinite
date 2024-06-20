@@ -201,6 +201,11 @@ class BattleScene extends Phaser.Scene {
 
                 // Display UI elements
                 this.createUI();
+
+                // Check whose turn it is and start the action immediately if it's the enemy's turn
+                if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
+                    this.enemyAction();
+                }
             } else {
                 console.error('Failed to generate enemy image');
             }
@@ -230,7 +235,7 @@ class BattleScene extends Phaser.Scene {
         this.playerHealthText = this.add.text(50, 20, `Health: ${this.player.health}`, { fontSize: '20px', fill: '#fff' });
         this.playerManaText = this.add.text(50, 50, `Mana: ${this.player.mana}`, { fontSize: '20px', fill: '#fff' });
         this.enemyHealthText = this.add.text(650, 20, `Health: ${this.enemy.health}`, { fontSize: '20px', fill: '#fff' });
-    
+
         this.actions = this.add.group();
         for (let i = 0; i < this.player.actions.length; i++) {
             let actionText = this.add.text(50, 100 + i * 50, this.player.actions[i], { fontSize: '20px', fill: '#fff', backgroundColor: '#000', padding: { left: 10, right: 10, top: 5, bottom: 5 } });
@@ -238,17 +243,15 @@ class BattleScene extends Phaser.Scene {
             actionText.on('pointerdown', () => this.handlePlayerAction(this.player.actions[i], this.chooseElement()));
             this.actions.add(actionText);
         }
-    
-        this.turnOrderText = this.add.text(650, 100, 'Turn Order:', { fontSize: '20px', fill: '#fff' });
+
+        this.turnOrderText = this.add.text(700, 100, 'Turn Order:', { fontSize: '20px', fill: '#fff' });
         this.updateTurnOrderDisplay();
-    
+
         // Help bar at the top
-        this.helpText = this.add.text(200, 20, '', { fontSize: '20px', fill: '#fff' });
-    
-        // Add initial description
+        this.helpText = this.add.text(50, 80, '', { fontSize: '20px', fill: '#fff' });
         this.helpText.setText('A battle has started! Choose your actions wisely.');
     }
-    
+
     chooseElement() {
         const elements = ['fire', 'ice', 'water', 'lightning'];
         return elements[Math.floor(Math.random() * elements.length)];
@@ -331,10 +334,14 @@ class BattleScene extends Phaser.Scene {
 
     enemyAction() {
         const performEnemyAction = () => {
+            console.log('performEnemyAction called, this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
+            console.log('performEnemyAction called, this.isCooldown: ', this.isCooldown);
             if (this.turnOrder[this.currentTurnIndex].name === 'Enemy' && !this.isCooldown) {
+                console.log('Enemy turn and not in cooldown');
                 let damage = 0;
                 let critical = false;
                 const action = this.enemy.actions[Math.floor(Math.random() * this.enemy.actions.length)];
+                console.log('Enemy action:', action);
                 if (action === 'Attack') {
                     damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                     critical = Math.random() < 0.1;
@@ -345,6 +352,7 @@ class BattleScene extends Phaser.Scene {
                 } else if (action === 'Magic Attack') {
                     const elements = ['fire', 'ice', 'water', 'lightning'];
                     const elementType = elements[Math.floor(Math.random() * elements.length)];
+                    console.log('Enemy element type:', elementType);
                     if (this.enemy.mana >= 10) {
                         damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.enemy.element[elementType], this.player.element[elementType], this.enemy.luk, this.player.eva);
                         critical = Math.random() < 0.1;
@@ -354,6 +362,7 @@ class BattleScene extends Phaser.Scene {
                         this.enemy.mana -= 10;
                         this.showDamageIndicator(this.player.sprite, damage, critical);
                     } else {
+                        console.log('Not enough mana for Magic Attack');
                         return;
                     }
                 }
@@ -362,12 +371,14 @@ class BattleScene extends Phaser.Scene {
                 this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                 this.startCooldown();
             } else {
+                console.log('Enemy turn but in cooldown or not enemy turn');
                 this.time.delayedCall(200, performEnemyAction, [], this);
             }
         };
+        console.log('Enemy action started');
         performEnemyAction();
     }
-    
+
     showDamageIndicator(target, damage, critical) {
         const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '20px', fill: critical ? '#ff0000' : '#ffffff' });
         this.tweens.add({
