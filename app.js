@@ -8,7 +8,7 @@ let npcBase64image = '';
 let monsterDescription = '';
 let personas;
 let persona;
-let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 10-1000, mana is 10-500, atk through wis are each 1-100, and the 4 elements are each a float between 0.0 and 3.0, where 0 is immune and 3 is very weak. Balance the stats so that if one is high, another is low. Personalize it so that the size, element, type all affect the stats.';
+let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 10-1000, mana is 10-500, atk through wis are each 1-100, and the 4 elements are each a float between -1.0 and 3.0, where -1.0 is the strongest and 3 is the weakest. Fire enemies should have a Fire element rating in the negative and a high water and ice element score. Balance the stats so that if one is high, another is low. Personalize it so that the size, element, type all affect the stats.';
 
 class ExplorationScene extends Phaser.Scene {
     constructor() {
@@ -449,22 +449,43 @@ class BattleScene extends Phaser.Scene {
     }
 
     calculateDamage(atk, def, luk, eva) {
-        let critical = Math.random() < 0.1; // 10% chance for critical hit
-        let baseDamage = atk - (critical ? 0 : def) + Phaser.Math.Between(-2, 2);
+        let criticalChance = luk / 100;
+        let critical = Math.random() < criticalChance;
+        let variance = Phaser.Math.FloatBetween(0.9, 1.1);
+        
+        let baseDamage;
+        if (critical) {
+            baseDamage = atk * 4 * variance;
+        } else {
+            baseDamage = (4 * atk - 2 * def) * variance;
+        }
+    
         baseDamage = Math.max(1, baseDamage); // Ensure minimum damage is 1
         let evaded = Math.random() < (eva * 0.01);
         return evaded ? 0 : baseDamage;
     }
-
-    calculateMagicDamage(magAtk, magDef, attackerElement, defenderElement, luk, eva) {
-        let critical = Math.random() < 0.1; // 10% chance for critical hit
-        let baseDamage = magAtk - (critical ? 0 : magDef) + Phaser.Math.Between(-2, 2);
-        baseDamage = Math.max(1, baseDamage); // Ensure minimum damage is 1
-        baseDamage *= attackerElement * defenderElement; // Elemental multiplier
-        let evaded = Math.random() < (eva * 0.01);
-        return evaded ? 0 : baseDamage;
+    
+    calculateMagicDamage(magAtk, magDef, attackerElement, defenderElement, luk) {
+        let criticalChance = luk / 100;
+        let critical = Math.random() < criticalChance;
+        let variance = Phaser.Math.FloatBetween(0.9, 1.1);
+    
+        // Treat negative attackerElement as 0
+        attackerElement = Math.max(0, attackerElement);
+    
+        let baseDamage;
+        if (critical) {
+            baseDamage = magAtk * 4 * variance;
+        } else {
+            baseDamage = (4 * magAtk * attackerElement - 2 * magDef * defenderElement) * variance;
+        }
+    
+        // Ensure minimum healing or damage is -1 or 1 respectively
+        baseDamage = Math.max(-1, baseDamage);
+    
+        return baseDamage;
     }
-
+        
     startCooldown() {
         this.isCooldown = true;
 
