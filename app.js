@@ -98,7 +98,7 @@ class ExplorationScene extends Phaser.Scene {
 
     startBattle(player, enemy) {
         // Transition to the battle scene, passing necessary data
-        this.scene.start('BattleScene', { player: player, enemy: enemy });
+        this.scene.start('BattleScene', { player: this.player, enemy: enemy });
     }
 
     update() {
@@ -148,6 +148,8 @@ class BattleScene extends Phaser.Scene {
     }
 
     preload() {
+        console.log('preload... npcBase64image:', npcBase64image);
+        console.log('preload... enemyImageBase64:', enemyImageBase64);
         this.textures.addBase64('npcBase64image', npcBase64image);
         this.textures.addBase64('enemyImageBase64', enemyImageBase64);
     }
