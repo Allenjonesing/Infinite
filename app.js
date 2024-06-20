@@ -313,8 +313,8 @@ class BattleScene extends Phaser.Scene {
     }
 
     enemyAction() {
-        if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
-            const performEnemyAction = () => {
+        const performEnemyAction = () => {
+            if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
                 if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
                     let damage = 0;
                     const action = this.enemy.actions[Math.floor(Math.random() * this.enemy.actions.length)];
@@ -337,10 +337,12 @@ class BattleScene extends Phaser.Scene {
                 } else {
                     this.time.delayedCall(200, performEnemyAction, [], this);
                 }
-            };
+            } else {
+                this.time.delayedCall(200, performEnemyAction, [], this);
+            }
+        };
+        performEnemyAction();
 
-            performEnemyAction();
-        }
     }
 
     calculateDamage(atk, def, luk, eva) {
