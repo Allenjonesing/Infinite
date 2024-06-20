@@ -8,7 +8,7 @@ let npcBase64image = '';
 let monsterDescription = '';
 let personas;
 let persona;
-let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 100-10000, mana is 10-1000, atk through wis are each 1-50, and the 4 elements are each a float between -1.0 and 3.0, where -1.0 is the strongest (Given to those of that element) and 3 is the weakest (Given to those that oppose  this element).';
+let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 1000-10000, mana is 100-500, atk through wis are each 1-50, and the 4 elements are each a float between -1.0 and 3.0, where -1.0 is the strongest (Given to those of that element) and 3 is the weakest (Given to those that oppose  this element).';
 let battleEnded = false;
 
 class ExplorationScene extends Phaser.Scene {
@@ -229,19 +229,22 @@ class BattleScene extends Phaser.Scene {
     
     endBattle(result) {
         battleEnded = true;
-        if (result === 'win') {
-            // Handle victory logic
-            this.helpText.setText('You Won! Please wait for the window to reload...');
-            this.enemy.sprite.destroy(); // Remove enemy sprite
-        } else {
-            // Handle defeat logic
-            this.helpText.setText('You Lost! Please wait for the window to reload...');
-            this.player.sprite.destroy(); // Remove player sprite
-        }
+        this.time.delayedCall(1000, () => {
 
-        this.time.delayedCall(5000, () => {
-            // Refresh the whole page after the battle ends
-            location.reload();
+            if (result === 'win') {
+                // Handle victory logic
+                this.helpText.setText('You Won! Please wait for the window to reload...');
+                this.enemy.sprite.destroy(); // Remove enemy sprite
+            } else {
+                // Handle defeat logic
+                this.helpText.setText('You Lost! Please wait for the window to reload...');
+                this.player.sprite.destroy(); // Remove player sprite
+            }
+            
+            this.time.delayedCall(4000, () => {
+                // Refresh the whole page after the battle ends
+                location.reload();
+            }, [], this);
         }, [], this);
     }
 
@@ -352,10 +355,6 @@ class BattleScene extends Phaser.Scene {
             } else if (action === 'Magic Attack') {
                 if (this.player.mana >= 10) {
                     damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.player.element[elementType], this.enemy.element[elementType], this.player.luk, this.enemy.eva);
-                    critical = Math.random() < 0.1;
-                    if (critical) {
-                        damage = this.calculateMagicDamage(this.player.magAtk, 0, this.player.element[elementType], this.enemy.element[elementType], this.player.luk, this.enemy.eva);
-                    }
                     this.player.mana -= 10;
                     this.helpText.setText(`Player uses ${elementType} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                     this.playMagicAttackAnimation(this.player.sprite, this.enemy.sprite, elementType, damage, critical);
@@ -497,7 +496,7 @@ class BattleScene extends Phaser.Scene {
     
         baseDamage *= attackerElement * defenderElement;
 
-        return baseDamage; // Allow negative values for potential healing
+        return  Math.floor(baseDamage); // Allow negative values for potential healing
     }
                 
     startCooldown() {
