@@ -228,8 +228,8 @@ class BattleScene extends Phaser.Scene {
             // Handle defeat logic
         }
 
-        // Return to the exploration scene
-        this.scene.start('ExplorationScene', { player: this.player });
+        // Refresh the whole page after the battle ends
+        location.reload();
     }
 
     createUI() {
@@ -263,11 +263,11 @@ class BattleScene extends Phaser.Scene {
             { name: 'Player', speed: this.player.spd, sprite: this.player.sprite },
             { name: 'Enemy', speed: this.enemy.spd, sprite: this.enemy.sprite }
         ];
-    
+
         let turnOrder = [];
         let currentTime = [0, 0]; // Initialize current times for both participants
         let totalTurns = 0;
-    
+
         // Calculate the total number of turns based on the highest speed
         let totalParticipantTurns = 100; // Arbitrary large number to ensure enough turns are calculated
         for (let i = 0; i < totalParticipantTurns; i++) {
@@ -276,22 +276,22 @@ class BattleScene extends Phaser.Scene {
             currentTime[nextTurnIndex] += 1; // Increment the chosen participant's elapsed time
             totalTurns++;
         }
-    
+
         return turnOrder;
     }
-    
+
     updateTurnOrderDisplay() {
         if (this.turnOrderList) {
             this.turnOrderList.destroy();
         }
-    
+
         let orderText = '';
         for (let i = 0; i < 10; i++) {
             orderText += `${this.turnOrder[(this.currentTurnIndex + i) % this.turnOrder.length].name}\n`;
         }
-    
+
         this.turnOrderList = this.add.text(700, 100, orderText, { fontSize: '20px', fill: '#fff' });
-    
+
         this.turnOrderList.alpha = 0;
         this.tweens.add({
             targets: this.turnOrderList,
@@ -300,7 +300,7 @@ class BattleScene extends Phaser.Scene {
             ease: 'Power1'
         });
     }
-    
+
     handlePlayerAction(action, elementType = null) {
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
             let damage = 0;
