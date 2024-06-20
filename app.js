@@ -150,42 +150,58 @@ class BattleScene extends Phaser.Scene {
     preload() {
         console.log('preload... npcBase64image:', npcBase64image);
         console.log('preload... enemyImageBase64:', enemyImageBase64);
-        this.textures.addBase64('npcBase64image', npcBase64image);
-        this.textures.addBase64('enemyImageBase64', enemyImageBase64);
+    
+        if (npcBase64image) {
+            this.textures.addBase64('npcBase64image', npcBase64image);
+            console.log('preload... NPC Base64 image added successfully');
+        } else {
+            console.error('preload... NPC Base64 image is missing');
+        }
+    
+        if (enemyImageBase64) {
+            this.textures.addBase64('enemyImageBase64', enemyImageBase64);
+            console.log('preload... Enemy Base64 image added successfully');
+        } else {
+            console.error('preload... Enemy Base64 image is missing');
+        }
     }
-
+    
     async create(data) {
         this.player = data.player;
         this.enemy = data.enemy;
-
+    
         // Initialize player and enemy data
         this.player = { name: 'Player', health: 100, speed: 5, sprite: null, actions: ['Attack', 'Defend'] };
         this.enemy = { name: 'Enemy', health: 100, speed: 3, sprite: null, actions: ['Attack'] };
-
-        // Generate enemy image based on news article and setting
-        if (newsData.length > 0) {
-            console.log('enemyImageBase64: ', enemyImageBase64);
-            if (enemyImageBase64) {
-                // Display player and enemy sprites
-                this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
-                this.enemy.sprite = this.add.sprite(500, 300, 'enemyImageBase64');
-
-                // Initialize turn order and current turn index
-                this.turnOrder = this.calculateTurnOrder();
-                this.currentTurnIndex = 0;
-
-                // Cooldown flag
-                this.isCooldown = false;
-
-                // Display UI elements
-                this.createUI();
-            } else {
-                console.error('Failed to generate enemy image');
-            }
+    
+        console.log('create... NPC Base64 image:', npcBase64image);
+        console.log('create... Enemy Base64 image:', enemyImageBase64);
+    
+        if (npcBase64image && this.textures.exists('npcBase64image')) {
+            this.player.sprite = this.add.sprite(100, 300, 'npcBase64image');
+            console.log('create... NPC sprite added successfully');
+        } else {
+            console.error('create... Failed to add NPC sprite');
         }
+    
+        if (enemyImageBase64 && this.textures.exists('enemyImageBase64')) {
+            this.enemy.sprite = this.add.sprite(500, 300, 'enemyImageBase64');
+            console.log('create... Enemy sprite added successfully');
+        } else {
+            console.error('create... Failed to add Enemy sprite');
+        }
+    
+        // Initialize turn order and current turn index
+        this.turnOrder = this.calculateTurnOrder();
+        this.currentTurnIndex = 0;
+    
+        // Cooldown flag
+        this.isCooldown = false;
+    
+        // Display UI elements
+        this.createUI();
     }
-
-    update() {
+        update() {
         if (this.player.health <= 0) {
             this.endBattle('lose');
         } else if (this.enemy.health <= 0) {
@@ -350,6 +366,7 @@ async function generateEnemyImage(newsArticle, setting) {
                 console.log('generateEnemyImage... parsedBody.base64_image: ', parsedBody.base64_image);
                 resolve(`data:image/png;base64,${parsedBody.base64_image}`);
             } else {
+                console.error('generateEnemyImage... No image generated');
                 reject(new Error('No image generated'));
             }
         } catch (error) {
@@ -365,17 +382,23 @@ function spawnEnemies(scene) {
         const newsArticle = newsData[0]; // Use the first article for the enemy
         console.log('spawnEnemies... Generating new enemy image... ');
         const imageKey = 'enemyImageBase64';
-        for (let i = 0; i < 3; i++) {
-            let x = Phaser.Math.Between(50, 750);
-            let y = Phaser.Math.Between(50, 550);
-            let enemy = scene.enemies.create(x, y, imageKey); // Create enemies using the Base64 image
-            enemy.setCollideWorldBounds(true);
+        if (enemyImageBase64 && scene.textures.exists(imageKey)) {
+            console.log('spawnEnemies... enemyImageBase64:', enemyImageBase64);
+            for (let i = 0; i < 3; i++) {
+                let x = Phaser.Math.Between(50, 750);
+                let y = Phaser.Math.Between(50, 550);
+                let enemy = scene.enemies.create(x, y, imageKey); // Create enemies using the Base64 image
+                enemy.setCollideWorldBounds(true);
+                console.log('spawnEnemies... Enemy sprite added at', x, y);
+            }
+            // Add enemy collisions
+            scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
+            scene.physics.add.collider(scene.enemies, scene.trees);
+            scene.physics.add.collider(scene.npcs, scene.enemies);
+            scene.physics.add.collider(scene.enemies, scene.enemies);
+        } else {
+            console.error('spawnEnemies... Enemy Base64 image is missing or not added as a texture');
         }
-        // Add enemy collisions
-        scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
-        scene.physics.add.collider(scene.enemies, scene.trees);
-        scene.physics.add.collider(scene.npcs, scene.enemies);
-        scene.physics.add.collider(scene.enemies, scene.enemies);
     } else {
         console.error('No news data available to generate enemies');
     }
