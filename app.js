@@ -987,9 +987,6 @@ function spawnEnemies(scene) {
 }
 
 async function fetchNews() {
-    const loadingMessage = document.getElementById('loading');
-    loadingMessage.style.display = 'block';
-
     try {
         const apiUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
         const newsEndpoint = '/test';
@@ -1017,11 +1014,9 @@ async function fetchNews() {
 
         newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
         let generatedAIResponses = await generateAIResponses();
-        loadingMessage.style.display = 'none';
         return generatedAIResponses;
     } catch (error) {
         console.error('Error fetching news:', error);
-        loadingMessage.style.display = 'none'; // Hide loading text in case of error
         return [];
     }
 }
