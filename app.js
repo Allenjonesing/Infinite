@@ -47,8 +47,8 @@ class ExplorationScene extends Phaser.Scene {
 
     PrepBase64Images() {
         if (enemyImageBase64 && npcBase64image) {
-            scene.textures.addBase64('enemyImageBase64', enemyImageBase64);
-            scene.textures.addBase64('npcBase64image', npcBase64image);
+            this.textures.addBase64('enemyImageBase64', enemyImageBase64);
+            this.textures.addBase64('npcBase64image', npcBase64image);
         }
     }
 
