@@ -18,72 +18,23 @@ class ExplorationScene extends Phaser.Scene {
 
     preload() {
         this.load.image('player', 'assets/player.png');
-        this.load.image('tree', 'assets/tree.png');
-        this.load.image('npc', 'assets/npc.png');
     }
 
     async create() {
         // Create player
         this.player = this.physics.add.sprite(400, 300, 'player');
         this.player.setCollideWorldBounds(true);
-
-        // Create NPCs
-        this.npcs = this.physics.add.group({ immovable: true });
-        for (let i = 0; i < 5; i++) {
-            let x = Phaser.Math.Between(50, 750);
-            let y = Phaser.Math.Between(50, 550);
-            this.npcs.create(x, y, 'npc').setCollideWorldBounds(true);
-        }
-
         // Initialize enemies group
         this.enemies = this.physics.add.group();
-
-        // Create trees
-        this.trees = this.physics.add.staticGroup();
-        for (let i = 0; i < 10; i++) {
-            let x = Phaser.Math.Between(50, 750);
-            let y = Phaser.Math.Between(50, 550);
-            this.trees.create(x, y, 'tree');
-        }
-
-        // Add collisions
-        this.physics.add.collider(this.player, this.npcs);
-        this.physics.add.collider(this.player, this.trees);
-        this.physics.add.collider(this.npcs, this.trees);
-        this.physics.add.collider(this.npcs, this.npcs);
-
-        // Input handling
-        this.input.on('pointerdown', (pointer) => {
-            target = { x: pointer.x, y: pointer.y };
-        });
-
-        this.input.on('pointerup', () => {
-            target = null;
-            this.player.body.setVelocity(0, 0);
-        });
 
         // Fetch news data and generate AI responses
         newsData = await fetchNews();
 
-        this.npcs.children.iterate((npc, index) => {
-            let persona = personas[index % personas.length]; // Cycle through personas
-            npc.persona = persona;
-            // Assign news articles to NPCs
-            let newsIndex = index % newsData.length;
-            npc.newsText = newsData[newsIndex].description;
-        });
-
-        // Enable NPC interaction
-        this.npcs.children.iterate((npc) => {
-            npc.setInteractive();
-            npc.on('pointerdown', () => {
-                alert(`${npc.persona}: ${npc.response}`);
-            });
-        });
-
         const newsArticle = newsData[0]; // Use the first article for the enemy
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
 
+        // Display news information
+        this.displayNewsInfo(newsData[0], persona, enemyImageBase64);
         // Spawn enemies after data is ready
         spawnEnemies(this);
     }
@@ -91,6 +42,16 @@ class ExplorationScene extends Phaser.Scene {
     startBattle(player, enemy) {
         // Transition to the battle scene, passing necessary data
         this.scene.start('BattleScene', { player: player, enemy: enemy });
+    }
+
+    displayNewsInfo(news, persona, enemyImage) {
+        this.add.text(20, 20, `Based on the news article: ${news.title}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: 760 } });
+        this.add.text(20, 60, `You'll play as: ${persona.name}, ${persona.description}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: 760 } });
+        this.add.text(20, 100, `You'll be fighting: ${monsterDescription}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: 760 } });
+
+        if (enemyImage) {
+            this.add.image(400, 300, 'enemyImageBase64').setScale(0.5); // Adjust the scale as necessary
+        }
     }
 
     update() {
@@ -105,20 +66,11 @@ class ExplorationScene extends Phaser.Scene {
         if (this.enemies && this.enemies.children) {
             this.enemies.children.iterate((enemy) => {
                 this.physics.moveToObject(enemy, this.player, 50);
-            });
-
-            this.enemies.children.iterate((enemy) => {
                 if (enemy.body.speed > 0) {
                     enemy.body.setVelocity(0, 0);
                 }
             });
         }
-
-        this.npcs.children.iterate((npc) => {
-            if (npc.body.speed > 0) {
-                npc.body.setVelocity(0, 0);
-            }
-        });
     }
 }
 
@@ -234,11 +186,11 @@ class BattleScene extends Phaser.Scene {
             skills: [],
             magic: []
         };
-    
+
         // Determine if attack is far greater than magic attack or vice versa
         const isPhysicalOnly = stats.atk > 2 * stats.magAtk;
         const isMagicOnly = stats.magAtk > 2 * stats.atk;
-    
+
         // Add skills if atk is high and not exclusively magic
         if (!isMagicOnly) {
             if (stats.element.fire <= 0) actions.skills.push('Burn');
@@ -246,7 +198,7 @@ class BattleScene extends Phaser.Scene {
             if (stats.element.lightning <= 0) actions.skills.push('Stun');
             if (stats.element.water <= 0) actions.skills.push('Poison');
         }
-    
+
         // Add magic attacks based on elemental strengths and not exclusively physical
         if (!isPhysicalOnly) {
             for (const [element, value] of Object.entries(stats.element)) {
@@ -254,7 +206,7 @@ class BattleScene extends Phaser.Scene {
                     actions.magic.push(`${element.charAt(0).toUpperCase() + element.slice(1)} Magic Attack`);
                 }
             }
-    
+
             // Add more magic attacks if magAtk is high
             if (stats.magAtk > stats.atk) {
                 if (stats.element.fire <= 0) actions.magic.push('Fire Magic Attack');
@@ -262,14 +214,14 @@ class BattleScene extends Phaser.Scene {
                 if (stats.element.lightning <= 0) actions.magic.push('Lightning Magic Attack');
                 if (stats.element.water <= 0) actions.magic.push('Water Magic Attack');
             }
-    
+
             // Add healing spells
             actions.magic.push('Heal');
         }
-    
+
         return actions;
     }
-    
+
     update() {
         if (battleEnded == false) {
             if (this.player.health <= 0) {
@@ -305,19 +257,19 @@ class BattleScene extends Phaser.Scene {
     createUI() {
         // Help text at the top
         this.helpText = this.add.text(20, 20, 'A battle has begun...', { fontSize: '18px', fill: '#fff' });
-    
+
         // Player health and mana
         this.playerHealthText = this.add.text(50, 100, `Health: ${this.player.health}`, { fontSize: '20px', fill: '#fff' });
         this.playerManaText = this.add.text(50, 130, `Mana: ${this.player.mana}`, { fontSize: '20px', fill: '#fff' });
-    
+
         // Enemy health and mana
         this.enemyHealthText = this.add.text(450, 100, `Health: ${this.enemy.health}`, { fontSize: '20px', fill: '#fff' });
         this.enemyManaText = this.add.text(450, 130, `Mana: ${this.enemy.mana}`, { fontSize: '20px', fill: '#fff' });
-    
+
         // Turn order list
         this.turnOrderText = this.add.text(675, 80, 'Turn List', { fontSize: '20px', fill: '#fff' });
         this.updateTurnOrderDisplay();
-    
+
         // Action buttons at the bottom
         this.actions = this.add.group();
         const actionNames = ['Attack', 'Defend', 'Magic Attack', 'Skills', 'Heal'];
@@ -326,7 +278,7 @@ class BattleScene extends Phaser.Scene {
             actionText.setInteractive();
             actionText.on('pointerdown', () => this.handlePlayerAction(actionNames[i]));
             this.actions.add(actionText);
-    
+
             // Add animation and colorful effect
             this.tweens.add({
                 targets: actionText,
@@ -338,19 +290,19 @@ class BattleScene extends Phaser.Scene {
                 ease: 'Power1'
             });
         }
-    
+
         // Add borders around health and mana areas
         this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(40, 90, 200, 75);
         this.add.graphics().lineStyle(2, 0xff0000).strokeRect(440, 90, 200, 75);
-    
+
         // Add border around action buttons
         this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(90, window.innerHeight - 150, 750, 100); // Adjusted width for more options
-    
+
         // Initially hide the action buttons and box
         this.actions.children.each(action => action.setVisible(false));
         this.actionBox.setVisible(false);
     }
-            
+
     chooseElement() {
         const elements = ['fire', 'ice', 'water', 'lightning'];
         return elements[Math.floor(Math.random() * elements.length)];
@@ -401,13 +353,13 @@ class BattleScene extends Phaser.Scene {
 
     handlePlayerAction(action, elementType = null) {
         this.hideSubOptions(); // Ensure sub-options are hidden when a main action is chosen
-    
+
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
             if (action === 'Magic Attack' && !elementType) {
                 this.showElementSelection();
                 return;
             }
-    
+
             let damage = 0;
             let critical = false;
             if (action === 'Attack') {
@@ -450,19 +402,19 @@ class BattleScene extends Phaser.Scene {
             this.hidePlayerActions();
         }
     }
-            
+
     calculateHealing(magAtk) {
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
         let baseHealing = Math.floor(2 * magAtk * variance);
         return Math.max(1, baseHealing); // Ensure minimum healing is 1
     }
-    
+
     showSkillSelection() {
         this.hideSubOptions(); // Hide any existing sub-options
-    
+
         const skills = ['Poison', 'Stun', 'Burn', 'Freeze']; // Example status effects
         this.skillButtons = this.add.group();
-    
+
         for (let i = 0; i < skills.length; i++) {
             let skillText = this.add.text(100 + i * 300, window.innerHeight - 200, skills[i], { fontSize: '40px', fill: '#fff', backgroundColor: '#000', padding: { left: 20, right: 20, top: 10, bottom: 10 } });
             skillText.setInteractive();
@@ -472,7 +424,7 @@ class BattleScene extends Phaser.Scene {
                 this.actionBox.setSize(750, 100); // Shrink action box back to original size
             });
             this.skillButtons.add(skillText);
-    
+
             // Add animation and colorful effect
             this.tweens.add({
                 targets: skillText,
@@ -484,17 +436,17 @@ class BattleScene extends Phaser.Scene {
                 ease: 'Power1'
             });
         }
-    
+
         this.helpText.setText('Choose a skill:');
         this.actionBox.setSize(750, 200); // Expand action box
     }
-        
+
     showElementSelection() {
         this.hideSubOptions(); // Hide any existing sub-options
-    
+
         const elements = ['fire', 'ice', 'water', 'lightning'];
         this.elementButtons = this.add.group();
-    
+
         for (let i = 0; i < elements.length; i++) {
             let elementText = this.add.text(100 + i * 300, window.innerHeight - 200, elements[i], { fontSize: '40px', fill: '#fff', backgroundColor: '#000', padding: { left: 20, right: 20, top: 10, bottom: 10 } });
             elementText.setInteractive();
@@ -504,7 +456,7 @@ class BattleScene extends Phaser.Scene {
                 this.actionBox.setSize(750, 100); // Shrink action box back to original size
             });
             this.elementButtons.add(elementText);
-    
+
             // Add animation and colorful effect
             this.tweens.add({
                 targets: elementText,
@@ -516,11 +468,11 @@ class BattleScene extends Phaser.Scene {
                 ease: 'Power1'
             });
         }
-    
+
         this.helpText.setText('Choose an element for your Magic Attack:');
         this.actionBox.setSize(750, 200); // Expand action box
     }
-        
+
     hideSubOptions() {
         if (this.skillButtons) {
             this.skillButtons.clear(true, true);
@@ -530,7 +482,7 @@ class BattleScene extends Phaser.Scene {
         }
         this.actionBox.setSize(750, 100); // Ensure the action box is the correct size
     }
-        
+
     enemyAction() {
         console.log('enemyAction...');
         const performEnemyAction = () => {
@@ -544,12 +496,12 @@ class BattleScene extends Phaser.Scene {
                 let action;
                 let highestDamage = 0;
                 let bestElement = 'physical';
-    
+
                 // Determine if there's an element or physical attack that hasn't been tried yet
                 const elements = Object.keys(this.enemy.triedElements);
                 console.log('performEnemyAction... elements: ', elements);
                 let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
-    
+
                 console.log('performEnemyAction... untriedElement: ', untriedElement);
                 if (untriedElement) {
                     if (untriedElement === 'physical') {
@@ -576,7 +528,7 @@ class BattleScene extends Phaser.Scene {
                         action = `${bestElement.charAt(0).toUpperCase() + bestElement.slice(1)} Magic Attack`;
                     }
                 }
-    
+
                 console.log('performEnemyAction... actionType: ', actionType);
                 console.log('performEnemyAction... action: ', action);
                 if (actionType === 'physical') {
@@ -588,13 +540,13 @@ class BattleScene extends Phaser.Scene {
                     this.enemy.triedElements.physical = true; // Mark physical attack as tried
                 } else if (actionType === 'magic') {
                     const elementType = action.split(' ')[0].toLowerCase();
-    
+
                     if (this.enemy.mana >= 10) {
                         damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.luk);
                         this.enemy.mana -= 10;
                         this.helpText.setText(`Enemy uses ${elementType.charAt(0).toUpperCase() + elementType.slice(1)} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                         this.playMagicAttackAnimation(this.enemy.sprite, this.player.sprite, elementType, damage, critical, this.player.element[elementType]);
-    
+
                         // Learn about player's elemental weaknesses
                         this.enemy.learnedElementalWeaknesses[elementType] = Math.max(this.enemy.learnedElementalWeaknesses[elementType], damage);
                         this.enemy.triedElements[elementType] = true; // Mark this element as tried
@@ -616,7 +568,7 @@ class BattleScene extends Phaser.Scene {
                             break;
                         }
                     }
-    
+
                     if (skillToUse) {
                         this.applyStatusEffect('Enemy', 'Player', skillToUse);
                     } else {
@@ -647,7 +599,7 @@ class BattleScene extends Phaser.Scene {
                     this.helpText.setText('Enemy defends, boosting defense for this turn.');
                 }
                 console.log('performEnemyAction... damage: ', damage);
-    
+
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
                 this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
@@ -659,7 +611,7 @@ class BattleScene extends Phaser.Scene {
         };
         performEnemyAction();
     }
-            
+
     applyStatusEffect(caster, target, statusEffect) {
         let targetCharacter = target === 'Player' ? this.player : this.enemy;
         let casterCharacter = caster === 'Player' ? this.player : this.enemy;
@@ -803,17 +755,17 @@ class BattleScene extends Phaser.Scene {
             this.enemy.def /= 2; // Reset defense boost after turn
             this.enemy.isDefending = false;
         }
-    
+
         // Move to the next character's turn
         this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
         const currentCharacter = this.turnOrder[this.currentTurnIndex].name === 'Player' ? this.player : this.enemy;
-    
+
         if (this.isCharacterFrozenOrStunned(currentCharacter)) {
             this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
         }
-    
+
         this.handleStatusEffects();
-    
+
         if (this.turnOrder[this.currentTurnIndex].name === 'Player') {
             this.showPlayerActions();
         } else {
@@ -822,12 +774,12 @@ class BattleScene extends Phaser.Scene {
         }
         this.updateTurnOrderDisplay();
     }
-    
+
     isCharacterFrozenOrStunned(character) {
-    
+
         const frozenStatus = character.statusEffects.find(effect => effect.type === 'Freeze');
         const stunnedStatus = character.statusEffects.find(effect => effect.type === 'Stun');
-    
+
         if (frozenStatus) {
             frozenStatus.turns--;
             if (frozenStatus.turns <= 0) {
@@ -837,7 +789,7 @@ class BattleScene extends Phaser.Scene {
             this.helpText.setText(`${character.name} is frozen and skips a turn!`);
             return true;
         }
-    
+
         if (stunnedStatus) {
             stunnedStatus.turns--;
             if (stunnedStatus.turns <= 0) {
@@ -847,10 +799,10 @@ class BattleScene extends Phaser.Scene {
             this.helpText.setText(`${character.name} is stunned and skips a turn!`);
             return true;
         }
-    
+
         return false;
     }
-    
+
     handleStatusEffects() {
         const currentCharacter = this.turnOrder[this.currentTurnIndex].name === 'Player' ? this.player : this.enemy;
         currentCharacter.statusEffects.forEach((effect, index) => {
@@ -880,13 +832,13 @@ class BattleScene extends Phaser.Scene {
         this.actions.children.each(action => action.setVisible(true));
         this.actionBox.setVisible(true);
     }
-    
+
     hidePlayerActions() {
         this.actions.children.each(action => action.setVisible(false));
         this.hideSubOptions(); // Ensure sub-options are hidden
         this.actionBox.setVisible(false);
     }
-        
+
     playAttackAnimation(attacker, defender) {
         this.tweens.add({
             targets: attacker,
