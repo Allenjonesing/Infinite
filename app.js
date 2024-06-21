@@ -334,7 +334,7 @@ class BattleScene extends Phaser.Scene {
         this.add.graphics().lineStyle(2, 0xff0000).strokeRect(this.scale.width - 260, 90, 200, 75);
 
         // Add border around action buttons
-        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(textPadding, this.scale.height - 150, this.scale.width - (2 * textPadding), 100);
+        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(textPadding, this.scale.height - 200, this.scale.width - 50, 150);
     }
 
     chooseElement() {
