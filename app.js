@@ -179,7 +179,7 @@ class BattleScene extends Phaser.Scene {
             luk: enemyStats.luk,
             wis: enemyStats.wis,
             sprite: null,
-            actions: ['Attack', 'Defend', 'Magic Attack', 'Skills'],
+            actions: this.generateEnemyActions(enemyStats),
             element: enemyStats.element, // Example element multipliers
             learnedElementalWeaknesses: {
                 fire: 0,
@@ -228,6 +228,39 @@ class BattleScene extends Phaser.Scene {
         }
     }
 
+    generateEnemyActions(stats) {
+        let actions = {
+            physical: ['Attack'],
+            skills: [],
+            magic: []
+        };
+    
+        // Add skills based on high atk
+        if (stats.atk > stats.magAtk) {
+            if (stats.element.fire <= 0) actions.skills.push('Burn');
+            if (stats.element.ice <= 0) actions.skills.push('Freeze');
+            if (stats.element.lightning <= 0) actions.skills.push('Stun');
+            if (stats.element.water <= 0) actions.skills.push('Poison');
+        }
+    
+        // Add magic attacks based on elemental strengths
+        for (const [element, value] of Object.entries(stats.element)) {
+            if (value <= 0) { // Strong in this element
+                actions.magic.push(`${element.charAt(0).toUpperCase() + element.slice(1)} Magic Attack`);
+            }
+        }
+    
+        // Add more magic attacks if magAtk is high
+        if (stats.magAtk > stats.atk) {
+            if (stats.element.fire <= 0) actions.magic.push('Fire Magic Attack');
+            if (stats.element.ice <= 0) actions.magic.push('Ice Magic Attack');
+            if (stats.element.lightning <= 0) actions.magic.push('Lightning Magic Attack');
+            if (stats.element.water <= 0) actions.magic.push('Water Magic Attack');
+        }
+    
+        return actions;
+    }
+    
     update() {
         if (battleEnded == false) {
             if (this.player.health <= 0) {
@@ -421,31 +454,26 @@ class BattleScene extends Phaser.Scene {
     }
 
     enemyAction() {
-        console.log('enemyAction...');
         const performEnemyAction = () => {
-            console.log('performEnemyAction...');
-            console.log('performEnemyAction... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
-            console.log('performEnemyAction... this.isCooldown: ', this.isCooldown);
             if (this.turnOrder[this.currentTurnIndex].name === 'Enemy' && !this.isCooldown) {
                 let damage = 0;
                 let critical = false;
+                let actionType;
                 let action;
                 let highestDamage = 0;
                 let bestElement = 'physical';
-
+    
                 // Determine if there's an element or physical attack that hasn't been tried yet
                 const elements = Object.keys(this.enemy.triedElements);
-                console.log('performEnemyAction... elements: ', elements);
                 let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
-
-                console.log('performEnemyAction... untriedElement: ', untriedElement);
+    
                 if (untriedElement) {
                     if (untriedElement === 'physical') {
+                        actionType = 'physical';
                         action = 'Attack';
-                        bestElement = 'physical';
                     } else {
-                        action = 'Magic Attack';
-                        bestElement = untriedElement;
+                        actionType = 'magic';
+                        action = `${untriedElement.charAt(0).toUpperCase() + untriedElement.slice(1)} Magic Attack`;
                     }
                 } else {
                     // Determine the best attack based on the highest damage dealt so far
@@ -455,26 +483,31 @@ class BattleScene extends Phaser.Scene {
                             bestElement = element;
                         }
                     }
-                    action = bestElement === 'physical' ? 'Attack' : 'Magic Attack';
+                    if (bestElement === 'physical') {
+                        actionType = 'physical';
+                        action = 'Attack';
+                    } else {
+                        actionType = 'magic';
+                        action = `${bestElement.charAt(0).toUpperCase() + bestElement.slice(1)} Magic Attack`;
+                    }
                 }
-
-                console.log('performEnemyAction... action: ', action);
-                if (action === 'Attack') {
+    
+                if (actionType === 'physical') {
                     damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                     this.showDamageIndicator(this.player.sprite, damage, critical);
                     this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                     this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                     this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
                     this.enemy.triedElements.physical = true; // Mark physical attack as tried
-                } else if (action === 'Magic Attack') {
-                    const elementType = bestElement;
-
+                } else if (actionType === 'magic') {
+                    const elementType = action.split(' ')[0].toLowerCase();
+    
                     if (this.enemy.mana >= 10) {
                         damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.luk);
                         this.enemy.mana -= 10;
-                        this.helpText.setText(`Enemy uses ${elementType} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                        this.helpText.setText(`Enemy uses ${elementType.charAt(0).toUpperCase() + elementType.slice(1)} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                         this.playMagicAttackAnimation(this.enemy.sprite, this.player.sprite, elementType, damage, critical, this.player.element[elementType]);
-
+    
                         // Learn about player's elemental weaknesses
                         this.enemy.learnedElementalWeaknesses[elementType] = Math.max(this.enemy.learnedElementalWeaknesses[elementType], damage);
                         this.enemy.triedElements[elementType] = true; // Mark this element as tried
@@ -487,8 +520,8 @@ class BattleScene extends Phaser.Scene {
                         this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
                         this.enemy.triedElements.physical = true; // Mark physical attack as tried
                     }
-                } else if (action === 'Skills') {
-                    const skills = ['Poison', 'Stun', 'Burn', 'Freeze']; // Example status effects
+                } else if (actionType === 'skills') {
+                    const skills = this.enemy.actions.skills; // Example status effects
                     let skillToUse;
                     for (const skill of skills) {
                         if (!this.enemy.learnedStatusImmunities[skill] && !this.player.statusEffects.includes(skill)) {
@@ -496,7 +529,7 @@ class BattleScene extends Phaser.Scene {
                             break;
                         }
                     }
-
+    
                     if (skillToUse) {
                         this.applyStatusEffect('Enemy', 'Player', skillToUse);
                     } else {
@@ -506,25 +539,23 @@ class BattleScene extends Phaser.Scene {
                         this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                         this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
                     }
-                } else if (action === 'Defend') {
+                } else if (actionType === 'Defend') {
                     this.enemy.def *= 2; // Temporary defense boost
                     this.enemy.isDefending = true; // Temporary defense boost
                     this.helpText.setText('Enemy defends, boosting defense for this turn.');
                 }
-                console.log('performEnemyAction... damage: ', damage);
-
+    
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
                 this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
                 this.startCooldown();
             } else {
-                console.log('Delating Call to performEnemyAction...');
                 this.time.delayedCall(200, performEnemyAction, [], this);
             }
         };
         performEnemyAction();
     }
-
+    
     applyStatusEffect(caster, target, statusEffect) {
         let targetCharacter = target === 'Player' ? this.player : this.enemy;
         let casterCharacter = caster === 'Player' ? this.player : this.enemy;
