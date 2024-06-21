@@ -234,33 +234,39 @@ class BattleScene extends Phaser.Scene {
             skills: [],
             magic: []
         };
-    
-        // Add skills based on high atk
-        if (stats.atk > stats.magAtk) {
+
+        // Determine if attack is far greater than magic attack or vice versa
+        const isPhysicalOnly = stats.atk > 2 * stats.magAtk;
+        const isMagicOnly = stats.magAtk > 2 * stats.atk;
+
+        // Add skills if atk is high and not exclusively magic
+        if (!isMagicOnly) {
             if (stats.element.fire <= 0) actions.skills.push('Burn');
             if (stats.element.ice <= 0) actions.skills.push('Freeze');
             if (stats.element.lightning <= 0) actions.skills.push('Stun');
             if (stats.element.water <= 0) actions.skills.push('Poison');
         }
-    
-        // Add magic attacks based on elemental strengths
-        for (const [element, value] of Object.entries(stats.element)) {
-            if (value <= 0) { // Strong in this element
-                actions.magic.push(`${element.charAt(0).toUpperCase() + element.slice(1)} Magic Attack`);
+
+        // Add magic attacks based on elemental strengths and not exclusively physical
+        if (!isPhysicalOnly) {
+            for (const [element, value] of Object.entries(stats.element)) {
+                if (value <= 0) { // Strong in this element
+                    actions.magic.push(`${element.charAt(0).toUpperCase() + element.slice(1)} Magic Attack`);
+                }
+            }
+
+            // Add more magic attacks if magAtk is high
+            if (stats.magAtk > stats.atk) {
+                if (stats.element.fire <= 0) actions.magic.push('Fire Magic Attack');
+                if (stats.element.ice <= 0) actions.magic.push('Ice Magic Attack');
+                if (stats.element.lightning <= 0) actions.magic.push('Lightning Magic Attack');
+                if (stats.element.water <= 0) actions.magic.push('Water Magic Attack');
             }
         }
-    
-        // Add more magic attacks if magAtk is high
-        if (stats.magAtk > stats.atk) {
-            if (stats.element.fire <= 0) actions.magic.push('Fire Magic Attack');
-            if (stats.element.ice <= 0) actions.magic.push('Ice Magic Attack');
-            if (stats.element.lightning <= 0) actions.magic.push('Lightning Magic Attack');
-            if (stats.element.water <= 0) actions.magic.push('Water Magic Attack');
-        }
-    
+
         return actions;
     }
-    
+
     update() {
         if (battleEnded == false) {
             if (this.player.health <= 0) {
@@ -454,7 +460,11 @@ class BattleScene extends Phaser.Scene {
     }
 
     enemyAction() {
+        console.log('enemyAction...');
         const performEnemyAction = () => {
+            console.log('performEnemyAction...');
+            console.log('performEnemyAction... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
+            console.log('performEnemyAction... this.isCooldown: ', this.isCooldown);
             if (this.turnOrder[this.currentTurnIndex].name === 'Enemy' && !this.isCooldown) {
                 let damage = 0;
                 let critical = false;
@@ -465,8 +475,10 @@ class BattleScene extends Phaser.Scene {
     
                 // Determine if there's an element or physical attack that hasn't been tried yet
                 const elements = Object.keys(this.enemy.triedElements);
+                console.log('performEnemyAction... elements: ', elements);
                 let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
     
+                console.log('performEnemyAction... untriedElement: ', untriedElement);
                 if (untriedElement) {
                     if (untriedElement === 'physical') {
                         actionType = 'physical';
@@ -478,6 +490,7 @@ class BattleScene extends Phaser.Scene {
                 } else {
                     // Determine the best attack based on the highest damage dealt so far
                     for (const [element, dmg] of Object.entries(this.enemy.learnedElementalWeaknesses)) {
+                        console.log(`Checking damage for element ${element}: ${dmg}`);
                         if (dmg > highestDamage) {
                             highestDamage = dmg;
                             bestElement = element;
@@ -492,6 +505,8 @@ class BattleScene extends Phaser.Scene {
                     }
                 }
     
+                console.log('performEnemyAction... actionType: ', actionType);
+                console.log('performEnemyAction... action: ', action);
                 if (actionType === 'physical') {
                     damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                     this.showDamageIndicator(this.player.sprite, damage, critical);
@@ -544,12 +559,14 @@ class BattleScene extends Phaser.Scene {
                     this.enemy.isDefending = true; // Temporary defense boost
                     this.helpText.setText('Enemy defends, boosting defense for this turn.');
                 }
+                console.log('performEnemyAction... damage: ', damage);
     
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
                 this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
                 this.startCooldown();
             } else {
+                console.log('Delaying Call to performEnemyAction...');
                 this.time.delayedCall(200, performEnemyAction, [], this);
             }
         };
