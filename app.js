@@ -944,7 +944,7 @@ class BattleScene extends Phaser.Scene {
     
         this.time.delayedCall(500, () => {
             magicBall.destroy();
-            this.createExplosion(defender.x, defender.y, color);
+            //this.createExplosion(defender.x, defender.y, color);
             this.showDamageIndicator(defender, damage, critical, elementValue);
         });
     }
