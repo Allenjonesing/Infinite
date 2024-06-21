@@ -743,16 +743,16 @@ class BattleScene extends Phaser.Scene {
     }
 
     isCharacterFrozenOrStunned(character) {
-        console.log('nextTurn... character: ', character);
+        console.log('isCharacterFrozenOrStunned... character: ', character);
 
         const frozenStatus = character.statusEffects.find(effect => effect.type === 'Freeze');
-        console.log('nextTurn... character: ', character);
+        console.log('isCharacterFrozenOrStunned... character: ', character);
         const stunnedStatus = character.statusEffects.find(effect => effect.type === 'Stun');
-        console.log('nextTurn... character: ', character);
+        console.log('isCharacterFrozenOrStunned... character: ', character);
 
         if (frozenStatus) {
             frozenStatus.turns--;
-            console.log('nextTurn... frozenStatus.turns: ', frozenStatus.turns);
+            console.log('isCharacterFrozenOrStunned... frozenStatus.turns: ', frozenStatus.turns);
             if (frozenStatus.turns <= 0) {
                 character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Freeze');
                 return false;
@@ -763,7 +763,7 @@ class BattleScene extends Phaser.Scene {
 
         if (stunnedStatus) {
             stunnedStatus.turns--;
-            console.log('nextTurn... stunnedStatus.turns: ', stunnedStatus.turns);
+            console.log('isCharacterFrozenOrStunned... stunnedStatus.turns: ', stunnedStatus.turns);
             if (stunnedStatus.turns <= 0) {
                 character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Stun');
                 return false;
@@ -772,7 +772,7 @@ class BattleScene extends Phaser.Scene {
             return true;
         }
 
-        console.log('nextTurn... FREE!');
+        console.log('isCharacterFrozenOrStunned... FREE!');
         return false;
     }
 
