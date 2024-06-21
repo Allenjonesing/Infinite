@@ -393,6 +393,20 @@ class BattleScene extends Phaser.Scene {
         });
     }
     
+    applyEffect(target, color) {
+        let healingLight = this.add.graphics();
+        healingLight.fillStyle(color, 0.5); // Green color with some transparency
+        healingLight.fillCircle(target.x, target.y, 50);
+        this.tweens.add({
+            targets: healingLight,
+            alpha: { from: 1, to: 0 },
+            duration: 1000,
+            ease: 'Power1',
+            onComplete: () => {
+                healingLight.destroy();
+            }
+        });
+    }
     
     handlePlayerAction(action, elementType = null) {
         this.hideSubOptions(); // Ensure sub-options are hidden when a main action is chosen
@@ -431,8 +445,9 @@ class BattleScene extends Phaser.Scene {
                 if (this.player.mana >= 15) {
                     damage = -this.calculateHealing(this.player.magAtk);
                     this.player.mana -= 15;
-                    this.player.health = Math.min(this.player.health - damage, 100); // Assuming 100 is max health
-                    this.helpText.setText(`Player uses Heal! Restores ${-damage} health.`);
+                    this.player.health -= damage; // Assuming 100 is max health
+                    this.helpText.setText(`Player uses Heal! Restores ${damage} health.`);
+                    this.showDamageIndicator(this.player.sprite, damage, critical);
                     this.applyHealingEffect(this.player.sprite);
                 } else {
                     this.helpText.setText("Not enough mana!");
@@ -622,6 +637,7 @@ class BattleScene extends Phaser.Scene {
                         this.enemy.triedElements.physical = true; // Mark physical attack as tried
                     }
                 } else if (actionType === 'skills') {
+                    this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                     if (skills.includes(action)) {
                         this.helpText.setText(`Enemy uses ${action}!`);
                         this.applyStatusEffect('Enemy', 'Player', action);
@@ -630,17 +646,17 @@ class BattleScene extends Phaser.Scene {
                         damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                         this.showDamageIndicator(this.player.sprite, damage, critical);
                         this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-                        this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                         this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
                     }
                 } else if (actionType === 'Heal') {
                     if (this.enemy.mana >= 15) {
                         damage = -this.calculateHealing(this.enemy.magAtk);
                         this.enemy.mana -= 15;
-                        this.enemy.health = Math.min(this.enemy.health - damage, this.enemy.maxHealth); // Assuming maxHealth is defined
+                        this.enemy.health -= damage; // Assuming 100 is max health
                         this.helpText.setText(`Enemy uses Heal! Restores ${-damage} health.`);
-                        this.applyHealingEffect(this.enemy.sprite); // Add healing effect
-                    } else {
+                        this.showDamageIndicator(this.enemy.sprite, damage, critical);
+                        this.applyHealingEffect(this.enemy.sprite);
+                        } else {
                         // Fallback to physical attack if not enough mana
                         damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                         this.showDamageIndicator(this.player.sprite, damage, critical);
@@ -944,7 +960,7 @@ class BattleScene extends Phaser.Scene {
     
         this.time.delayedCall(500, () => {
             magicBall.destroy();
-            //this.createExplosion(defender.x, defender.y, color);
+            this.applyEffect(defender, color);
             this.showDamageIndicator(defender, damage, critical, elementValue);
         });
     }
