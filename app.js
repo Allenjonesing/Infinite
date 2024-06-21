@@ -145,7 +145,6 @@ class BattleScene extends Phaser.Scene {
 
         // Initialize player and enemy data
         const playerStats = await fetchPlayerStats();
-        console.log('create... playerStats: ', playerStats);
         this.player = {
             name: 'Player',
             health: playerStats.health,
@@ -163,10 +162,8 @@ class BattleScene extends Phaser.Scene {
             element: playerStats.element // Example element multipliers
         };
 
-        console.log('create... this.player: ', this.player);
 
         const enemyStats = await fetchEnemyStats();
-        console.log('create... enemyStats: ', enemyStats);
         this.enemy = {
             name: 'Enemy',
             health: enemyStats.health,
@@ -181,9 +178,21 @@ class BattleScene extends Phaser.Scene {
             wis: enemyStats.wis,
             sprite: null,
             actions: ['Attack', 'Defend', 'Magic Attack'],
-            element: enemyStats.element // Example element multipliers
+            element: enemyStats.element, // Example element multipliers
+            learnedElementalWeaknesses: {
+                fire: 0,
+                ice: 0,
+                water: 0,
+                lightning: 0,
+                physical: 0 // Track physical attack damage
+            },
+            triedElements: {
+                fire: false,
+                ice: false,
+                water: false,
+                lightning: false
+            }
         };
-        console.log('create... this.enemy: ', this.enemy);
 
         // Generate enemy image based on news article and setting
         if (newsData.length > 0) {
@@ -391,12 +400,26 @@ class BattleScene extends Phaser.Scene {
                 let damage = 0;
                 let critical = false;
                 let action;
+                let highestDamage = 0;
+                let bestElement = 'physical';
     
-                // Determine the best attack based on enemy's strengths
-                if (this.enemy.atk > this.enemy.magAtk) {
-                    action = 'Attack';
-                } else {
+                // Determine if there's an element that hasn't been tried yet
+                const elements = Object.keys(this.enemy.triedElements);
+                let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
+    
+                if (untriedElement) {
+                    // If there's an untried element, try it first
                     action = 'Magic Attack';
+                    bestElement = untriedElement;
+                } else {
+                    // Determine the best attack based on the highest damage dealt so far
+                    for (const [element, dmg] of Object.entries(this.enemy.learnedElementalWeaknesses)) {
+                        if (dmg > highestDamage) {
+                            highestDamage = dmg;
+                            bestElement = element;
+                        }
+                    }
+                    action = bestElement === 'physical' ? 'Attack' : 'Magic Attack';
                 }
     
                 if (action === 'Attack') {
@@ -404,32 +427,33 @@ class BattleScene extends Phaser.Scene {
                     this.showDamageIndicator(this.player.sprite, damage, critical);
                     this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                     this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
+                    this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
                 } else if (action === 'Magic Attack') {
-                    const elements = ['fire', 'ice', 'water', 'lightning'];
-                    let elementType;
-    
-                    // Avoid using elements that heal the player
-                    do {
-                        elementType = elements[Math.floor(Math.random() * elements.length)];
-                    } while (this.player.element[elementType] < 0);
+                    const elementType = bestElement;
     
                     if (this.enemy.mana >= 10) {
                         damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.luk);
                         this.enemy.mana -= 10;
                         this.helpText.setText(`Enemy uses ${elementType} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                         this.playMagicAttackAnimation(this.enemy.sprite, this.player.sprite, elementType, damage, critical, this.player.element[elementType]);
+    
+                        // Learn about player's elemental weaknesses
+                        this.enemy.learnedElementalWeaknesses[elementType] = Math.max(this.enemy.learnedElementalWeaknesses[elementType], damage);
+                        this.enemy.triedElements[elementType] = true; // Mark this element as tried
                     } else {
-                        action = 'Attack';
+                        // Fallback to physical attack if not enough mana
                         damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                         this.showDamageIndicator(this.player.sprite, damage, critical);
                         this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                         this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
+                        this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
                     }
                 } else if (action === 'Defend') {
                     this.enemy.def *= 2; // Temporary defense boost
                     this.enemy.isDefending = true; // Temporary defense boost
                     this.helpText.setText('Enemy defends, boosting defense for this turn.');
                 }
+    
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
                 this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
@@ -440,7 +464,7 @@ class BattleScene extends Phaser.Scene {
         };
         performEnemyAction();
     }
-    
+                
     showDamageIndicator(target, damage, critical, elementValue) {
         let fontColor = '#f0d735';
         let delaytime = 0;
@@ -542,7 +566,6 @@ class BattleScene extends Phaser.Scene {
     }
 
     nextTurn() {
-        console.log('nextTurn...');
         if (this.turnOrder[this.currentTurnIndex].name === 'Player' && this.player.isDefending) {
             this.player.def /= 2; // Reset defense boost after turn
             this.player.isDefending = false;
@@ -892,7 +915,6 @@ async function generatePersonas(setting) {
 }
 
 async function fetchEnemyStats() {
-    console.log('fetchEnemyStats...');
     const prompt = `Generate stats for an enemy based on this description: ${monsterDescription}. ${statRequirements}`;
     const encodedPrompt = encodeURIComponent(prompt);
 
@@ -909,9 +931,7 @@ async function fetchEnemyStats() {
             throw new Error('Network response was not ok');
         }
 
-        console.log('fetchEnemyStats... response: ', response);
         const data = await response.json();
-        console.log('fetchEnemyStats... data: ', data);
         if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
             return JSON.parse(data.choices[0].message.content);
         } else {
@@ -924,7 +944,6 @@ async function fetchEnemyStats() {
 }
 
 async function fetchPlayerStats() {
-    console.log('fetchPlayerStats...');
     const prompt = `Generate stats for the player based on this description: ${persona.name}, ${persona.description}. ${statRequirements}`;
     const encodedPrompt = encodeURIComponent(prompt);
 
@@ -941,9 +960,7 @@ async function fetchPlayerStats() {
             throw new Error('Network response was not ok');
         }
 
-        console.log('fetchPlayerStats... response: ', response);
         const data = await response.json();
-        console.log('fetchPlayerStats... data: ', data);
         if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
             return JSON.parse(data.choices[0].message.content);
         } else {
