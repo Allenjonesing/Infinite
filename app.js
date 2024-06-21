@@ -572,7 +572,7 @@ class BattleScene extends Phaser.Scene {
         };
         performEnemyAction();
     }
-    
+        
     applyStatusEffect(caster, target, statusEffect) {
         let targetCharacter = target === 'Player' ? this.player : this.enemy;
         let casterCharacter = caster === 'Player' ? this.player : this.enemy;
@@ -719,20 +719,20 @@ class BattleScene extends Phaser.Scene {
             this.enemy.def /= 2; // Reset defense boost after turn
             this.enemy.isDefending = false;
         }
-
+    
+        // Move to the next character's turn
+        this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
         const currentCharacter = this.turnOrder[this.currentTurnIndex].name === 'Player' ? this.player : this.enemy;
         console.log('nextTurn... currentCharacter: ', currentCharacter);
-        this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
-        console.log('nextTurn... this.currentTurnIndex: ', this.currentTurnIndex);
-
+    
         if (this.isCharacterFrozenOrStunned(currentCharacter)) {
             console.log('nextTurn... Before Stun this.currentTurnIndex: ', this.currentTurnIndex);
             this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
             console.log('nextTurn... After Stun this.currentTurnIndex: ', this.currentTurnIndex);
         }
-
+    
         this.handleStatusEffects();
-
+    
         console.log('nextTurn... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
         if (this.turnOrder[this.currentTurnIndex].name === 'Player') {
             this.showPlayerActions();
@@ -742,15 +742,13 @@ class BattleScene extends Phaser.Scene {
         }
         this.updateTurnOrderDisplay();
     }
-
+    
     isCharacterFrozenOrStunned(character) {
         console.log('isCharacterFrozenOrStunned... character: ', character);
-
+    
         const frozenStatus = character.statusEffects.find(effect => effect.type === 'Freeze');
-        console.log('isCharacterFrozenOrStunned... character: ', character);
         const stunnedStatus = character.statusEffects.find(effect => effect.type === 'Stun');
-        console.log('isCharacterFrozenOrStunned... character: ', character);
-
+    
         if (frozenStatus) {
             frozenStatus.turns--;
             console.log('isCharacterFrozenOrStunned... frozenStatus.turns: ', frozenStatus.turns);
@@ -761,7 +759,7 @@ class BattleScene extends Phaser.Scene {
             this.helpText.setText(`${character.name} is frozen and skips a turn!`);
             return true;
         }
-
+    
         if (stunnedStatus) {
             stunnedStatus.turns--;
             console.log('isCharacterFrozenOrStunned... stunnedStatus.turns: ', stunnedStatus.turns);
@@ -772,11 +770,11 @@ class BattleScene extends Phaser.Scene {
             this.helpText.setText(`${character.name} is stunned and skips a turn!`);
             return true;
         }
-
+    
         console.log('isCharacterFrozenOrStunned... FREE!');
         return false;
     }
-
+    
     handleStatusEffects() {
         const currentCharacter = this.turnOrder[this.currentTurnIndex].name === 'Player' ? this.player : this.enemy;
         currentCharacter.statusEffects.forEach((effect, index) => {
