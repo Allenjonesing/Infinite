@@ -33,6 +33,7 @@ class ExplorationScene extends Phaser.Scene {
 
         // Fetch news data and generate AI responses
         newsData = await fetchNews();
+        console.log('newsData: ', newsData);
 
         const newsArticle = newsData[0]; // Use the first article for the enemy
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
