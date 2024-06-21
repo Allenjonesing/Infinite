@@ -557,7 +557,7 @@ class BattleScene extends Phaser.Scene {
                 let bestElement = 'physical';
 
                 // Periodically reset tried attacks and skills
-                if (this.enemy.triedElements.resetCounter === undefined || this.enemy.triedElements.resetCounter >= 5) {
+                if (this.enemy.triedElements.resetCounter === undefined || this.enemy.triedElements.resetCounter >= 20) {
                     this.enemy.triedElements = {
                         fire: false,
                         ice: false,
