@@ -687,6 +687,9 @@ class BattleScene extends Phaser.Scene {
     }
 
     applyStatusEffect(caster, target, statusEffect) {
+        console.log('applyStatusEffect... caster: ', caster);
+        console.log('applyStatusEffect... target: ', target);
+        console.log('applyStatusEffect... statusEffect: ', statusEffect);
         this.time.delayedCall(150, () => {  // Delay of 1 second for a more natural response
             let targetCharacter = target === 'Player' ? this.player : this.enemy;
             let casterCharacter = caster === 'Player' ? this.player : this.enemy;
