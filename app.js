@@ -350,7 +350,7 @@ class BattleScene extends Phaser.Scene {
                     damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.enemy.element[elementType], this.player.luk, this.enemy.eva);
                     this.player.mana -= 10;
                     this.helpText.setText(`Player uses ${elementType} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-                    this.playMagicAttackAnimation(this.player.sprite, this.enemy.sprite, elementType, damage, critical);
+                    this.playMagicAttackAnimation(this.player.sprite, this.enemy.sprite, elementType, damage, critical, this.enemy.element[elementType]);
                 } else {
                     this.helpText.setText("Not enough mana!");
                     return;
@@ -438,6 +438,20 @@ class BattleScene extends Phaser.Scene {
             fontColor = elementValue < 0.0 ? '#0cc43d' : '#2bf1ff';
             const immunityText = elementValue < 0.0 ? 'BUFF' : 'IMMUNE';
             const displayText = this.add.text(target.x, target.y - 50, immunityText, { fontSize: '50px', fill: fontColor, fontStyle: 'bold' });
+            this.tweens.add({
+                targets: displayText,
+                y: target.y - 250,
+                alpha: { from: 1, to: 0 },
+                duration: 2500,
+                ease: 'Power1',
+                onComplete: () => {
+                    displayText.destroy();
+                }
+            });
+        } else if (critical) {
+            delaytime = 500;
+            fontColor = '#f0d735'
+            const displayText = this.add.text(target.x, target.y - 50, 'CRITICAL', { fontSize: '50px', fill: fontColor, fontStyle: 'bold' });
             this.tweens.add({
                 targets: displayText,
                 y: target.y - 250,
