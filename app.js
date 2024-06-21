@@ -570,7 +570,7 @@ class BattleScene extends Phaser.Scene {
                         water: this.enemy.learnedElementalWeaknesses.water < 0 ? this.enemy.triedElements.fire : false,
                         lightning: this.enemy.learnedElementalWeaknesses.lightning < 0 ? this.enemy.triedElements.fire : false,
                         physical: this.enemy.learnedElementalWeaknesses.physical < 0 ? this.enemy.triedElements.fire : false,
-                        skills: this.enemy.triedElements.skills,
+                        skills: this.enemy.triedElements.skills || [],
                         resetCounter: 0
                     };
                 } else {
