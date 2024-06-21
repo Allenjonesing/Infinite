@@ -708,6 +708,9 @@ class BattleScene extends Phaser.Scene {
     }
 
     nextTurn() {
+        console.log('nextTurn... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
+        console.log('nextTurn... this.player.isDefending: ', this.player.isDefending);
+        console.log('nextTurn... this.enemy.isDefending: ', this.enemy.isDefending);
         if (this.turnOrder[this.currentTurnIndex].name === 'Player' && this.player.isDefending) {
             this.player.def /= 2; // Reset defense boost after turn
             this.player.isDefending = false;
@@ -717,10 +720,14 @@ class BattleScene extends Phaser.Scene {
             this.enemy.isDefending = false;
         }
 
+        // this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
         const currentCharacter = this.turnOrder[this.currentTurnIndex].name === 'Player' ? this.player : this.enemy;
+        console.log('nextTurn... currentCharacter: ', currentCharacter);
 
         if (this.isCharacterFrozenOrStunned(currentCharacter)) {
+            console.log('nextTurn... Before Stun this.currentTurnIndex: ', this.currentTurnIndex);
             this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
+            console.log('nextTurn... After Stun this.currentTurnIndex: ', this.currentTurnIndex);
         }
 
         this.handleStatusEffects();
@@ -736,11 +743,16 @@ class BattleScene extends Phaser.Scene {
     }
 
     isCharacterFrozenOrStunned(character) {
+        console.log('nextTurn... character: ', character);
+
         const frozenStatus = character.statusEffects.find(effect => effect.type === 'Freeze');
+        console.log('nextTurn... character: ', character);
         const stunnedStatus = character.statusEffects.find(effect => effect.type === 'Stun');
+        console.log('nextTurn... character: ', character);
 
         if (frozenStatus) {
             frozenStatus.turns--;
+            console.log('nextTurn... frozenStatus.turns: ', frozenStatus.turns);
             if (frozenStatus.turns <= 0) {
                 character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Freeze');
                 return false;
@@ -751,6 +763,7 @@ class BattleScene extends Phaser.Scene {
 
         if (stunnedStatus) {
             stunnedStatus.turns--;
+            console.log('nextTurn... stunnedStatus.turns: ', stunnedStatus.turns);
             if (stunnedStatus.turns <= 0) {
                 character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Stun');
                 return false;
@@ -759,6 +772,7 @@ class BattleScene extends Phaser.Scene {
             return true;
         }
 
+        console.log('nextTurn... FREE!');
         return false;
     }
 
