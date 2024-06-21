@@ -387,13 +387,18 @@ class BattleScene extends Phaser.Scene {
 
     enemyAction() {
         const performEnemyAction = () => {
-            console.log('performEnemyAction called');
             if (this.turnOrder[this.currentTurnIndex].name === 'Enemy' && !this.isCooldown) {
-                console.log('Enemy turn and not in cooldown');
                 let damage = 0;
                 let critical = false;
-                const action = this.enemy.actions[Math.floor(Math.random() * this.enemy.actions.length)];
-                console.log('Enemy action:', action);
+                let action;
+    
+                // Determine the best attack based on enemy's strengths
+                if (this.enemy.atk > this.enemy.magAtk) {
+                    action = 'Attack';
+                } else {
+                    action = 'Magic Attack';
+                }
+    
                 if (action === 'Attack') {
                     damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                     this.showDamageIndicator(this.player.sprite, damage, critical);
@@ -401,16 +406,24 @@ class BattleScene extends Phaser.Scene {
                     this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                 } else if (action === 'Magic Attack') {
                     const elements = ['fire', 'ice', 'water', 'lightning'];
-                    const elementType = elements[Math.floor(Math.random() * elements.length)];
-                    console.log('Enemy element type:', elementType);
+                    let elementType;
+    
+                    // Avoid using elements that heal the player
+                    do {
+                        elementType = elements[Math.floor(Math.random() * elements.length)];
+                    } while (this.player.element[elementType] < 0);
+    
                     if (this.enemy.mana >= 10) {
-                        damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.luk, this.player.eva);
+                        damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.luk);
                         this.enemy.mana -= 10;
                         this.helpText.setText(`Enemy uses ${elementType} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                         this.playMagicAttackAnimation(this.enemy.sprite, this.player.sprite, elementType, damage, critical, this.player.element[elementType]);
                     } else {
-                        console.log('Not enough mana for Magic Attack');
-                        return;
+                        action = 'Attack';
+                        damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
+                        this.showDamageIndicator(this.player.sprite, damage, critical);
+                        this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                        this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                     }
                 } else if (action === 'Defend') {
                     this.enemy.def *= 2; // Temporary defense boost
@@ -422,14 +435,12 @@ class BattleScene extends Phaser.Scene {
                 this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
                 this.startCooldown();
             } else {
-                console.log('Enemy turn but in cooldown or not enemy turn');
                 this.time.delayedCall(200, performEnemyAction, [], this);
             }
         };
-        console.log('Enemy action started');
         performEnemyAction();
     }
-
+    
     showDamageIndicator(target, damage, critical, elementValue) {
         let fontColor = '#f0d735';
         let delaytime = 0;
