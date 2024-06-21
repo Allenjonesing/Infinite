@@ -11,6 +11,30 @@ let persona;
 let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 1000-10000, mana is 100-500, atk through wis are each 1-50, and the 4 elements are each a int between -1 and 3, where -1 is the strongest (Given to those of that element) and 3 is the weakest (Given to those that oppose this element). Include status immunities in the format {immunities: ["Poison", "Stun", "Burn", "Freeze"]}.';
 let battleEnded = false;
 
+const config = {
+    type: Phaser.AUTO,
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: window.innerWidth,
+        height: window.innerHeight
+    },
+    scene: [ExplorationScene, BattleScene],
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: false
+        }
+    }
+};
+
+const game = new Phaser.Game(config);
+
+window.addEventListener('resize', () => {
+    game.scale.resize(window.innerWidth, window.innerHeight);
+});
+
 class ExplorationScene extends Phaser.Scene {
     constructor() {
         super({ key: 'ExplorationScene' });
@@ -24,6 +48,7 @@ class ExplorationScene extends Phaser.Scene {
         // Create player
         this.player = this.physics.add.sprite(400, 300, 'player');
         this.player.setCollideWorldBounds(true);
+
         // Initialize enemies group
         this.enemies = this.physics.add.group();
 
@@ -35,6 +60,7 @@ class ExplorationScene extends Phaser.Scene {
 
         // Display news information
         this.displayNewsInfo(newsData[0], persona, enemyImageBase64);
+
         // Spawn enemies after data is ready
         spawnEnemies(this);
     }
@@ -45,12 +71,12 @@ class ExplorationScene extends Phaser.Scene {
     }
 
     displayNewsInfo(news, persona, enemyImage) {
-        this.add.text(20, 20, `Based on the news article: ${news.title}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: 760 } });
-        this.add.text(20, 60, `You'll play as: ${persona.name}, ${persona.description}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: 760 } });
-        this.add.text(20, 100, `You'll be fighting: ${monsterDescription}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: 760 } });
+        this.add.text(20, 20, `Based on the news article: ${news.title}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: window.innerWidth - 40 } });
+        this.add.text(20, 60, `You'll play as: ${persona.name}, ${persona.description}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: window.innerWidth - 40 } });
+        this.add.text(20, 100, `You'll be fighting: ${monsterDescription}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: window.innerWidth - 40 } });
 
         if (enemyImage) {
-            this.add.image(400, 300, 'enemyImageBase64').setScale(0.5); // Adjust the scale as necessary
+            this.add.image(window.innerWidth / 2, window.innerHeight / 2, 'enemyImageBase64').setScale(0.5); // Adjust the scale as necessary
         }
     }
 
@@ -916,43 +942,17 @@ function spawnEnemies(scene) {
         scene.textures.addBase64('enemyImageBase64', enemyImageBase64);
         scene.textures.addBase64('npcBase64image', npcBase64image);
         for (let i = 0; i < 3; i++) {
-            let x = Phaser.Math.Between(50, 750);
-            let y = Phaser.Math.Between(50, 550);
+            let x = Phaser.Math.Between(50, window.innerWidth - 50);
+            let y = Phaser.Math.Between(50, window.innerHeight - 50);
             let enemy = scene.enemies.create(x, y, 'enemyImageBase64');
             enemy.setCollideWorldBounds(true);
         }
         scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
-        scene.physics.add.collider(scene.enemies, scene.trees);
-        scene.physics.add.collider(scene.npcs, scene.enemies);
         scene.physics.add.collider(scene.enemies, scene.enemies);
     } else {
         console.error('No news data available to generate enemies');
     }
 }
-
-const config = {
-    type: Phaser.AUTO,
-    scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: window.innerWidth,
-        height: window.innerHeight
-    },
-    scene: [ExplorationScene, BattleScene],
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 0 },
-            debug: false
-        }
-    }
-};
-
-const game = new Phaser.Game(config);
-
-window.addEventListener('resize', () => {
-    game.scale.resize(window.innerWidth, window.innerHeight);
-});
 
 async function fetchNews() {
     const loadingMessage = document.getElementById('loading');
