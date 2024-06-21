@@ -419,6 +419,7 @@ class BattleScene extends Phaser.Scene {
                 }
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
+                this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
                 this.startCooldown();
             } else {
                 console.log('Enemy turn but in cooldown or not enemy turn');
@@ -594,9 +595,9 @@ class BattleScene extends Phaser.Scene {
 
         let magicBall = this.add.circle(attacker.x, attacker.y, 30, color);
         this.physics.add.existing(magicBall);
-        this.physics.moveTo(magicBall, defender.x > 400 ? defender.x + 200 : defender.x, defender.y, 450);
+        this.physics.moveTo(magicBall, defender.x > 400 ? defender.x + 200 : defender.x, defender.y, 500);
 
-        this.time.delayedCall(750, () => {
+        this.time.delayedCall(500, () => {
             magicBall.destroy();
             this.showDamageIndicator(defender, damage, critical, elementValue);
         });
