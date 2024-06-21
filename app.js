@@ -1194,14 +1194,17 @@ async function generateAIResponses() {
                                 throw new Error('No image generated');
                             }
                         } catch (error) {
+                            loacation.reload();
                             console.error('Error generating AI response:', error);
                         }
                     }
                 } catch (error) {
+                    loacation.reload();
                     console.error('Error generating AI response:', error);
                 }
             }
         } catch (error) {
+            loacation.reload();
             console.error('Error generating AI response:', error);
         }
     }
@@ -1232,6 +1235,7 @@ async function generatePersonas(setting) {
             parsedPersonas = JSON.parse(aiResponse.choices[0].message.content);
         }
     } catch (error) {
+        loacation.reload();
         console.error('Error generating AI response:', error);
     }
 
