@@ -539,7 +539,7 @@ class BattleScene extends Phaser.Scene {
                 let action;
                 let highestDamage = 0;
                 let bestElement = 'physical';
-
+    
                 // Periodically reset tried attacks and skills
                 if (this.enemy.triedElements.resetCounter === undefined || this.enemy.triedElements.resetCounter >= 5) {
                     this.enemy.triedElements = {
@@ -551,21 +551,21 @@ class BattleScene extends Phaser.Scene {
                         skills: [],
                         resetCounter: 0
                     };
+                } else {
+                    this.enemy.triedElements.resetCounter++;
                 }
-
+    
                 // Determine if there's an element, physical attack, or skill that hasn't been tried yet
                 const elements = Object.keys(this.enemy.triedElements).filter(e => e !== 'resetCounter' && e !== 'skills');
                 let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
-
-                if (!untriedElement && this.enemy.actions.skills.length > 0) {
-                    const untriedSkill = this.enemy.actions.skills.find(skill => !this.enemy.triedElements.skills.includes(skill));
-                    if (untriedSkill) {
-                        actionType = 'skills';
-                        action = untriedSkill;
-                    }
-                }
-
-                if (!untriedElement && actionType !== 'skills') {
+    
+                const skills = this.enemy.actions.skills || [];
+                let untriedSkill = skills.find(skill => !this.enemy.triedElements.skills.includes(skill));
+    
+                if (!untriedElement && untriedSkill) {
+                    actionType = 'skills';
+                    action = untriedSkill;
+                } else if (!untriedElement && !untriedSkill) {
                     // Determine the best attack based on the highest damage dealt so far
                     for (const [element, dmg] of Object.entries(this.enemy.learnedElementalWeaknesses)) {
                         console.log(`Checking damage for element ${element}: ${dmg}`);
@@ -590,7 +590,7 @@ class BattleScene extends Phaser.Scene {
                         action = `${untriedElement.charAt(0).toUpperCase() + untriedElement.slice(1)} Magic Attack`;
                     }
                 }
-
+    
                 console.log('performEnemyAction... actionType: ', actionType);
                 console.log('performEnemyAction... action: ', action);
                 if (actionType === 'physical') {
@@ -602,13 +602,13 @@ class BattleScene extends Phaser.Scene {
                     this.enemy.triedElements.physical = true; // Mark physical attack as tried
                 } else if (actionType === 'magic') {
                     const elementType = action.split(' ')[0].toLowerCase();
-
+    
                     if (this.enemy.mana >= 10) {
                         damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.luk);
                         this.enemy.mana -= 10;
                         this.helpText.setText(`Enemy uses ${elementType.charAt(0).toUpperCase() + elementType.slice(1)} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                         this.playMagicAttackAnimation(this.enemy.sprite, this.player.sprite, elementType, damage, critical, this.player.element[elementType]);
-
+    
                         // Learn about player's elemental weaknesses
                         this.enemy.learnedElementalWeaknesses[elementType] = Math.max(this.enemy.learnedElementalWeaknesses[elementType], damage);
                         this.enemy.triedElements[elementType] = true; // Mark this element as tried
@@ -622,20 +622,10 @@ class BattleScene extends Phaser.Scene {
                         this.enemy.triedElements.physical = true; // Mark physical attack as tried
                     }
                 } else if (actionType === 'skills') {
-                    const skills = this.enemy.actions.skills; // Example status effects
-                    let skillToUse;
-                    for (const skill of skills) {
-                        if (!this.enemy.learnedStatusImmunities[skill] && !this.player.statusEffects.includes(skill)) {
-                            skillToUse = skill;
-                            break;
-                        }
-                    }
-
-                    if (skillToUse) {
-                        this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-                        this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
-                        this.applyStatusEffect('Enemy', 'Player', skillToUse);
-                        this.enemy.triedElements.skills.push(skillToUse); // Mark skill as tried
+                    if (skills.includes(action)) {
+                        this.helpText.setText(`Enemy uses ${action}!`);
+                        this.applyStatusEffect('Enemy', 'Player', action);
+                        this.enemy.triedElements.skills.push(action); // Mark skill as tried
                     } else {
                         damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                         this.showDamageIndicator(this.player.sprite, damage, critical);
@@ -649,6 +639,7 @@ class BattleScene extends Phaser.Scene {
                         this.enemy.mana -= 15;
                         this.enemy.health = Math.min(this.enemy.health - damage, this.enemy.maxHealth); // Assuming maxHealth is defined
                         this.helpText.setText(`Enemy uses Heal! Restores ${-damage} health.`);
+                        this.applyHealingEffect(this.enemy.sprite); // Add healing effect
                     } else {
                         // Fallback to physical attack if not enough mana
                         damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
@@ -664,7 +655,7 @@ class BattleScene extends Phaser.Scene {
                     this.helpText.setText('Enemy defends, boosting defense for this turn.');
                 }
                 console.log('performEnemyAction... damage: ', damage);
-
+    
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
                 this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
@@ -676,7 +667,7 @@ class BattleScene extends Phaser.Scene {
         };
         performEnemyAction();
     }
-
+    
     applyStatusEffect(caster, target, statusEffect) {
         this.time.delayedCall(150, () => {  // Delay of 1 second for a more natural response
             let targetCharacter = target === 'Player' ? this.player : this.enemy;
