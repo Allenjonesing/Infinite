@@ -378,15 +378,30 @@ class BattleScene extends Phaser.Scene {
         });
     }
 
+    applyHealingEffect(target) {
+        let healingLight = this.add.graphics();
+        healingLight.fillStyle(0x00ff00, 0.5); // Green color with some transparency
+        healingLight.fillCircle(target.x, target.y, 50);
+        this.tweens.add({
+            targets: healingLight,
+            alpha: { from: 1, to: 0 },
+            duration: 1000,
+            ease: 'Power1',
+            onComplete: () => {
+                healingLight.destroy();
+            }
+        });
+    }
+    
     handlePlayerAction(action, elementType = null) {
         this.hideSubOptions(); // Ensure sub-options are hidden when a main action is chosen
-
+    
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
             if (action === 'Magic Attack' && !elementType) {
                 this.showElementSelection();
                 return;
             }
-
+    
             let damage = 0;
             let critical = false;
             if (action === 'Attack') {
@@ -417,6 +432,7 @@ class BattleScene extends Phaser.Scene {
                     this.player.mana -= 15;
                     this.player.health = Math.min(this.player.health - damage, 100); // Assuming 100 is max health
                     this.helpText.setText(`Player uses Heal! Restores ${-damage} health.`);
+                    this.applyHealingEffect(this.player.sprite);
                 } else {
                     this.helpText.setText("Not enough mana!");
                     return;
@@ -929,17 +945,34 @@ class BattleScene extends Phaser.Scene {
                 color = 0xffffff; // Default to white
                 break;
         }
-
+    
         let magicBall = this.add.circle(attacker.x, attacker.y, 30, color);
         this.physics.add.existing(magicBall);
-        this.physics.moveTo(magicBall, defender.x > 400 ? defender.x + 200 : defender.x, defender.y, 500);
-
+        this.physics.moveTo(magicBall, defender.x, defender.y, 500);
+    
         this.time.delayedCall(500, () => {
             magicBall.destroy();
+            this.createExplosion(defender.x, defender.y, color);
             this.showDamageIndicator(defender, damage, critical, elementValue);
         });
     }
-
+    
+    createExplosion(x, y, color) {
+        let particles = this.add.particles('particle');
+        let emitter = particles.createEmitter({
+            x: x,
+            y: y,
+            speed: { min: -800, max: 800 },
+            angle: { min: 0, max: 360 },
+            scale: { start: 0.5, end: 0 },
+            blendMode: 'ADD',
+            lifespan: 500,
+            tint: color
+        });
+        this.time.delayedCall(500, () => {
+            particles.destroy();
+        });
+    }
 }
 
 const config = {
