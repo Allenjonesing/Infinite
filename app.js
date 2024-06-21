@@ -8,7 +8,7 @@ let npcBase64image = '';
 let monsterDescription = '';
 let personas;
 let persona;
-let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 1000-10000, mana is 100-500, atk through wis are each 1-50, and the 4 elements are each a int between -1 and 3, where -1 is the strongest (Given to those of that element) and 3 is the weakest (Given to those that oppose this element).';
+let statRequirements = 'They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 1000-10000, mana is 100-500, atk through wis are each 1-50, and the 4 elements are each a int between -1 and 3, where -1 is the strongest (Given to those of that element) and 3 is the weakest (Given to those that oppose this element). Include status immunities in the format {immunities: ["Poison", "Stun", "Burn", "Freeze"]}.';
 let battleEnded = false;
 
 class ExplorationScene extends Phaser.Scene {
@@ -159,7 +159,9 @@ class BattleScene extends Phaser.Scene {
             wis: playerStats.wis,
             sprite: null,
             actions: ['Attack', 'Defend', 'Magic Attack'],
-            element: playerStats.element // Example element multipliers
+            element: playerStats.element,
+            statusEffects: [],
+            immunities: playerStats.immunities || []
         };
 
 
@@ -191,7 +193,9 @@ class BattleScene extends Phaser.Scene {
                 ice: false,
                 water: false,
                 lightning: false
-            }
+            },
+            statusEffects: [],
+            immunities: enemyStats.immunities || []
         };
 
         // Generate enemy image based on news article and setting
@@ -368,6 +372,9 @@ class BattleScene extends Phaser.Scene {
                 this.player.def *= 2; // Temporary defense boost
                 this.player.isDefending = true; // Temporary defense boost
                 this.helpText.setText('Player defends, boosting defense for this turn.');
+            } else if (action === 'Skills') {
+                this.showSkillSelection();
+                return;
             }
             this.enemy.health -= damage;
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
@@ -375,6 +382,23 @@ class BattleScene extends Phaser.Scene {
             this.startCooldown();
             this.hidePlayerActions();
         }
+    }
+
+    showSkillSelection() {
+        const skills = ['Poison', 'Stun', 'Burn', 'Freeze']; // Example status effects
+        this.skillButtons = this.add.group();
+
+        for (let i = 0; i < skills.length; i++) {
+            let skillText = this.add.text(200 + i * 150, 550, skills[i], { fontSize: '20px', fill: '#fff', backgroundColor: '#000', padding: { left: 10, right: 10, top: 5, bottom: 5 } });
+            skillText.setInteractive();
+            skillText.on('pointerdown', () => {
+                this.applyStatusEffect('Player', 'Enemy', skills[i]);
+                this.skillButtons.clear(true, true);
+            });
+            this.skillButtons.add(skillText);
+        }
+
+        this.helpText.setText('Choose a skill:');
     }
 
     showElementSelection() {
@@ -402,17 +426,13 @@ class BattleScene extends Phaser.Scene {
                 let action;
                 let highestDamage = 0;
                 let bestElement = 'physical';
-    
-                // Determine if there's an element that hasn't been tried yet
                 const elements = Object.keys(this.enemy.triedElements);
                 let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
-    
+
                 if (untriedElement) {
-                    // If there's an untried element, try it first
                     action = 'Magic Attack';
                     bestElement = untriedElement;
                 } else {
-                    // Determine the best attack based on the highest damage dealt so far
                     for (const [element, dmg] of Object.entries(this.enemy.learnedElementalWeaknesses)) {
                         if (dmg > highestDamage) {
                             highestDamage = dmg;
@@ -421,7 +441,7 @@ class BattleScene extends Phaser.Scene {
                     }
                     action = bestElement === 'physical' ? 'Attack' : 'Magic Attack';
                 }
-    
+
                 if (action === 'Attack') {
                     damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                     this.showDamageIndicator(this.player.sprite, damage, critical);
@@ -430,18 +450,35 @@ class BattleScene extends Phaser.Scene {
                     this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
                 } else if (action === 'Magic Attack') {
                     const elementType = bestElement;
-    
+
                     if (this.enemy.mana >= 10) {
                         damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.luk);
                         this.enemy.mana -= 10;
                         this.helpText.setText(`Enemy uses ${elementType} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                         this.playMagicAttackAnimation(this.enemy.sprite, this.player.sprite, elementType, damage, critical, this.player.element[elementType]);
-    
-                        // Learn about player's elemental weaknesses
+
                         this.enemy.learnedElementalWeaknesses[elementType] = Math.max(this.enemy.learnedElementalWeaknesses[elementType], damage);
-                        this.enemy.triedElements[elementType] = true; // Mark this element as tried
+                        this.enemy.triedElements[elementType] = true;
                     } else {
-                        // Fallback to physical attack if not enough mana
+                        damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
+                        this.showDamageIndicator(this.player.sprite, damage, critical);
+                        this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                        this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
+                        this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
+                    }
+                } else if (action === 'Skills') {
+                    const skills = ['Poison', 'Stun', 'Burn', 'Freeze']; // Example status effects
+                    let skillToUse;
+                    for (const skill of skills) {
+                        if (!this.enemy.learnedStatusImmunities[skill] && !this.player.statusEffects.includes(skill)) {
+                            skillToUse = skill;
+                            break;
+                        }
+                    }
+
+                    if (skillToUse) {
+                        this.applyStatusEffect('Enemy', 'Player', skillToUse);
+                    } else {
                         damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                         this.showDamageIndicator(this.player.sprite, damage, critical);
                         this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
@@ -453,7 +490,7 @@ class BattleScene extends Phaser.Scene {
                     this.enemy.isDefending = true; // Temporary defense boost
                     this.helpText.setText('Enemy defends, boosting defense for this turn.');
                 }
-    
+
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
                 this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
@@ -464,11 +501,45 @@ class BattleScene extends Phaser.Scene {
         };
         performEnemyAction();
     }
-                
+
+    applyStatusEffect(caster, target, statusEffect) {
+        let targetCharacter = target === 'Player' ? this.player : this.enemy;
+        let casterCharacter = caster === 'Player' ? this.player : this.enemy;
+    
+        if (targetCharacter.immunities.includes(statusEffect)) {
+            this.helpText.setText(`${targetCharacter.name} is immune to ${statusEffect}!`);
+            if (caster === 'Enemy') {
+                this.enemy.learnedStatusImmunities[statusEffect] = true;
+            }
+        } else if (!targetCharacter.statusEffects.find(effect => effect.type === statusEffect)) {
+            let turns = statusEffect === 'Stun' || statusEffect === 'Freeze' ? 5 : -1; // -1 means it doesn't expire automatically
+            targetCharacter.statusEffects.push({ type: statusEffect, turns });
+            this.helpText.setText(`${targetCharacter.name} is now affected by ${statusEffect}!`);
+        } else {
+            this.helpText.setText(`${targetCharacter.name} is already affected by ${statusEffect}.`);
+        }
+    
+        this.updateStatusIndicators(targetCharacter);
+        this.startCooldown();
+    }
+    
+    updateStatusIndicators(character) {
+        if (character.statusIndicators) {
+            character.statusIndicators.destroy();
+        }
+    
+        character.statusIndicators = this.add.group();
+        const statusEffects = character.statusEffects;
+        for (let i = 0; i < statusEffects.length; i++) {
+            let statusText = this.add.text(20, 200 + i * 30, `${statusEffects[i].type} (${statusEffects[i].turns > 0 ? statusEffects[i].turns : '∞'})`, { fontSize: '20px', fill: '#fff', backgroundColor: '#000', padding: { left: 10, right: 10, top: 5, bottom: 5 } });
+            character.statusIndicators.add(statusText);
+        }
+    }
+    
     showDamageIndicator(target, damage, critical, elementValue) {
         let fontColor = '#f0d735';
         let delaytime = 0;
-        
+
         if (elementValue <= 0.0) {
             delaytime = 500;
             fontColor = elementValue < 0.0 ? '#0cc43d' : '#2bf1ff';
@@ -542,19 +613,19 @@ class BattleScene extends Phaser.Scene {
         let criticalChance = luk / 100;
         let critical = Math.random() < criticalChance;
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
-    
+
         let baseDamage;
         if (critical) {
             baseDamage = Math.floor((2 * magAtk) * variance)
         } else {
             baseDamage = Math.floor((2 * magAtk - magDef) * variance);
         }
-    
+
         baseDamage *= defenderElement;
-        
+
         return Math.floor(baseDamage); // Allow negative values for potential healing
     }
-    
+
     startCooldown() {
         this.isCooldown = true;
 
@@ -574,9 +645,15 @@ class BattleScene extends Phaser.Scene {
             this.enemy.def /= 2; // Reset defense boost after turn
             this.enemy.isDefending = false;
         }
-
-        this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
-
+    
+        const currentCharacter = this.turnOrder[this.currentTurnIndex].name === 'Player' ? this.player : this.enemy;
+    
+        if (this.isCharacterFrozenOrStunned(currentCharacter)) {
+            this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
+        }
+    
+        this.handleStatusEffects();
+    
         if (this.turnOrder[this.currentTurnIndex].name === 'Player') {
             this.showPlayerActions();
         } else {
@@ -584,6 +661,58 @@ class BattleScene extends Phaser.Scene {
             this.enemyAction();
         }
         this.updateTurnOrderDisplay();
+    }
+    
+    isCharacterFrozenOrStunned(character) {
+        const frozenStatus = character.statusEffects.find(effect => effect.type === 'Freeze');
+        const stunnedStatus = character.statusEffects.find(effect => effect.type === 'Stun');
+    
+        if (frozenStatus) {
+            frozenStatus.turns--;
+            if (frozenStatus.turns <= 0) {
+                character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Freeze');
+                return false;
+            }
+            this.helpText.setText(`${character.name} is frozen and skips a turn!`);
+            return true;
+        }
+    
+        if (stunnedStatus) {
+            stunnedStatus.turns--;
+            if (stunnedStatus.turns <= 0) {
+                character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Stun');
+                return false;
+            }
+            this.helpText.setText(`${character.name} is stunned and skips a turn!`);
+            return true;
+        }
+    
+        return false;
+    }
+    
+    handleStatusEffects() {
+        const currentCharacter = this.turnOrder[this.currentTurnIndex].name === 'Player' ? this.player : this.enemy;
+        currentCharacter.statusEffects.forEach((effect, index) => {
+            switch (effect.type) {
+                case 'Poison':
+                    currentCharacter.health -= 10; // Example poison damage
+                    this.helpText.setText(`${currentCharacter.name} takes poison damage!`);
+                    break;
+                case 'Burn':
+                    currentCharacter.health -= 15; // Example burn damage
+                    this.helpText.setText(`${currentCharacter.name} takes burn damage!`);
+                    // Cure Freeze if the character is burned
+                    currentCharacter.statusEffects = currentCharacter.statusEffects.filter(eff => eff.type !== 'Freeze');
+                    break;
+                // Stun and Freeze are handled in isCharacterFrozenOrStunned method
+            }
+    
+            if (currentCharacter.health <= 0) {
+                this.endBattle(currentCharacter.name === 'Player' ? 'lose' : 'win');
+            }
+        });
+    
+        this.updateStatusIndicators(currentCharacter);
     }
 
     showPlayerActions() {
