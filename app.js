@@ -32,7 +32,7 @@ class ExplorationScene extends Phaser.Scene {
         this.enemies = this.physics.add.group();
 
         // Fetch news data and generate AI responses
-        newsData = await fetchNews();
+        await fetchNews();
         console.log('newsData: ', newsData);
 
         const newsArticle = newsData[0]; // Use the first article for the enemy
@@ -869,6 +869,7 @@ class BattleScene extends Phaser.Scene {
             frozenStatus.turns--;
             if (frozenStatus.turns <= 0) {
                 character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Freeze');
+                this.updateStatusIndicators(character);
                 return false;
             }
             this.helpText.setText(`${character.name} is frozen and skips a turn!`);
@@ -879,6 +880,7 @@ class BattleScene extends Phaser.Scene {
             stunnedStatus.turns--;
             if (stunnedStatus.turns <= 0) {
                 character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Stun');
+                this.updateStatusIndicators(character);
                 return false;
             }
             this.helpText.setText(`${character.name} is stunned and skips a turn!`);
