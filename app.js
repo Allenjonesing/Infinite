@@ -1001,10 +1001,8 @@ const config = {
     scale: {
         mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        parent: 'phaser-game',
-        width: '100%',
-        height: '100%',
-        fullscreenTarget: 'phaser-game'
+        width: window.innerWidth,
+        height: window.innerHeight
     },
     scene: [ExplorationScene, BattleScene],
     physics: {
@@ -1019,7 +1017,19 @@ const config = {
 const game = new Phaser.Game(config);
 
 window.addEventListener('resize', () => {
-    game.scale.resize(window.innerWidth, window.innerHeight);
+    const newWidth = window.innerWidth;
+    const newHeight = window.innerHeight;
+
+    game.scale.resize(newWidth, newHeight);
+    game.scene.scenes.forEach(scene => {
+        scene.scale.resize(newWidth, newHeight);
+        scene.children.list.forEach(child => {
+            if (child.isText) {
+                // Adjust font size or reposition texts if needed
+                child.setFontSize(newHeight / 25); // Example adjustment
+            }
+        });
+    });
 });
 
 async function generateEnemyImage(newsArticle, setting) {
