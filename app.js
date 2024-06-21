@@ -22,6 +22,8 @@ class ExplorationScene extends Phaser.Scene {
     }
 
     async create() {
+        // Add a loading text
+        let loadingText = this.add.text(window.innerWidth / 2, window.innerHeight / 2, 'Loading...', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5);
         // Create player
         this.player = this.physics.add.sprite(400, 300, 'player');
         this.player.setCollideWorldBounds(true);
@@ -34,6 +36,9 @@ class ExplorationScene extends Phaser.Scene {
 
         const newsArticle = newsData[0]; // Use the first article for the enemy
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
+
+        // Remove the loading text
+        loadingText.destroy();
 
         // Display news information
         this.displayNewsInfo(newsData[0], persona);
@@ -158,6 +163,25 @@ class BattleScene extends Phaser.Scene {
                 this.player.sprite = this.add.sprite(150, 300, 'npcBase64image'); // Use the cached player image
                 this.enemy.sprite = this.add.sprite(550, 300, 'enemyImageBase64');
 
+                // Add hover animations
+                this.add.tween({
+                    targets: this.player.sprite,
+                    y: this.player.sprite.y - 10,
+                    duration: 1000,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut'
+                });
+
+                this.add.tween({
+                    targets: this.enemy.sprite,
+                    y: this.enemy.sprite.y - 10,
+                    duration: 1000,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut'
+                });
+
                 // Initialize turn order and current turn index
                 this.turnOrder = this.calculateTurnOrder();
                 this.currentTurnIndex = 0;
@@ -274,10 +298,12 @@ class BattleScene extends Phaser.Scene {
         // Action buttons at the bottom
         this.actions = this.add.group();
         const actionNames = ['Attack', 'Defend', 'Magic Attack', 'Skills', 'Heal'];
+        const actionWidth = window.innerWidth / actionNames.length;
         for (let i = 0; i < actionNames.length; i++) {
-            let actionText = this.add.text(100 + i * 150, window.innerHeight - 100, actionNames[i], { fontSize: '40px', fill: '#fff', backgroundColor: '#000', padding: { left: 20, right: 20, top: 10, bottom: 10 } });
+            let actionText = this.add.text(i * actionWidth + actionWidth / 2, window.innerHeight - 50, actionNames[i], { fontSize: '40px', fill: '#fff', backgroundColor: '#000', padding: { left: 20, right: 20, top: 10, bottom: 10 } });
             actionText.setInteractive();
             actionText.on('pointerdown', () => this.handlePlayerAction(actionNames[i]));
+            actionText.setOrigin(0.5);
             this.actions.add(actionText);
 
             // Add animation and colorful effect
@@ -422,7 +448,6 @@ class BattleScene extends Phaser.Scene {
             skillText.on('pointerdown', () => {
                 this.applyStatusEffect('Player', 'Enemy', skills[i]);
                 this.skillButtons.clear(true, true);
-                this.actionBox.setSize(750, 100); // Shrink action box back to original size
             });
             this.skillButtons.add(skillText);
 
@@ -439,7 +464,6 @@ class BattleScene extends Phaser.Scene {
         }
 
         this.helpText.setText('Choose a skill:');
-        this.actionBox.setSize(750, 200); // Expand action box
     }
 
     showElementSelection() {
@@ -847,7 +871,17 @@ class BattleScene extends Phaser.Scene {
             x: defender.x - 50,
             duration: 300,
             yoyo: true,
-            ease: 'Power1'
+            ease: 'Power1',
+            onComplete: () => {
+                this.tweens.add({
+                    targets: defender,
+                    angle: { from: -5, to: 5 },
+                    duration: 100,
+                    yoyo: true,
+                    repeat: 5,
+                    ease: 'Sine.easeInOut'
+                });
+            }
         });
     }
 
