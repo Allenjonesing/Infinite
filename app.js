@@ -559,12 +559,12 @@ class BattleScene extends Phaser.Scene {
                 // Periodically reset tried attacks and skills
                 if (this.enemy.triedElements.resetCounter === undefined || this.enemy.triedElements.resetCounter >= 20) {
                     this.enemy.triedElements = {
-                        fire: false,
-                        ice: false,
-                        water: false,
-                        lightning: false,
-                        physical: false,
-                        skills: [],
+                        fire: this.enemy.learnedElementalWeaknesses.fire < 0 ? this.enemy.triedElements.fire : false,
+                        ice: this.enemy.learnedElementalWeaknesses.ice < 0 ? this.enemy.triedElements.fire : false,
+                        water: this.enemy.learnedElementalWeaknesses.water < 0 ? this.enemy.triedElements.fire : false,
+                        lightning: this.enemy.learnedElementalWeaknesses.lightning < 0 ? this.enemy.triedElements.fire : false,
+                        physical: this.enemy.learnedElementalWeaknesses.physical < 0 ? this.enemy.triedElements.fire : false,
+                        skills: this.enemy.triedElements.skills,
                         resetCounter: 0
                     };
                 } else {
