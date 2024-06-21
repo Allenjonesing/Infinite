@@ -146,6 +146,7 @@ class BattleScene extends Phaser.Scene {
                 lightning: 0,
                 physical: 0 // Track physical attack damage
             },
+            learnedStatusImmunities: [],
             triedElements: {
                 fire: false,
                 ice: false,
@@ -323,7 +324,7 @@ class BattleScene extends Phaser.Scene {
         this.add.graphics().lineStyle(2, 0xff0000).strokeRect(440, 90, 200, 75);
 
         // Add border around action buttons
-        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(90, window.innerHeight - 150, 900, 100); // Adjusted width for more options
+        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(90, window.innerHeight - 150, 800, 200); // Adjusted width for more options
 
         // Initially hide the action buttons and box
         this.actions.children.each(action => action.setVisible(false));
@@ -478,6 +479,7 @@ class BattleScene extends Phaser.Scene {
             let skillText = this.add.text(100 + i * 300, window.innerHeight - 200, skills[i], { fontSize: '40px', fill: '#fff', backgroundColor: '#000', padding: { left: 20, right: 20, top: 10, bottom: 10 } });
             skillText.setInteractive();
             skillText.on('pointerdown', () => {
+                this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
                 this.applyStatusEffect('Player', 'Enemy', skills[i]);
                 this.skillButtons.clear(true, true);
             });
@@ -510,7 +512,6 @@ class BattleScene extends Phaser.Scene {
             elementText.on('pointerdown', () => {
                 this.handlePlayerAction('Magic Attack', elements[i]);
                 this.elementButtons.clear(true, true);
-                this.actionBox.setSize(750, 100); // Shrink action box back to original size
             });
             this.elementButtons.add(elementText);
 
@@ -527,7 +528,6 @@ class BattleScene extends Phaser.Scene {
         }
 
         this.helpText.setText('Choose an element for your Magic Attack:');
-        this.actionBox.setSize(750, 200); // Expand action box
     }
 
     hideSubOptions() {
