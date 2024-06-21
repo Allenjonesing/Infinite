@@ -456,6 +456,7 @@ class BattleScene extends Phaser.Scene {
                 }
             }
             this.enemy.health -= damage;
+            this.playerHealthText.setText(`Health: ${this.player.health}`);
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
             this.playerManaText.setText(`Mana: ${this.player.mana}`);
             this.startCooldown();
@@ -674,6 +675,7 @@ class BattleScene extends Phaser.Scene {
 
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
+                this.enemyHealthText.setText(`Health: ${this.player.health}`);
                 this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
                 this.startCooldown();
             } else {
