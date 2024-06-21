@@ -720,9 +720,10 @@ class BattleScene extends Phaser.Scene {
             this.enemy.isDefending = false;
         }
 
-        // this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
         const currentCharacter = this.turnOrder[this.currentTurnIndex].name === 'Player' ? this.player : this.enemy;
         console.log('nextTurn... currentCharacter: ', currentCharacter);
+        this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
+        console.log('nextTurn... this.currentTurnIndex: ', this.currentTurnIndex);
 
         if (this.isCharacterFrozenOrStunned(currentCharacter)) {
             console.log('nextTurn... Before Stun this.currentTurnIndex: ', this.currentTurnIndex);
