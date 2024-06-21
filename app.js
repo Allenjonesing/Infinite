@@ -18,6 +18,7 @@ class ExplorationScene extends Phaser.Scene {
 
     preload() {
         this.load.image('player', 'assets/player.png');
+        this.load.image('enemy', 'assets/enemy.png');
     }
 
     async create() {
@@ -35,10 +36,20 @@ class ExplorationScene extends Phaser.Scene {
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
 
         // Display news information
-        this.displayNewsInfo(newsData[0], persona, enemyImageBase64);
+        this.displayNewsInfo(newsData[0], persona);
+
+        //Prep Base64 images
+        PrepBase64Images();
 
         // Spawn enemies after data is ready
         spawnEnemies(this);
+    }
+
+    PrepBase64Images() {
+        if (enemyImageBase64 && npcBase64image) {
+            scene.textures.addBase64('enemyImageBase64', enemyImageBase64);
+            scene.textures.addBase64('npcBase64image', npcBase64image);
+        }
     }
 
     startBattle(player, enemy) {
@@ -46,12 +57,12 @@ class ExplorationScene extends Phaser.Scene {
         this.scene.start('BattleScene', { player: player, enemy: enemy });
     }
 
-    displayNewsInfo(news, persona, enemyImage) {
+    displayNewsInfo(news, persona) {
         this.add.text(20, 20, `Based on the news article: ${news.title}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: window.innerWidth - 40 } });
         this.add.text(20, 60, `You'll play as: ${persona.name}, ${persona.description}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: window.innerWidth - 40 } });
         this.add.text(20, 100, `You'll be fighting: ${monsterDescription}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: window.innerWidth - 40 } });
 
-        if (enemyImage) {
+        if (enemyImageBase64) {
             this.add.image(window.innerWidth / 2, window.innerHeight / 2, 'enemyImageBase64').setScale(0.5); // Adjust the scale as necessary
         }
     }
@@ -144,7 +155,7 @@ class BattleScene extends Phaser.Scene {
         // Generate enemy image based on news article and setting
         if (newsData.length > 0) {
             if (enemyImageBase64) {
-                this.player.sprite = this.add.sprite(150, 300, 'npcBase64image');
+                this.player.sprite = this.add.sprite(150, 300, 'npcBase64image'); // Use the cached player image
                 this.enemy.sprite = this.add.sprite(550, 300, 'enemyImageBase64');
 
                 // Initialize turn order and current turn index
@@ -286,7 +297,7 @@ class BattleScene extends Phaser.Scene {
         this.add.graphics().lineStyle(2, 0xff0000).strokeRect(440, 90, 200, 75);
 
         // Add border around action buttons
-        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(90, window.innerHeight - 150, 750, 100); // Adjusted width for more options
+        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(90, window.innerHeight - 150, 900, 100); // Adjusted width for more options
 
         // Initially hide the action buttons and box
         this.actions.children.each(action => action.setVisible(false));
@@ -470,7 +481,8 @@ class BattleScene extends Phaser.Scene {
         if (this.elementButtons) {
             this.elementButtons.clear(true, true);
         }
-        this.actionBox.setSize(750, 100); // Ensure the action box is the correct size
+        this.actionBox.clear(); // Ensure the action box is the correct size
+        this.actionBox.lineStyle(2, 0xffff00).strokeRect(90, window.innerHeight - 150, 900, 100); // Re-draw the action box
     }
 
     enemyAction() {
@@ -927,12 +939,10 @@ async function generateEnemyImage(newsArticle, setting) {
 
 function spawnEnemies(scene) {
     if (newsData.length > 0) {
-        scene.textures.addBase64('enemyImageBase64', enemyImageBase64);
-        scene.textures.addBase64('npcBase64image', npcBase64image);
         for (let i = 0; i < 3; i++) {
             let x = Phaser.Math.Between(50, window.innerWidth - 50);
             let y = Phaser.Math.Between(50, window.innerHeight - 50);
-            let enemy = scene.enemies.create(x, y, 'enemyImageBase64');
+            let enemy = scene.enemies.create(x, y, 'enemy');
             enemy.setCollideWorldBounds(true);
         }
         scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
@@ -943,6 +953,9 @@ function spawnEnemies(scene) {
 }
 
 async function fetchNews() {
+    const loadingMessage = document.getElementById('loading');
+    loadingMessage.style.display = 'block';
+
     try {
         const apiUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
         const newsEndpoint = '/test';
@@ -970,9 +983,11 @@ async function fetchNews() {
 
         newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
         let generatedAIResponses = await generateAIResponses();
+        loadingMessage.style.display = 'none';
         return generatedAIResponses;
     } catch (error) {
         console.error('Error fetching news:', error);
+        loadingMessage.style.display = 'none'; // Hide loading text in case of error
         return [];
     }
 }
@@ -992,7 +1007,6 @@ async function generateAIResponses() {
 
     for (let i = 0; i < newsData.length; i++) {
         const news = newsData[i];
-
         var prompt = `Describe in 10-20 words a fictional version of following news article with no likeness to real people or brand names:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
 
         try {
@@ -1055,6 +1069,7 @@ async function generateAIResponses() {
                             if (parsedBody && parsedBody.base64_image) {
                                 const base64string = `data:image/png;base64,${parsedBody.base64_image}`;
                                 responses.push({ response: monsterDescription, persona: persona, imageBase64: base64string });
+                                npcBase64image = base64string; // Cache player image correctly
                             } else {
                                 throw new Error('No image generated');
                             }
