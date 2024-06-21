@@ -460,11 +460,7 @@ class BattleScene extends Phaser.Scene {
     }
 
     enemyAction() {
-        console.log('enemyAction...');
         const performEnemyAction = () => {
-            console.log('performEnemyAction...');
-            console.log('performEnemyAction... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
-            console.log('performEnemyAction... this.isCooldown: ', this.isCooldown);
             if (this.turnOrder[this.currentTurnIndex].name === 'Enemy' && !this.isCooldown) {
                 let damage = 0;
                 let critical = false;
@@ -475,10 +471,8 @@ class BattleScene extends Phaser.Scene {
     
                 // Determine if there's an element or physical attack that hasn't been tried yet
                 const elements = Object.keys(this.enemy.triedElements);
-                console.log('performEnemyAction... elements: ', elements);
                 let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
     
-                console.log('performEnemyAction... untriedElement: ', untriedElement);
                 if (untriedElement) {
                     if (untriedElement === 'physical') {
                         actionType = 'physical';
@@ -490,7 +484,6 @@ class BattleScene extends Phaser.Scene {
                 } else {
                     // Determine the best attack based on the highest damage dealt so far
                     for (const [element, dmg] of Object.entries(this.enemy.learnedElementalWeaknesses)) {
-                        console.log(`Checking damage for element ${element}: ${dmg}`);
                         if (dmg > highestDamage) {
                             highestDamage = dmg;
                             bestElement = element;
@@ -505,8 +498,6 @@ class BattleScene extends Phaser.Scene {
                     }
                 }
     
-                console.log('performEnemyAction... actionType: ', actionType);
-                console.log('performEnemyAction... action: ', action);
                 if (actionType === 'physical') {
                     damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                     this.showDamageIndicator(this.player.sprite, damage, critical);
@@ -559,14 +550,12 @@ class BattleScene extends Phaser.Scene {
                     this.enemy.isDefending = true; // Temporary defense boost
                     this.helpText.setText('Enemy defends, boosting defense for this turn.');
                 }
-                console.log('performEnemyAction... damage: ', damage);
     
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
                 this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
                 this.startCooldown();
             } else {
-                console.log('Delaying Call to performEnemyAction...');
                 this.time.delayedCall(200, performEnemyAction, [], this);
             }
         };
@@ -708,9 +697,6 @@ class BattleScene extends Phaser.Scene {
     }
 
     nextTurn() {
-        console.log('nextTurn... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
-        console.log('nextTurn... this.player.isDefending: ', this.player.isDefending);
-        console.log('nextTurn... this.enemy.isDefending: ', this.enemy.isDefending);
         if (this.turnOrder[this.currentTurnIndex].name === 'Player' && this.player.isDefending) {
             this.player.def /= 2; // Reset defense boost after turn
             this.player.isDefending = false;
@@ -723,17 +709,13 @@ class BattleScene extends Phaser.Scene {
         // Move to the next character's turn
         this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
         const currentCharacter = this.turnOrder[this.currentTurnIndex].name === 'Player' ? this.player : this.enemy;
-        console.log('nextTurn... currentCharacter: ', currentCharacter);
     
         if (this.isCharacterFrozenOrStunned(currentCharacter)) {
-            console.log('nextTurn... Before Stun this.currentTurnIndex: ', this.currentTurnIndex);
             this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
-            console.log('nextTurn... After Stun this.currentTurnIndex: ', this.currentTurnIndex);
         }
     
         this.handleStatusEffects();
     
-        console.log('nextTurn... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
         if (this.turnOrder[this.currentTurnIndex].name === 'Player') {
             this.showPlayerActions();
         } else {
@@ -744,14 +726,12 @@ class BattleScene extends Phaser.Scene {
     }
     
     isCharacterFrozenOrStunned(character) {
-        console.log('isCharacterFrozenOrStunned... character: ', character);
     
         const frozenStatus = character.statusEffects.find(effect => effect.type === 'Freeze');
         const stunnedStatus = character.statusEffects.find(effect => effect.type === 'Stun');
     
         if (frozenStatus) {
             frozenStatus.turns--;
-            console.log('isCharacterFrozenOrStunned... frozenStatus.turns: ', frozenStatus.turns);
             if (frozenStatus.turns <= 0) {
                 character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Freeze');
                 return false;
@@ -762,7 +742,6 @@ class BattleScene extends Phaser.Scene {
     
         if (stunnedStatus) {
             stunnedStatus.turns--;
-            console.log('isCharacterFrozenOrStunned... stunnedStatus.turns: ', stunnedStatus.turns);
             if (stunnedStatus.turns <= 0) {
                 character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Stun');
                 return false;
@@ -771,7 +750,6 @@ class BattleScene extends Phaser.Scene {
             return true;
         }
     
-        console.log('isCharacterFrozenOrStunned... FREE!');
         return false;
     }
     
