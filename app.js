@@ -522,7 +522,7 @@ class BattleScene extends Phaser.Scene {
                 let action;
                 let highestDamage = 0;
                 let bestElement = 'physical';
-    
+
                 // Periodically reset tried attacks and skills
                 if (this.enemy.triedElements.resetCounter === undefined || this.enemy.triedElements.resetCounter >= 5) {
                     this.enemy.triedElements = {
@@ -535,11 +535,11 @@ class BattleScene extends Phaser.Scene {
                         resetCounter: 0
                     };
                 }
-    
+
                 // Determine if there's an element, physical attack, or skill that hasn't been tried yet
                 const elements = Object.keys(this.enemy.triedElements).filter(e => e !== 'resetCounter' && e !== 'skills');
                 let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
-    
+
                 if (!untriedElement && this.enemy.actions.skills.length > 0) {
                     const untriedSkill = this.enemy.actions.skills.find(skill => !this.enemy.triedElements.skills.includes(skill));
                     if (untriedSkill) {
@@ -547,7 +547,7 @@ class BattleScene extends Phaser.Scene {
                         action = untriedSkill;
                     }
                 }
-    
+
                 if (!untriedElement && actionType !== 'skills') {
                     // Determine the best attack based on the highest damage dealt so far
                     for (const [element, dmg] of Object.entries(this.enemy.learnedElementalWeaknesses)) {
@@ -573,7 +573,7 @@ class BattleScene extends Phaser.Scene {
                         action = `${untriedElement.charAt(0).toUpperCase() + untriedElement.slice(1)} Magic Attack`;
                     }
                 }
-    
+
                 console.log('performEnemyAction... actionType: ', actionType);
                 console.log('performEnemyAction... action: ', action);
                 if (actionType === 'physical') {
@@ -585,13 +585,13 @@ class BattleScene extends Phaser.Scene {
                     this.enemy.triedElements.physical = true; // Mark physical attack as tried
                 } else if (actionType === 'magic') {
                     const elementType = action.split(' ')[0].toLowerCase();
-    
+
                     if (this.enemy.mana >= 10) {
                         damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.luk);
                         this.enemy.mana -= 10;
                         this.helpText.setText(`Enemy uses ${elementType.charAt(0).toUpperCase() + elementType.slice(1)} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                         this.playMagicAttackAnimation(this.enemy.sprite, this.player.sprite, elementType, damage, critical, this.player.element[elementType]);
-    
+
                         // Learn about player's elemental weaknesses
                         this.enemy.learnedElementalWeaknesses[elementType] = Math.max(this.enemy.learnedElementalWeaknesses[elementType], damage);
                         this.enemy.triedElements[elementType] = true; // Mark this element as tried
@@ -613,8 +613,10 @@ class BattleScene extends Phaser.Scene {
                             break;
                         }
                     }
-    
+
                     if (skillToUse) {
+                        this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                        this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                         this.applyStatusEffect('Enemy', 'Player', skillToUse);
                         this.enemy.triedElements.skills.push(skillToUse); // Mark skill as tried
                     } else {
@@ -645,7 +647,7 @@ class BattleScene extends Phaser.Scene {
                     this.helpText.setText('Enemy defends, boosting defense for this turn.');
                 }
                 console.log('performEnemyAction... damage: ', damage);
-    
+
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
                 this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
@@ -657,26 +659,28 @@ class BattleScene extends Phaser.Scene {
         };
         performEnemyAction();
     }
-        
+
     applyStatusEffect(caster, target, statusEffect) {
-        let targetCharacter = target === 'Player' ? this.player : this.enemy;
-        let casterCharacter = caster === 'Player' ? this.player : this.enemy;
+        this.time.delayedCall(150, () => {  // Delay of 1 second for a more natural response
+            let targetCharacter = target === 'Player' ? this.player : this.enemy;
+            let casterCharacter = caster === 'Player' ? this.player : this.enemy;
 
-        if (targetCharacter.immunities.includes(statusEffect)) {
-            this.helpText.setText(`${targetCharacter.name} is immune to ${statusEffect}!`);
-            if (caster === 'Enemy') {
-                this.enemy.learnedStatusImmunities[statusEffect] = true;
+            if (targetCharacter.immunities.includes(statusEffect)) {
+                this.helpText.setText(`${targetCharacter.name} is immune to ${statusEffect}!`);
+                if (caster === 'Enemy') {
+                    this.enemy.learnedStatusImmunities[statusEffect] = true;
+                }
+            } else if (!targetCharacter.statusEffects.find(effect => effect.type === statusEffect)) {
+                let turns = statusEffect === 'Stun' || statusEffect === 'Freeze' ? 5 : -1; // -1 means it doesn't expire automatically
+                targetCharacter.statusEffects.push({ type: statusEffect, turns });
+                this.helpText.setText(`${targetCharacter.name} is now affected by ${statusEffect}!`);
+            } else {
+                this.helpText.setText(`${targetCharacter.name} is already affected by ${statusEffect}.`);
             }
-        } else if (!targetCharacter.statusEffects.find(effect => effect.type === statusEffect)) {
-            let turns = statusEffect === 'Stun' || statusEffect === 'Freeze' ? 5 : -1; // -1 means it doesn't expire automatically
-            targetCharacter.statusEffects.push({ type: statusEffect, turns });
-            this.helpText.setText(`${targetCharacter.name} is now affected by ${statusEffect}!`);
-        } else {
-            this.helpText.setText(`${targetCharacter.name} is already affected by ${statusEffect}.`);
-        }
 
-        this.updateStatusIndicators(targetCharacter);
-        this.startCooldown();
+            this.updateStatusIndicators(targetCharacter);
+            this.startCooldown();
+        }, [], this);
     }
 
     updateStatusIndicators(character) {
@@ -711,7 +715,7 @@ class BattleScene extends Phaser.Scene {
                     displayText.destroy();
                 }
             });
-} else if (critical) {
+        } else if (critical) {
             delaytime = 500;
             fontColor = '#f0d735'
             const displayText = this.add.text(target.x, target.y - 50, 'CRITICAL', { fontSize: '50px', fill: fontColor, fontStyle: 'bold' });
@@ -891,18 +895,19 @@ class BattleScene extends Phaser.Scene {
             x: defender.x - 50,
             duration: 300,
             yoyo: true,
-            ease: 'Power1',
-            onComplete: () => {
-                this.tweens.add({
-                    targets: defender,
-                    angle: { from: -5, to: 5 },
-                    duration: 100,
-                    yoyo: true,
-                    repeat: 5,
-                    ease: 'Sine.easeInOut'
-                });
-            }
+            ease: 'Power1'
         });
+
+        this.time.delayedCall(150, () => {
+            this.tweens.add({
+                targets: defender,
+                angle: { from: -5, to: 5 },
+                duration: 50,
+                yoyo: true,
+                repeat: 5,
+                ease: 'Sine.easeInOut'
+            });
+        }, [], this);
     }
 
     playMagicAttackAnimation(attacker, defender, elementType, damage, critical, elementValue) {
