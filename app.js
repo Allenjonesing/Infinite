@@ -158,7 +158,7 @@ class BattleScene extends Phaser.Scene {
             luk: playerStats.luk,
             wis: playerStats.wis,
             sprite: null,
-            actions: ['Attack', 'Defend', 'Magic Attack'],
+            actions: ['Attack', 'Defend', 'Magic Attack', 'Skills'],
             element: playerStats.element,
             statusEffects: [],
             immunities: playerStats.immunities || []
@@ -179,7 +179,7 @@ class BattleScene extends Phaser.Scene {
             luk: enemyStats.luk,
             wis: enemyStats.wis,
             sprite: null,
-            actions: ['Attack', 'Defend', 'Magic Attack'],
+            actions: ['Attack', 'Defend', 'Magic Attack', 'Skills'],
             element: enemyStats.element, // Example element multipliers
             learnedElementalWeaknesses: {
                 fire: 0,
@@ -420,7 +420,11 @@ class BattleScene extends Phaser.Scene {
     }
 
     enemyAction() {
+        console.log('enemyAction...');
         const performEnemyAction = () => {
+            console.log('performEnemyAction...');
+            console.log('performEnemyAction... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
+            console.log('performEnemyAction... this.isCooldown: ', this.isCooldown);
             if (this.turnOrder[this.currentTurnIndex].name === 'Enemy' && !this.isCooldown) {
                 let damage = 0;
                 let critical = false;
@@ -430,8 +434,10 @@ class BattleScene extends Phaser.Scene {
 
                 // Determine if there's an element or physical attack that hasn't been tried yet
                 const elements = Object.keys(this.enemy.triedElements);
+                console.log('performEnemyAction... elements: ', elements);
                 let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
 
+                console.log('performEnemyAction... untriedElement: ', untriedElement);
                 if (untriedElement) {
                     if (untriedElement === 'physical') {
                         action = 'Attack';
@@ -451,6 +457,7 @@ class BattleScene extends Phaser.Scene {
                     action = bestElement === 'physical' ? 'Attack' : 'Magic Attack';
                 }
 
+                console.log('performEnemyAction... action: ', action);
                 if (action === 'Attack') {
                     damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                     this.showDamageIndicator(this.player.sprite, damage, critical);
@@ -503,12 +510,14 @@ class BattleScene extends Phaser.Scene {
                     this.enemy.isDefending = true; // Temporary defense boost
                     this.helpText.setText('Enemy defends, boosting defense for this turn.');
                 }
+                console.log('performEnemyAction... damage: ', damage);
 
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
                 this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
                 this.startCooldown();
             } else {
+                console.log('Delating Call to performEnemyAction...');
                 this.time.delayedCall(200, performEnemyAction, [], this);
             }
         };
@@ -731,7 +740,6 @@ class BattleScene extends Phaser.Scene {
     showPlayerActions() {
         this.actions.children.each(action => action.setVisible(true));
         this.actionBox.setVisible(true);
-        this.helpText.setText('Your turn! Choose your action wisely.');
     }
 
     hidePlayerActions() {
