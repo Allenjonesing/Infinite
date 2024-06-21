@@ -38,14 +38,14 @@ class ExplorationScene extends Phaser.Scene {
         // Display news information
         this.displayNewsInfo(newsData[0], persona);
 
-        //Prep Base64 images
-        this.PrepBase64Images();
+        // Prep Base64 images
+        this.prepBase64Images();
 
         // Spawn enemies after data is ready
         spawnEnemies(this);
     }
 
-    PrepBase64Images() {
+    prepBase64Images() {
         if (enemyImageBase64 && npcBase64image) {
             this.textures.addBase64('enemyImageBase64', enemyImageBase64);
             this.textures.addBase64('npcBase64image', npcBase64image);
