@@ -1029,9 +1029,11 @@ async function generateEnemyImage(newsArticle, setting) {
         if (parsedBody && parsedBody.base64_image) {
             return `data:image/png;base64,${parsedBody.base64_image}`;
         } else {
+            location.reload();
             throw new Error('No image generated');
         }
     } catch (error) {
+        location.reload();
         console.error('Error generating enemy image:', error);
         throw new Error('No image generated');
     }
@@ -1048,6 +1050,7 @@ function spawnEnemies(scene) {
         scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
         scene.physics.add.collider(scene.enemies, scene.enemies);
     } else {
+        location.reload();
         console.error('No news data available to generate enemies');
     }
 }
@@ -1059,22 +1062,26 @@ async function fetchNews() {
         const response = await fetch(apiUrl + newsEndpoint);
 
         if (!response.ok) {
+            location.reload();
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const jsonData = await response.json();
 
         if (!jsonData) {
+            location.reload();
             throw new Error('No Data gathered!');
         }
 
         const bodyData = JSON.parse(jsonData.body);
 
         if (!bodyData) {
+            location.reload();
             throw new Error('No body found in the response!');
         }
 
         if (!bodyData.articles) {
+            location.reload();
             throw new Error('No articles found in the body!');
         }
 
@@ -1082,6 +1089,7 @@ async function fetchNews() {
         let generatedAIResponses = await generateAIResponses();
         return generatedAIResponses;
     } catch (error) {
+        location.reload();
         console.error('Error fetching news:', error);
         return [];
     }
