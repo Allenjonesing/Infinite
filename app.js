@@ -518,19 +518,19 @@ class BattleScene extends Phaser.Scene {
         let criticalChance = luk / 100;
         let critical = Math.random() < criticalChance;
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
-
+    
         let baseDamage;
         if (critical) {
             baseDamage = Math.floor((2 * magAtk) * variance)
         } else {
             baseDamage = Math.floor((2 * magAtk - magDef) * variance);
         }
-
+    
         baseDamage *= defenderElement;
-
+        
         return Math.floor(baseDamage); // Allow negative values for potential healing
     }
-
+    
     startCooldown() {
         this.isCooldown = true;
 
