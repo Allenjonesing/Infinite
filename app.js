@@ -393,6 +393,7 @@ class BattleScene extends Phaser.Scene {
         });
     }
     
+    
     handlePlayerAction(action, elementType = null) {
         this.hideSubOptions(); // Ensure sub-options are hidden when a main action is chosen
     
@@ -973,7 +974,7 @@ class BattleScene extends Phaser.Scene {
             particles.destroy();
         });
     }
-}
+    }
 
 const config = {
     type: Phaser.AUTO,
