@@ -281,29 +281,38 @@ class BattleScene extends Phaser.Scene {
     }
 
     createUI() {
+        const textPadding = 20;
+        const actionButtonWidth = (this.scale.width - (2 * textPadding)) / 5; // Assuming 5 action buttons
+
         // Help text at the top
-        this.helpText = this.add.text(20, 20, 'A battle has begun...', { fontSize: '18px', fill: '#fff' });
+        this.helpText = this.add.text(textPadding, textPadding, 'A battle has begun...', { fontSize: '14px', fill: '#fff' });
 
         // Player health and mana
-        this.playerHealthText = this.add.text(50, 100, `Health: ${this.player.health}`, { fontSize: '20px', fill: '#fff' });
-        this.playerManaText = this.add.text(50, 130, `Mana: ${this.player.mana}`, { fontSize: '20px', fill: '#fff' });
+        this.playerHealthText = this.add.text(textPadding, 100, `Health: ${this.player.health}`, { fontSize: '16px', fill: '#fff' });
+        this.playerManaText = this.add.text(textPadding, 130, `Mana: ${this.player.mana}`, { fontSize: '16px', fill: '#fff' });
 
         // Enemy health and mana
-        this.enemyHealthText = this.add.text(450, 100, `Health: ${this.enemy.health}`, { fontSize: '20px', fill: '#fff' });
-        this.enemyManaText = this.add.text(450, 130, `Mana: ${this.enemy.mana}`, { fontSize: '20px', fill: '#fff' });
+        this.enemyHealthText = this.add.text(this.scale.width - 250, 100, `Health: ${this.enemy.health}`, { fontSize: '16px', fill: '#fff' });
+        this.enemyManaText = this.add.text(this.scale.width - 250, 130, `Mana: ${this.enemy.mana}`, { fontSize: '16px', fill: '#fff' });
 
         // Turn order list
-        this.turnOrderText = this.add.text(675, 80, 'Turn List', { fontSize: '20px', fill: '#fff' });
+        this.turnOrderText = this.add.text(this.scale.width / 2, 80, 'Turn List', { fontSize: '16px', fill: '#fff' }).setOrigin(0.5);
         this.updateTurnOrderDisplay();
 
         // Action buttons at the bottom
         this.actions = this.add.group();
         const actionNames = ['Attack', 'Defend', 'Magic Attack', 'Skills', 'Heal'];
-        const actionWidth = window.innerWidth / actionNames.length;
-        for (let i = 0; i < actionNames.length; i++) {
-            let actionText = this.add.text(i * actionWidth + actionWidth / 2, window.innerHeight - 50, actionNames[i], { fontSize: '40px', fill: '#fff', backgroundColor: '#000', padding: { left: 20, right: 20, top: 10, bottom: 10 } });
+
+        actionNames.forEach((actionName, index) => {
+            const x = textPadding + index * actionButtonWidth + actionButtonWidth / 2;
+            let actionText = this.add.text(x, this.scale.height - 50, actionName, {
+                fontSize: '20px',
+                fill: '#fff',
+                backgroundColor: '#000',
+                padding: { left: 20, right: 20, top: 10, bottom: 10 }
+            });
             actionText.setInteractive();
-            actionText.on('pointerdown', () => this.handlePlayerAction(actionNames[i]));
+            actionText.on('pointerdown', () => this.handlePlayerAction(actionName));
             actionText.setOrigin(0.5);
             this.actions.add(actionText);
 
@@ -317,18 +326,14 @@ class BattleScene extends Phaser.Scene {
                 repeat: -1,
                 ease: 'Power1'
             });
-        }
+        });
 
         // Add borders around health and mana areas
-        this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(40, 90, 200, 75);
-        this.add.graphics().lineStyle(2, 0xff0000).strokeRect(440, 90, 200, 75);
+        this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(textPadding - 10, 90, 200, 75);
+        this.add.graphics().lineStyle(2, 0xff0000).strokeRect(this.scale.width - 260, 90, 200, 75);
 
         // Add border around action buttons
-        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(90, window.innerHeight - 150, 800, 200); // Adjusted width for more options
-
-        // Initially hide the action buttons and box
-        this.actions.children.each(action => action.setVisible(false));
-        this.actionBox.setVisible(false);
+        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(textPadding, this.scale.height - 150, this.scale.width - (2 * textPadding), 100);
     }
 
     chooseElement() {
@@ -993,8 +998,10 @@ const config = {
     scale: {
         mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: window.innerWidth,
-        height: window.innerHeight
+        parent: 'phaser-game',
+        width: '100%',
+        height: '100%',
+        fullscreenTarget: 'phaser-game'
     },
     scene: [ExplorationScene, BattleScene],
     physics: {
@@ -1009,19 +1016,7 @@ const config = {
 const game = new Phaser.Game(config);
 
 window.addEventListener('resize', () => {
-    const newWidth = window.innerWidth;
-    const newHeight = window.innerHeight;
-
-    game.scale.resize(newWidth, newHeight);
-    game.scene.scenes.forEach(scene => {
-        scene.scale.resize(newWidth, newHeight);
-        scene.children.list.forEach(child => {
-            if (child.isText) {
-                // Adjust font size or reposition texts if needed
-                child.setFontSize(newHeight / 25); // Example adjustment
-            }
-        });
-    });
+    game.scale.resize(window.innerWidth, window.innerHeight);
 });
 
 async function generateEnemyImage(newsArticle, setting) {
