@@ -216,6 +216,7 @@ class BattleScene extends Phaser.Scene {
                 this.createUI();
 
                 // Check whose turn it is and start the action immediately if it's the enemy's turn
+                console.log('create... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
                 if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
                     this.enemyAction();
                 } else {
@@ -676,6 +677,7 @@ class BattleScene extends Phaser.Scene {
 
         this.handleStatusEffects();
 
+        console.log('nextTurn... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
         if (this.turnOrder[this.currentTurnIndex].name === 'Player') {
             this.showPlayerActions();
         } else {
