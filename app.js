@@ -17,24 +17,82 @@ class ExplorationScene extends Phaser.Scene {
     }
 
     preload() {
+        this.load.image('enemy', 'assets/enemy.png');
         this.load.image('player', 'assets/player.png');
         this.load.image('tree', 'assets/tree.png');
         this.load.image('npc', 'assets/npc.png');
     }
 
-    async create() {
-        // Create player
-        this.player = this.physics.add.sprite(400, 300, 'player');
-        this.player.setCollideWorldBounds(true);
+    async create(data) {
+        if (data.player) {
+            this.player = this.physics.add.sprite(data.player.x, data.player.y, 'player');
+            Object.assign(this.player, data.player); // Preserve player data
+        } else {
+            // Create player
+            this.player = this.physics.add.sprite(400, 300, 'player');
+            this.player.setCollideWorldBounds(true);
 
-        // Create NPCs
-        this.npcs = this.physics.add.group({ immovable: true });
-        for (let i = 0; i < 5; i++) {
-            let x = Phaser.Math.Between(50, 750);
-            let y = Phaser.Math.Between(50, 550);
-            this.npcs.create(x, y, 'npc').setCollideWorldBounds(true);
+                    // Initialize player and enemy data
+        const playerStats = await fetchPlayerStats();
+        console.log('create... playerStats: ', playerStats);
+        this.player = {
+            name: 'Player',
+            health: playerStats.health,
+            mana: playerStats.mana,
+            atk: playerStats.atk,
+            def: playerStats.def,
+            spd: playerStats.spd,
+            eva: playerStats.eva,
+            magAtk: playerStats.magAtk,
+            magDef: playerStats.magDef,
+            luk: playerStats.luk,
+            wis: playerStats.wis,
+            sprite: null,
+            actions: ['Attack', 'Defend', 'Magic Attack'],
+            element: playerStats.element // Example element multipliers
+        };
+
         }
 
+// Reinitialize or create NPCs
+if (data.npcs) {
+    this.npcs = this.physics.add.group({ immovable: true });
+    data.npcs.forEach(npcData => {
+        let npc = this.npcs.create(npcData.x, npcData.y, 'npc').setCollideWorldBounds(true);
+        npc.persona = npcData.persona;
+        npc.newsText = npcData.newsText;
+        npc.setInteractive();
+        npc.on('pointerdown', () => {
+            alert(`${npc.persona}: ${npc.response}`);
+        });
+    });
+} else {
+    this.npcs = this.physics.add.group({ immovable: true });
+    for (let i = 0; i < 5; i++) {
+        let x = Phaser.Math.Between(50, 750);
+        let y = Phaser.Math.Between(50, 550);
+        let npc = this.npcs.create(x, y, 'npc').setCollideWorldBounds(true);
+        npc.setInteractive();
+        npc.on('pointerdown', () => {
+            alert(`${npc.persona}: ${npc.response}`);
+        });
+    }
+}
+
+// Reinitialize or create trees
+if (data.trees) {
+    this.trees = this.physics.add.staticGroup();
+    data.trees.forEach(treeData => {
+        this.trees.create(treeData.x, treeData.y, 'tree').setTint(0x00ff00); // Green tint for trees
+    });
+} else {
+    this.trees = this.physics.add.staticGroup();
+    for (let i = 0; i < 10; i++) {
+        let x = Phaser.Math.Between(50, 750);
+        let y = Phaser.Math.Between(50, 550);
+        this.trees.create(x, y, 'tree').setTint(0x00ff00); // Green tint for trees
+    }
+}
         // Initialize enemies group
         this.enemies = this.physics.add.group();
 
@@ -52,9 +110,6 @@ class ExplorationScene extends Phaser.Scene {
         this.physics.add.collider(this.npcs, this.trees);
         this.physics.add.collider(this.npcs, this.npcs);
 
-        // Health HUD
-        healthText = this.add.text(16, 16, 'Health: 100', { fontSize: '32px', fill: '#fff' });
-
         // Input handling
         this.input.on('pointerdown', (pointer) => {
             target = { x: pointer.x, y: pointer.y };
@@ -65,9 +120,10 @@ class ExplorationScene extends Phaser.Scene {
             this.player.body.setVelocity(0, 0);
         });
 
-        // Fetch news data and generate AI responses
-        newsData = await fetchNews();
-
+// Fetch news data and generate AI responses if not already fetched
+if (!this.newsData) {
+    this.newsData = await fetchNews();
+}
         this.npcs.children.iterate((npc, index) => {
             let persona = personas[index % personas.length]; // Cycle through personas
             npc.persona = persona;
@@ -91,11 +147,37 @@ class ExplorationScene extends Phaser.Scene {
         spawnEnemies(this);
     }
 
-    startBattle(player, enemy) {
-        // Transition to the battle scene, passing necessary data
-        this.scene.start('BattleScene', { player: player, enemy: enemy });
-    }
+    startBattle(enemy) {
+        let playerData = {
+            x: this.player.x,
+            y: this.player.y,
+            health: this.player.health,
+            mana: this.player.mana,
+            atk: this.player.atk,
+            def: this.player.def,
+            spd: this.player.spd,
+            eva: this.player.eva,
+            magAtk: this.player.magAtk,
+            magDef: this.player.magDef,
+            luk: this.player.luk,
+            wis: this.player.wis,
+            element: this.player.element
+        };
 
+        let npcsData = this.npcs.getChildren().map(npc => ({
+            x: npc.x,
+            y: npc.y,
+            persona: npc.persona,
+            newsText: npc.newsText
+        }));
+
+        let treesData = this.trees.getChildren().map(tree => ({
+            x: tree.x,
+            y: tree.y
+        }));
+
+        this.scene.start('BattleScene', { player: playerData, enemy: enemy, npcs: npcsData, trees: treesData });
+    }
     update() {
         if (this.input.activePointer.isDown) {
             target = { x: this.input.activePointer.worldX, y: this.input.activePointer.worldY };
@@ -146,25 +228,6 @@ class BattleScene extends Phaser.Scene {
         this.player = data.player;
         this.enemy = data.enemy;
 
-        // Initialize player and enemy data
-        const playerStats = await fetchPlayerStats();
-        console.log('create... playerStats: ', playerStats);
-        this.player = {
-            name: 'Player',
-            health: playerStats.health,
-            mana: playerStats.mana,
-            atk: playerStats.atk,
-            def: playerStats.def,
-            spd: playerStats.spd,
-            eva: playerStats.eva,
-            magAtk: playerStats.magAtk,
-            magDef: playerStats.magDef,
-            luk: playerStats.luk,
-            wis: playerStats.wis,
-            sprite: null,
-            actions: ['Attack', 'Defend', 'Magic Attack'],
-            element: playerStats.element // Example element multipliers
-        };
 
         console.log('create... this.player: ', this.player);
 
@@ -630,7 +693,7 @@ function spawnEnemies(scene) {
         for (let i = 0; i < 3; i++) {
             let x = Phaser.Math.Between(50, 750);
             let y = Phaser.Math.Between(50, 550);
-            let enemy = scene.enemies.create(x, y, 'enemyImageBase64');
+            let enemy = scene.enemies.create(x, y, 'enemy');
             enemy.setCollideWorldBounds(true);
         }
         scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
