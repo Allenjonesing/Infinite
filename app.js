@@ -226,28 +226,24 @@ class BattleScene extends Phaser.Scene {
             }
         }
     }
-
+    
     endBattle(result) {
         battleEnded = true;
         this.time.delayedCall(1000, () => {
 
             if (result === 'win') {
                 // Handle victory logic
-                this.helpText.setText('You Won! Gained 50 Gold, 20 Exp!');
+                this.helpText.setText('You Won! Please wait for the window to reload...');
                 this.enemy.sprite.destroy(); // Remove enemy sprite
-
-                // Grant rewards
-                this.player.gold += 50; // Example reward
-                this.player.exp += 20; // Example reward
             } else {
                 // Handle defeat logic
                 this.helpText.setText('You Lost! Please wait for the window to reload...');
                 this.player.sprite.destroy(); // Remove player sprite
             }
-
+            
             this.time.delayedCall(4000, () => {
                 // Refresh the whole page after the battle ends
-                this.scene.start('ExplorationScene', { player: this.player });
+                location.reload();
             }, [], this);
         }, [], this);
     }
@@ -255,19 +251,19 @@ class BattleScene extends Phaser.Scene {
     createUI() {
         // Help text at the top
         this.helpText = this.add.text(20, 20, 'A battle has begun...', { fontSize: '18px', fill: '#fff' });
-
+    
         // Player health and mana
         this.playerHealthText = this.add.text(50, 100, `Health: ${this.player.health}`, { fontSize: '20px', fill: '#fff' });
         this.playerManaText = this.add.text(50, 130, `Mana: ${this.player.mana}`, { fontSize: '20px', fill: '#fff' });
-
+        
         // Enemy health and mana
         this.enemyHealthText = this.add.text(450, 100, `Health: ${this.enemy.health}`, { fontSize: '20px', fill: '#fff' });
         this.enemyManaText = this.add.text(450, 130, `Mana: ${this.enemy.mana}`, { fontSize: '20px', fill: '#fff' });
-
+    
         // Turn order list
         this.turnOrderText = this.add.text(675, 80, 'Turn List', { fontSize: '20px', fill: '#fff' });
         this.updateTurnOrderDisplay();
-
+    
         // Action buttons at the bottom
         this.actions = this.add.group();
         const actionNames = ['Attack', 'Defend', 'Magic Attack'];
@@ -277,19 +273,19 @@ class BattleScene extends Phaser.Scene {
             actionText.on('pointerdown', () => this.handlePlayerAction(actionNames[i]));
             this.actions.add(actionText);
         }
-
+    
         // Add borders around health and mana areas
         this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(40, 90, 200, 75);
         this.add.graphics().lineStyle(2, 0xff0000).strokeRect(440, 90, 200, 75);
-
+    
         // Add border around action buttons
-        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(190, 490, 520, 80);
-
+        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(190, 490, 520, 60);
+    
         // Initially hide the action buttons and box
         this.actions.children.each(action => action.setVisible(false));
         this.actionBox.setVisible(false);
     }
-
+    
     chooseElement() {
         const elements = ['fire', 'ice', 'water', 'lightning'];
         return elements[Math.floor(Math.random() * elements.length)];
@@ -344,7 +340,7 @@ class BattleScene extends Phaser.Scene {
                 this.showElementSelection();
                 return;
             }
-
+    
             let damage = 0;
             let critical = false;
             if (action === 'Attack') {
@@ -378,11 +374,11 @@ class BattleScene extends Phaser.Scene {
             this.hidePlayerActions();
         }
     }
-
+    
     showElementSelection() {
         const elements = ['fire', 'ice', 'water', 'lightning'];
         this.elementButtons = this.add.group();
-
+    
         for (let i = 0; i < elements.length; i++) {
             let elementText = this.add.text(200 + i * 150, 550, elements[i], { fontSize: '20px', fill: '#fff', backgroundColor: '#000', padding: { left: 10, right: 10, top: 5, bottom: 5 } });
             elementText.setInteractive();
@@ -392,10 +388,10 @@ class BattleScene extends Phaser.Scene {
             });
             this.elementButtons.add(elementText);
         }
-
+    
         this.helpText.setText('Choose an element for your Magic Attack:');
     }
-
+    
     enemyAction() {
         const performEnemyAction = () => {
             console.log('performEnemyAction called');
@@ -419,9 +415,11 @@ class BattleScene extends Phaser.Scene {
                     const elementType = elements[Math.floor(Math.random() * elements.length)];
                     console.log('Enemy element type:', elementType);
                     if (this.enemy.mana >= 10) {
-                        this.enemy.mana -= 10;
                         damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.enemy.element[elementType], this.player.element[elementType], this.enemy.luk, this.player.eva);
                         critical = Math.random() < 0.1;
+                        if (critical) {
+                            damage = this.calculateMagicDamage(this.enemy.magAtk, 0, this.enemy.element[elementType], this.player.element[elementType], this.enemy.luk, this.player.eva);
+                        }
                         this.enemy.mana -= 10;
                         this.helpText.setText(`Enemy uses ${elementType} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                         this.playMagicAttackAnimation(this.enemy.sprite, this.player.sprite, elementType, damage, critical);
@@ -462,30 +460,24 @@ class BattleScene extends Phaser.Scene {
                 damageText.destroy();
             }
         });
-
-        // Play sound effect
-        if (critical) {
-            //this.sound.play('criticalHit');
-        } else {
-            // this.sound.play('hit');
-        }
     }
 
     calculateDamage(atk, def, luk, eva) {
         let criticalChance = luk / 100;
         let critical = Math.random() < criticalChance;
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
-
+        
         let baseDamage;
         if (critical) {
             baseDamage = Math.floor(atk * 4 * variance);
         } else {
             baseDamage = Math.floor((4 * atk - 2 * def) * variance);
         }
-
+    
         baseDamage = Math.max(1, baseDamage); // Ensure minimum damage is 1
         let evaded = Math.random() < (eva * 0.01);
         return evaded ? 0 : baseDamage;
     }
-
-    calculateMagicDamage(magAtk, magDef, attackerElement, defenderEle
+        
+    calculateMagicDamage(magAtk, magDef, attackerElement, defenderElement, luk) {
+        let criticalChance = luk 
