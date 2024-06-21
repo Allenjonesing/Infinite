@@ -17,82 +17,24 @@ class ExplorationScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('enemy', 'assets/enemy.png');
         this.load.image('player', 'assets/player.png');
         this.load.image('tree', 'assets/tree.png');
         this.load.image('npc', 'assets/npc.png');
     }
 
-    async create(data) {
-        if (data.player) {
-            this.player = this.physics.add.sprite(data.player.x, data.player.y, 'player');
-            Object.assign(this.player, data.player); // Preserve player data
-        } else {
-            // Create player
-            this.player = this.physics.add.sprite(400, 300, 'player');
-            this.player.setCollideWorldBounds(true);
+    async create() {
+        // Create player
+        this.player = this.physics.add.sprite(400, 300, 'player');
+        this.player.setCollideWorldBounds(true);
 
-            // Initialize player and enemy data
-            const playerStats = await fetchPlayerStats();
-            console.log('create... playerStats: ', playerStats);
-            this.player = {
-                name: 'Player',
-                health: playerStats.health,
-                mana: playerStats.mana,
-                atk: playerStats.atk,
-                def: playerStats.def,
-                spd: playerStats.spd,
-                eva: playerStats.eva,
-                magAtk: playerStats.magAtk,
-                magDef: playerStats.magDef,
-                luk: playerStats.luk,
-                wis: playerStats.wis,
-                sprite: null,
-                actions: ['Attack', 'Defend', 'Magic Attack'],
-                element: playerStats.element // Example element multipliers
-            };
-
+        // Create NPCs
+        this.npcs = this.physics.add.group({ immovable: true });
+        for (let i = 0; i < 5; i++) {
+            let x = Phaser.Math.Between(50, 750);
+            let y = Phaser.Math.Between(50, 550);
+            this.npcs.create(x, y, 'npc').setCollideWorldBounds(true);
         }
 
-        // Reinitialize or create NPCs
-        if (data.npcs) {
-            this.npcs = this.physics.add.group({ immovable: true });
-            data.npcs.forEach(npcData => {
-                let npc = this.npcs.create(npcData.x, npcData.y, 'npc').setCollideWorldBounds(true);
-                npc.persona = npcData.persona;
-                npc.newsText = npcData.newsText;
-                npc.setInteractive();
-                npc.on('pointerdown', () => {
-                    alert(`${npc.persona}: ${npc.response}`);
-                });
-            });
-        } else {
-            this.npcs = this.physics.add.group({ immovable: true });
-            for (let i = 0; i < 5; i++) {
-                let x = Phaser.Math.Between(50, 750);
-                let y = Phaser.Math.Between(50, 550);
-                let npc = this.npcs.create(x, y, 'npc').setCollideWorldBounds(true);
-                npc.setInteractive();
-                npc.on('pointerdown', () => {
-                    alert(`${npc.persona}: ${npc.response}`);
-                });
-            }
-        }
-
-        // Reinitialize or create trees
-        if (data.trees) {
-            this.trees = this.physics.add.staticGroup();
-            data.trees.forEach(treeData => {
-                this.trees.create(treeData.x, treeData.y, 'tree').setTint(0x00ff00); // Green tint for trees
-            });
-        } else {
-            this.trees = this.physics.add.staticGroup();
-            for (let i = 0; i < 10; i++) {
-                let x = Phaser.Math.Between(50, 750);
-                let y = Phaser.Math.Between(50, 550);
-                this.trees.create(x, y, 'tree').setTint(0x00ff00); // Green tint for trees
-            }
-        }
         // Initialize enemies group
         this.enemies = this.physics.add.group();
 
@@ -110,6 +52,9 @@ class ExplorationScene extends Phaser.Scene {
         this.physics.add.collider(this.npcs, this.trees);
         this.physics.add.collider(this.npcs, this.npcs);
 
+        // Health HUD
+        healthText = this.add.text(16, 16, 'Health: 100', { fontSize: '32px', fill: '#fff' });
+
         // Input handling
         this.input.on('pointerdown', (pointer) => {
             target = { x: pointer.x, y: pointer.y };
@@ -120,10 +65,9 @@ class ExplorationScene extends Phaser.Scene {
             this.player.body.setVelocity(0, 0);
         });
 
-        // Fetch news data and generate AI responses if not already fetched
-        if (!this.newsData) {
-            this.newsData = await fetchNews();
-        }
+        // Fetch news data and generate AI responses
+        newsData = await fetchNews();
+
         this.npcs.children.iterate((npc, index) => {
             let persona = personas[index % personas.length]; // Cycle through personas
             npc.persona = persona;
@@ -147,37 +91,11 @@ class ExplorationScene extends Phaser.Scene {
         spawnEnemies(this);
     }
 
-    startBattle(enemy) {
-        let playerData = {
-            x: this.player.x,
-            y: this.player.y,
-            health: this.player.health,
-            mana: this.player.mana,
-            atk: this.player.atk,
-            def: this.player.def,
-            spd: this.player.spd,
-            eva: this.player.eva,
-            magAtk: this.player.magAtk,
-            magDef: this.player.magDef,
-            luk: this.player.luk,
-            wis: this.player.wis,
-            element: this.player.element
-        };
-
-        let npcsData = this.npcs.getChildren().map(npc => ({
-            x: npc.x,
-            y: npc.y,
-            persona: npc.persona,
-            newsText: npc.newsText
-        }));
-
-        let treesData = this.trees.getChildren().map(tree => ({
-            x: tree.x,
-            y: tree.y
-        }));
-
-        this.scene.start('BattleScene', { player: playerData, enemy: enemy, npcs: npcsData, trees: treesData });
+    startBattle(player, enemy) {
+        // Transition to the battle scene, passing necessary data
+        this.scene.start('BattleScene', { player: player, enemy: enemy });
     }
+
     update() {
         if (this.input.activePointer.isDown) {
             target = { x: this.input.activePointer.worldX, y: this.input.activePointer.worldY };
@@ -228,6 +146,25 @@ class BattleScene extends Phaser.Scene {
         this.player = data.player;
         this.enemy = data.enemy;
 
+        // Initialize player and enemy data
+        const playerStats = await fetchPlayerStats();
+        console.log('create... playerStats: ', playerStats);
+        this.player = {
+            name: 'Player',
+            health: playerStats.health,
+            mana: playerStats.mana,
+            atk: playerStats.atk,
+            def: playerStats.def,
+            spd: playerStats.spd,
+            eva: playerStats.eva,
+            magAtk: playerStats.magAtk,
+            magDef: playerStats.magDef,
+            luk: playerStats.luk,
+            wis: playerStats.wis,
+            sprite: null,
+            actions: ['Attack', 'Defend', 'Magic Attack'],
+            element: playerStats.element // Example element multipliers
+        };
 
         console.log('create... this.player: ', this.player);
 
@@ -551,446 +488,4 @@ class BattleScene extends Phaser.Scene {
         return evaded ? 0 : baseDamage;
     }
 
-    calculateMagicDamage(magAtk, magDef, attackerElement, defenderElement, luk) {
-        let criticalChance = luk / 100;
-        let critical = Math.random() < criticalChance;
-        let variance = Phaser.Math.FloatBetween(0.9, 1.1);
-
-        // Treat negative attackerElement as 0
-        attackerElement = Math.max(0, attackerElement);
-
-        let baseDamage;
-        if (critical) {
-            baseDamage = Math.floor((2 * magAtk) * variance)
-        } else {
-            baseDamage = Math.floor((2 * magAtk - magDef) * variance);
-        }
-
-        baseDamage *= attackerElement * defenderElement;
-
-        return Math.floor(baseDamage); // Allow negative values for potential healing
-    }
-
-    startCooldown() {
-        this.isCooldown = true;
-
-        this.time.delayedCall(1000, () => {  // Delay of 1 second for a more natural response
-            this.isCooldown = false;
-            this.nextTurn();
-            this.updateTurnOrderDisplay();  // Ensure UI updates immediately after turn change
-        }, [], this);
-    }
-
-    nextTurn() {
-        console.log('nextTurn...');
-        if (this.turnOrder[this.currentTurnIndex].name === 'Player' && this.player.isDefending) {
-            this.player.def /= 2; // Reset defense boost after turn
-            this.player.isDefending = false;
-        }
-        if (this.turnOrder[this.currentTurnIndex].name === 'Enemy' && this.enemy.isDefending) {
-            this.enemy.def /= 2; // Reset defense boost after turn
-            this.enemy.isDefending = false;
-        }
-
-        this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
-
-        if (this.turnOrder[this.currentTurnIndex].name === 'Player') {
-            this.showPlayerActions();
-        } else {
-            this.hidePlayerActions();
-            this.enemyAction();
-        }
-        this.updateTurnOrderDisplay();
-    }
-
-    showPlayerActions() {
-        this.actions.children.each(action => action.setVisible(true));
-        this.actionBox.setVisible(true);
-        this.helpText.setText('Your turn! Choose your action wisely.');
-    }
-
-    hidePlayerActions() {
-        this.actions.children.each(action => action.setVisible(false));
-        this.actionBox.setVisible(false);
-    }
-
-    playAttackAnimation(attacker, defender) {
-        this.tweens.add({
-            targets: attacker,
-            x: defender.x - 50,
-            duration: 300,
-            yoyo: true,
-            ease: 'Power1'
-        });
-    }
-
-    playMagicAttackAnimation(attacker, defender, elementType, damage, critical) {
-        let color;
-        switch (elementType) {
-            case 'fire':
-                color = 0xff4500; // Orange
-                break;
-            case 'ice':
-                color = 0x00ffff; // Cyan
-                break;
-            case 'water':
-                color = 0x1e90ff; // DodgerBlue
-                break;
-            case 'lightning':
-                color = 0xffff00; // Yellow
-                break;
-            default:
-                color = 0xffffff; // Default to white
-                break;
-        }
-
-        let magicBall = this.add.circle(attacker.x, attacker.y, 30, color);
-        this.physics.add.existing(magicBall);
-        this.physics.moveTo(magicBall, defender.x > 400 ? defender.x + 200 : defender.x, defender.y, 500);
-
-        this.time.delayedCall(750, () => {
-            magicBall.destroy();
-            this.showDamageIndicator(defender, damage, critical);
-        });
-    }
-
-}
-
-async function generateEnemyImage(newsArticle, setting) {
-    const prompt = `Generate an image of an enemy based on the following description:${monsterDescription}`;
-    const encodedPrompt = encodeURIComponent(prompt);
-
-    try {
-        const imageResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodedPrompt}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ prompt: prompt, generateImage: true })
-        });
-
-        if (!imageResponse.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const data = await imageResponse.json();
-        const parsedBody = JSON.parse(data.body);
-        if (parsedBody && parsedBody.base64_image) {
-            return `data:image/png;base64,${parsedBody.base64_image}`;
-        } else {
-            throw new Error('No image generated');
-        }
-    } catch (error) {
-        console.error('Error generating enemy image:', error);
-        throw new Error('No image generated');
-    }
-}
-
-function spawnEnemies(scene) {
-    if (newsData.length > 0) {
-        scene.textures.addBase64('enemyImageBase64', enemyImageBase64);
-        scene.textures.addBase64('npcBase64image', npcBase64image);
-        for (let i = 0; i < 3; i++) {
-            let x = Phaser.Math.Between(50, 750);
-            let y = Phaser.Math.Between(50, 550);
-            let enemy = scene.enemies.create(x, y, 'enemy');
-            enemy.setCollideWorldBounds(true);
-        }
-        scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
-        scene.physics.add.collider(scene.enemies, scene.trees);
-        scene.physics.add.collider(scene.npcs, scene.enemies);
-        scene.physics.add.collider(scene.enemies, scene.enemies);
-    } else {
-        console.error('No news data available to generate enemies');
-    }
-}
-
-const config = {
-    type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    scene: [ExplorationScene, BattleScene],
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 0 },
-            debug: false
-        }
-    }
-};
-
-const game = new Phaser.Game(config);
-
-async function fetchNews() {
-    const loadingMessage = document.getElementById('loading');
-    const newsContainer = document.getElementById('news');
-
-    loadingMessage.style.display = 'block';
-    newsContainer.style.display = 'none';
-
-    try {
-        const apiUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
-        const newsEndpoint = '/test';
-        const response = await fetch(apiUrl + newsEndpoint);
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const jsonData = await response.json();
-
-        if (!jsonData) {
-            throw new Error('No Data gathered!');
-        }
-
-        const bodyData = JSON.parse(jsonData.body);
-
-        if (!bodyData) {
-            throw new Error('No body found in the response!');
-        }
-
-        if (!bodyData.articles) {
-            throw new Error('No articles found in the body!');
-        }
-
-        newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
-        let generatedAIResponses = await generateAIResponses();
-        loadingMessage.style.display = 'none';
-        newsContainer.style.display = 'block';
-        return generatedAIResponses;
-    } catch (error) {
-        console.error('Error fetching news:', error);
-        newsContainer.innerHTML = `<div class="error-message">Error fetching news: ${error.message}</div>`;
-        loadingMessage.style.display = 'none';
-        newsContainer.style.display = 'block';
-        return [];
-    }
-}
-
-function structureNewsData(articles) {
-    return articles.map(article => {
-        return {
-            title: article.title,
-            description: article.description,
-            url: article.url
-        };
-    });
-}
-
-async function generateAIResponses() {
-    const newsContainer = document.getElementById('news');
-    newsContainer.innerHTML = ''; // Clear previous content
-    const responses = [];
-
-
-    for (let i = 0; i < newsData.length; i++) {
-        const news = newsData[i];
-
-        var prompt = `Describe in 10-20 words a fictional version of following news article with no likeness to real people or brand names:\n\nTitle: ${news.title}\nDescription: ${news.description}`;
-
-        try {
-            const settingResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodeURIComponent(prompt)}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ prompt: prompt })
-            });
-
-            if (!settingResponse.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            const settingResponseJson = await settingResponse.json();
-
-            if (settingResponseJson && settingResponseJson.choices && settingResponseJson.choices[0] && settingResponseJson.choices[0].message && settingResponseJson.choices[0].message.content) {
-                const textContent = settingResponseJson.choices[0].message.content;
-
-                personas = await generatePersonas(textContent);
-                let foundPersonas = personas.characters && Array.isArray(personas.characters) ? personas.characters : personas;
-                persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
-                prompt = `As ${persona.name}, ${persona.description}, in the setting chosen: ${setting}. Describe in 10-20 words a Monster that we'll be faced to fight due to a made up reason that makes sense.`;
-
-                try {
-                    const monsterDescriptionResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodeURIComponent(prompt)}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ prompt: prompt })
-                    });
-
-                    if (!monsterDescriptionResponse.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-
-                    const monsterDescriptionResponseJson = await monsterDescriptionResponse.json();
-
-                    if (monsterDescriptionResponseJson && monsterDescriptionResponseJson.choices && monsterDescriptionResponseJson.choices[0] && monsterDescriptionResponseJson.choices[0].message && monsterDescriptionResponseJson.choices[0].message.content) {
-                        monsterDescription = monsterDescriptionResponseJson.choices[0].message.content;
-                        const imgPrompt = `Generate an image of ${persona.name}, ${persona.description} in the setting chosen: ${setting}.`;
-
-                        try {
-                            const imageResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodeURIComponent(imgPrompt)}`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ prompt: imgPrompt, generateImage: true })
-                            });
-
-                            if (!imageResponse.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-
-                            const data = await imageResponse.json();
-                            const parsedBody = JSON.parse(data.body);
-                            if (parsedBody && parsedBody.base64_image) {
-                                const base64string = `data:image/png;base64,${parsedBody.base64_image}`;
-                                responses.push({ response: monsterDescription, persona: persona, imageBase64: base64string });
-                                displayAIResponse(news.title, monsterDescription, persona, base64string);
-                            } else {
-                                throw new Error('No image generated');
-                            }
-                        } catch (error) {
-                            console.error('Error generating AI response:', error);
-                            newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error generating AI response:', error);
-                    newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
-                }
-            }
-        } catch (error) {
-            console.error('Error generating AI response:', error);
-            newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
-        }
-
-        return responses;
-    }
-}
-
-async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
-    const newsContainer = document.getElementById('news');
-    const newsItem = document.createElement('div');
-    newsItem.className = 'news-item';
-
-    const titleElement = document.createElement('h3');
-    titleElement.textContent = `Based on the News Article: ${newsTitle}`;
-    newsItem.appendChild(titleElement);
-
-
-    const personaElement = document.createElement('h5');
-    personaElement.textContent = `You will be playing as: ${persona.name}, ${persona.description}`;
-    newsItem.appendChild(personaElement);
-
-    if (imageBase64) {
-        const imageElement = document.createElement('img');
-        imageElement.setAttribute("id", "playerImage");
-        imageElement.src = imageBase64;
-        imageElement.alt = 'Generated image';
-        newsItem.appendChild(imageElement);
-        npcBase64image = imageBase64;
-    }
-
-    const contentElement = document.createElement('h4');
-    contentElement.textContent = `You will be fighting: ${aiResponse}`;
-    newsItem.appendChild(contentElement);
-
-    newsContainer.appendChild(newsItem);
-}
-
-async function generatePersonas(setting) {
-    const prompt = `Generate 5 short (5-10 word) and detailed fictional character (Ensure no likeness to real people/places/brands) for a ${setting} setting in JSON format. Each persona should have a name and a description.`;
-    const encodedPrompt = encodeURIComponent(prompt);
-    let parsedPersonas = [];
-
-    try {
-        const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ prompt: prompt })
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const aiResponse = await response.json();
-
-        if (aiResponse && aiResponse.choices && aiResponse.choices[0] && aiResponse.choices[0].message && aiResponse.choices[0].message.content) {
-            parsedPersonas = JSON.parse(aiResponse.choices[0].message.content);
-        }
-    } catch (error) {
-        console.error('Error generating AI response:', error);
-    }
-
-    return parsedPersonas;
-}
-
-async function fetchEnemyStats() {
-    console.log('fetchEnemyStats...');
-    const prompt = `Generate stats for an enemy based on this description: ${monsterDescription}. ${statRequirements}`;
-    const encodedPrompt = encodeURIComponent(prompt);
-
-    try {
-        const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ prompt: prompt })
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        console.log('fetchEnemyStats... response: ', response);
-        const data = await response.json();
-        console.log('fetchEnemyStats... data: ', data);
-        if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-            return JSON.parse(data.choices[0].message.content);
-        } else {
-            throw new Error('No stats generated');
-        }
-    } catch (error) {
-        console.error('Error fetching enemy stats:', error);
-        throw new Error('No stats generated');
-    }
-}
-
-async function fetchPlayerStats() {
-    console.log('fetchPlayerStats...');
-    const prompt = `Generate stats for the player based on this description: ${persona.name}, ${persona.description}. ${statRequirements}`;
-    const encodedPrompt = encodeURIComponent(prompt);
-
-    try {
-        const response = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodedPrompt}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ prompt: prompt })
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        console.log('fetchPlayerStats... response: ', response);
-        const data = await response.json();
-        console.log('fetchPlayerStats... data: ', data);
-        if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-            return JSON.parse(data.choices[0].message.content);
-        } else {
-            throw new Error('No stats generated');
-        }
-    } catch (error) {
-        console.error('Error fetching player stats:', error);
-        throw new Error('No stats generated');
-    }
-}
+    calculateMagicDamage(magAtk, magDef, attackerElement, defenderEle
