@@ -3,19 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Detective</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="favicon.ico">
-    <script src="lib/phaser.min.js"></script>
-    <script src="app.js"></script>
+    <title>Phaser Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+        }
+        canvas {
+            display: block;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <div id="loading">
-        <h1>Loading...</h1>
-        <h2>AI Generation In Progress...</h2>
-        <h3>Gathering Real-World news...</h3>
-        <h4>Generating fictional setting and characters...</h4>
-    </div>
-    <div id="news"></div>
+    <div id="loading">Loading...</div>
+    <script src="lib/phaser.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

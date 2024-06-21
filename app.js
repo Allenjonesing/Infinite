@@ -322,7 +322,7 @@ class BattleScene extends Phaser.Scene {
         this.actions = this.add.group();
         const actionNames = ['Attack', 'Defend', 'Magic Attack', 'Skills', 'Heal'];
         for (let i = 0; i < actionNames.length; i++) {
-            let actionText = this.add.text(200 + i * 300, 500, actionNames[i], { fontSize: '40px', fill: '#fff', backgroundColor: '#000', padding: { left: 20, right: 20, top: 10, bottom: 10 } });
+            let actionText = this.add.text(100 + i * 150, window.innerHeight - 100, actionNames[i], { fontSize: '40px', fill: '#fff', backgroundColor: '#000', padding: { left: 20, right: 20, top: 10, bottom: 10 } });
             actionText.setInteractive();
             actionText.on('pointerdown', () => this.handlePlayerAction(actionNames[i]));
             this.actions.add(actionText);
@@ -340,17 +340,17 @@ class BattleScene extends Phaser.Scene {
         }
     
         // Add borders around health and mana areas
-        this.add.graphics().lineStyle(4, 0x00ff00).strokeRect(40, 90, 400, 150);
-        this.add.graphics().lineStyle(4, 0xff0000).strokeRect(440, 90, 400, 150);
+        this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(40, 90, 200, 75);
+        this.add.graphics().lineStyle(2, 0xff0000).strokeRect(440, 90, 200, 75);
     
         // Add border around action buttons
-        this.actionBox = this.add.graphics().lineStyle(4, 0xffff00).strokeRect(190, 490, 1560, 170); // Adjusted width for more options
+        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(90, window.innerHeight - 150, 750, 100); // Adjusted width for more options
     
         // Initially hide the action buttons and box
         this.actions.children.each(action => action.setVisible(false));
         this.actionBox.setVisible(false);
     }
-        
+            
     chooseElement() {
         const elements = ['fire', 'ice', 'water', 'lightning'];
         return elements[Math.floor(Math.random() * elements.length)];
@@ -450,7 +450,7 @@ class BattleScene extends Phaser.Scene {
             this.hidePlayerActions();
         }
     }
-        
+            
     calculateHealing(magAtk) {
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
         let baseHealing = Math.floor(2 * magAtk * variance);
@@ -464,12 +464,12 @@ class BattleScene extends Phaser.Scene {
         this.skillButtons = this.add.group();
     
         for (let i = 0; i < skills.length; i++) {
-            let skillText = this.add.text(200 + i * 300, 700, skills[i], { fontSize: '40px', fill: '#fff', backgroundColor: '#000', padding: { left: 20, right: 20, top: 10, bottom: 10 } });
+            let skillText = this.add.text(100 + i * 300, window.innerHeight - 200, skills[i], { fontSize: '40px', fill: '#fff', backgroundColor: '#000', padding: { left: 20, right: 20, top: 10, bottom: 10 } });
             skillText.setInteractive();
             skillText.on('pointerdown', () => {
                 this.applyStatusEffect('Player', 'Enemy', skills[i]);
                 this.skillButtons.clear(true, true);
-                this.actionBox.setSize(1560, 170); // Shrink action box back to original size
+                this.actionBox.setSize(750, 100); // Shrink action box back to original size
             });
             this.skillButtons.add(skillText);
     
@@ -486,9 +486,9 @@ class BattleScene extends Phaser.Scene {
         }
     
         this.helpText.setText('Choose a skill:');
-        this.actionBox.setSize(1560, 400); // Expand action box
+        this.actionBox.setSize(750, 200); // Expand action box
     }
-    
+        
     showElementSelection() {
         this.hideSubOptions(); // Hide any existing sub-options
     
@@ -496,12 +496,12 @@ class BattleScene extends Phaser.Scene {
         this.elementButtons = this.add.group();
     
         for (let i = 0; i < elements.length; i++) {
-            let elementText = this.add.text(200 + i * 300, 700, elements[i], { fontSize: '40px', fill: '#fff', backgroundColor: '#000', padding: { left: 20, right: 20, top: 10, bottom: 10 } });
+            let elementText = this.add.text(100 + i * 300, window.innerHeight - 200, elements[i], { fontSize: '40px', fill: '#fff', backgroundColor: '#000', padding: { left: 20, right: 20, top: 10, bottom: 10 } });
             elementText.setInteractive();
             elementText.on('pointerdown', () => {
                 this.handlePlayerAction('Magic Attack', elements[i]);
                 this.elementButtons.clear(true, true);
-                this.actionBox.setSize(1560, 170); // Shrink action box back to original size
+                this.actionBox.setSize(750, 100); // Shrink action box back to original size
             });
             this.elementButtons.add(elementText);
     
@@ -518,9 +518,9 @@ class BattleScene extends Phaser.Scene {
         }
     
         this.helpText.setText('Choose an element for your Magic Attack:');
-        this.actionBox.setSize(1560, 400); // Expand action box
+        this.actionBox.setSize(750, 200); // Expand action box
     }
-    
+        
     hideSubOptions() {
         if (this.skillButtons) {
             this.skillButtons.clear(true, true);
@@ -528,9 +528,9 @@ class BattleScene extends Phaser.Scene {
         if (this.elementButtons) {
             this.elementButtons.clear(true, true);
         }
-        this.actionBox.setSize(1560, 170); // Ensure the action box is the correct size
+        this.actionBox.setSize(750, 100); // Ensure the action box is the correct size
     }
-    
+        
     enemyAction() {
         console.log('enemyAction...');
         const performEnemyAction = () => {
@@ -886,7 +886,7 @@ class BattleScene extends Phaser.Scene {
         this.hideSubOptions(); // Ensure sub-options are hidden
         this.actionBox.setVisible(false);
     }
-    
+        
     playAttackAnimation(attacker, defender) {
         this.tweens.add({
             targets: attacker,
@@ -980,8 +980,12 @@ function spawnEnemies(scene) {
 
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: window.innerWidth,
+        height: window.innerHeight
+    },
     scene: [ExplorationScene, BattleScene],
     physics: {
         default: 'arcade',
@@ -993,6 +997,10 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+
+window.addEventListener('resize', () => {
+    game.scale.resize(window.innerWidth, window.innerHeight);
+});
 
 async function fetchNews() {
     const loadingMessage = document.getElementById('loading');
