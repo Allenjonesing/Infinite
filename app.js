@@ -100,18 +100,6 @@ class ExplorationScene extends Phaser.Scene {
     }
 }
 
-function takeDamage(player, enemy) {
-    health -= 0.1; // Reduce health gradually
-    healthText.setText('Health: ' + Math.max(Math.round(health), 0));
-
-    if (health <= 0) {
-        // Handle player death (restart game or end game)
-        this.physics.pause();
-        player.setTint(0xff0000);
-        healthText.setText('Health: 0');
-    }
-}
-
 class BattleScene extends Phaser.Scene {
     constructor() {
         super({ key: 'BattleScene' });
@@ -955,12 +943,6 @@ function spawnEnemies(scene) {
 }
 
 async function fetchNews() {
-    const loadingMessage = document.getElementById('loading');
-    const newsContainer = document.getElementById('news');
-
-    loadingMessage.style.display = 'block';
-    newsContainer.style.display = 'none';
-
     try {
         const apiUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
         const newsEndpoint = '/test';
@@ -988,14 +970,9 @@ async function fetchNews() {
 
         newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
         let generatedAIResponses = await generateAIResponses();
-        loadingMessage.style.display = 'none';
-        newsContainer.style.display = 'block';
         return generatedAIResponses;
     } catch (error) {
         console.error('Error fetching news:', error);
-        newsContainer.innerHTML = `<div class="error-message">Error fetching news: ${error.message}</div>`;
-        loadingMessage.style.display = 'none';
-        newsContainer.style.display = 'block';
         return [];
     }
 }
@@ -1011,10 +988,7 @@ function structureNewsData(articles) {
 }
 
 async function generateAIResponses() {
-    const newsContainer = document.getElementById('news');
-    newsContainer.innerHTML = ''; // Clear previous content
     const responses = [];
-
 
     for (let i = 0; i < newsData.length; i++) {
         const news = newsData[i];
@@ -1081,57 +1055,22 @@ async function generateAIResponses() {
                             if (parsedBody && parsedBody.base64_image) {
                                 const base64string = `data:image/png;base64,${parsedBody.base64_image}`;
                                 responses.push({ response: monsterDescription, persona: persona, imageBase64: base64string });
-                                displayAIResponse(news.title, monsterDescription, persona, base64string);
                             } else {
                                 throw new Error('No image generated');
                             }
                         } catch (error) {
                             console.error('Error generating AI response:', error);
-                            newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
                         }
                     }
                 } catch (error) {
                     console.error('Error generating AI response:', error);
-                    newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
                 }
             }
         } catch (error) {
             console.error('Error generating AI response:', error);
-            newsContainer.innerHTML += `<div class="error-message">Error generating AI response for article "${news.title}": ${error.message}</div>`;
         }
-
-        return responses;
     }
-}
-
-async function displayAIResponse(newsTitle, aiResponse, persona, imageBase64) {
-    const newsContainer = document.getElementById('news');
-    const newsItem = document.createElement('div');
-    newsItem.className = 'news-item';
-
-    const titleElement = document.createElement('h3');
-    titleElement.textContent = `Based on the News Article: ${newsTitle}`;
-    newsItem.appendChild(titleElement);
-
-
-    const personaElement = document.createElement('h5');
-    personaElement.textContent = `You will be playing as: ${persona.name}, ${persona.description}`;
-    newsItem.appendChild(personaElement);
-
-    if (imageBase64) {
-        const imageElement = document.createElement('img');
-        imageElement.setAttribute("id", "playerImage");
-        imageElement.src = imageBase64;
-        imageElement.alt = 'Generated image';
-        newsItem.appendChild(imageElement);
-        npcBase64image = imageBase64;
-    }
-
-    const contentElement = document.createElement('h4');
-    contentElement.textContent = `You will be fighting: ${aiResponse}`;
-    newsItem.appendChild(contentElement);
-
-    newsContainer.appendChild(newsItem);
+    return responses;
 }
 
 async function generatePersonas(setting) {
