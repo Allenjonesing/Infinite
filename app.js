@@ -675,7 +675,7 @@ class BattleScene extends Phaser.Scene {
 
                 this.player.health -= damage;
                 this.playerHealthText.setText(`Health: ${this.player.health}`);
-                this.enemyHealthText.setText(`Health: ${this.player.health}`);
+                this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
                 this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
                 this.startCooldown();
             } else {
@@ -708,7 +708,7 @@ class BattleScene extends Phaser.Scene {
             }
 
             this.updateStatusIndicators(targetCharacter);
-            this.startCooldown();
+            //this.startCooldown();
         }, [], this);
     }
 
@@ -840,7 +840,7 @@ class BattleScene extends Phaser.Scene {
         const currentCharacter = this.turnOrder[this.currentTurnIndex].name === 'Player' ? this.player : this.enemy;
 
         if (this.isCharacterFrozenOrStunned(currentCharacter)) {
-            this.currentTurnIndex = (this.currentTurnIndex + 1) % this.turnOrder.length;
+            this.startCooldown();
         }
 
         this.handleStatusEffects();
