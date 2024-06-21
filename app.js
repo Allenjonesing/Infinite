@@ -163,7 +163,7 @@ class BattleScene extends Phaser.Scene {
         if (newsData.length > 0) {
             if (enemyImageBase64) {
                 this.player.sprite = this.add.sprite(150, 300, 'npcBase64image'); // Use the cached player image
-                this.enemy.sprite = this.add.sprite(550, 300, 'enemyImageBase64');
+                this.enemy.sprite = this.add.sprite(this.scale.width - 250, 300, 'enemyImageBase64');
 
                 // Add hover animations
                 this.add.tween({
