@@ -32,67 +32,67 @@ class ExplorationScene extends Phaser.Scene {
             this.player = this.physics.add.sprite(400, 300, 'player');
             this.player.setCollideWorldBounds(true);
 
-                    // Initialize player and enemy data
-        const playerStats = await fetchPlayerStats();
-        console.log('create... playerStats: ', playerStats);
-        this.player = {
-            name: 'Player',
-            health: playerStats.health,
-            mana: playerStats.mana,
-            atk: playerStats.atk,
-            def: playerStats.def,
-            spd: playerStats.spd,
-            eva: playerStats.eva,
-            magAtk: playerStats.magAtk,
-            magDef: playerStats.magDef,
-            luk: playerStats.luk,
-            wis: playerStats.wis,
-            sprite: null,
-            actions: ['Attack', 'Defend', 'Magic Attack'],
-            element: playerStats.element // Example element multipliers
-        };
+            // Initialize player and enemy data
+            const playerStats = await fetchPlayerStats();
+            console.log('create... playerStats: ', playerStats);
+            this.player = {
+                name: 'Player',
+                health: playerStats.health,
+                mana: playerStats.mana,
+                atk: playerStats.atk,
+                def: playerStats.def,
+                spd: playerStats.spd,
+                eva: playerStats.eva,
+                magAtk: playerStats.magAtk,
+                magDef: playerStats.magDef,
+                luk: playerStats.luk,
+                wis: playerStats.wis,
+                sprite: null,
+                actions: ['Attack', 'Defend', 'Magic Attack'],
+                element: playerStats.element // Example element multipliers
+            };
 
         }
 
-// Reinitialize or create NPCs
-if (data.npcs) {
-    this.npcs = this.physics.add.group({ immovable: true });
-    data.npcs.forEach(npcData => {
-        let npc = this.npcs.create(npcData.x, npcData.y, 'npc').setCollideWorldBounds(true);
-        npc.persona = npcData.persona;
-        npc.newsText = npcData.newsText;
-        npc.setInteractive();
-        npc.on('pointerdown', () => {
-            alert(`${npc.persona}: ${npc.response}`);
-        });
-    });
-} else {
-    this.npcs = this.physics.add.group({ immovable: true });
-    for (let i = 0; i < 5; i++) {
-        let x = Phaser.Math.Between(50, 750);
-        let y = Phaser.Math.Between(50, 550);
-        let npc = this.npcs.create(x, y, 'npc').setCollideWorldBounds(true);
-        npc.setInteractive();
-        npc.on('pointerdown', () => {
-            alert(`${npc.persona}: ${npc.response}`);
-        });
-    }
-}
+        // Reinitialize or create NPCs
+        if (data.npcs) {
+            this.npcs = this.physics.add.group({ immovable: true });
+            data.npcs.forEach(npcData => {
+                let npc = this.npcs.create(npcData.x, npcData.y, 'npc').setCollideWorldBounds(true);
+                npc.persona = npcData.persona;
+                npc.newsText = npcData.newsText;
+                npc.setInteractive();
+                npc.on('pointerdown', () => {
+                    alert(`${npc.persona}: ${npc.response}`);
+                });
+            });
+        } else {
+            this.npcs = this.physics.add.group({ immovable: true });
+            for (let i = 0; i < 5; i++) {
+                let x = Phaser.Math.Between(50, 750);
+                let y = Phaser.Math.Between(50, 550);
+                let npc = this.npcs.create(x, y, 'npc').setCollideWorldBounds(true);
+                npc.setInteractive();
+                npc.on('pointerdown', () => {
+                    alert(`${npc.persona}: ${npc.response}`);
+                });
+            }
+        }
 
-// Reinitialize or create trees
-if (data.trees) {
-    this.trees = this.physics.add.staticGroup();
-    data.trees.forEach(treeData => {
-        this.trees.create(treeData.x, treeData.y, 'tree').setTint(0x00ff00); // Green tint for trees
-    });
-} else {
-    this.trees = this.physics.add.staticGroup();
-    for (let i = 0; i < 10; i++) {
-        let x = Phaser.Math.Between(50, 750);
-        let y = Phaser.Math.Between(50, 550);
-        this.trees.create(x, y, 'tree').setTint(0x00ff00); // Green tint for trees
-    }
-}
+        // Reinitialize or create trees
+        if (data.trees) {
+            this.trees = this.physics.add.staticGroup();
+            data.trees.forEach(treeData => {
+                this.trees.create(treeData.x, treeData.y, 'tree').setTint(0x00ff00); // Green tint for trees
+            });
+        } else {
+            this.trees = this.physics.add.staticGroup();
+            for (let i = 0; i < 10; i++) {
+                let x = Phaser.Math.Between(50, 750);
+                let y = Phaser.Math.Between(50, 550);
+                this.trees.create(x, y, 'tree').setTint(0x00ff00); // Green tint for trees
+            }
+        }
         // Initialize enemies group
         this.enemies = this.physics.add.group();
 
@@ -120,10 +120,10 @@ if (data.trees) {
             this.player.body.setVelocity(0, 0);
         });
 
-// Fetch news data and generate AI responses if not already fetched
-if (!this.newsData) {
-    this.newsData = await fetchNews();
-}
+        // Fetch news data and generate AI responses if not already fetched
+        if (!this.newsData) {
+            this.newsData = await fetchNews();
+        }
         this.npcs.children.iterate((npc, index) => {
             let persona = personas[index % personas.length]; // Cycle through personas
             npc.persona = persona;
