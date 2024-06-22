@@ -791,7 +791,7 @@ class BattleScene extends Phaser.Scene {
         this.time.delayedCall(150, () => {  // Delay of 1 second for a more natural response
             let targetCharacter = target === 'Player' ? this.player : this.enemy;
             let casterCharacter = caster === 'Player' ? this.player : this.enemy;
-
+    
             if (targetCharacter.immunities.includes(statusEffect)) {
                 this.helpText.setText(`${targetCharacter.name} is immune to ${statusEffect}!`);
                 if (caster === 'Enemy') {
@@ -804,12 +804,12 @@ class BattleScene extends Phaser.Scene {
             } else {
                 this.helpText.setText(`${targetCharacter.name} is already affected by ${statusEffect}.`);
             }
-
+    
             this.updateStatusIndicators(targetCharacter);
             //this.startCooldown();
         }, [], this);
     }
-
+    
     updateStatusIndicators(character) {
         if (character.statusIndicators) {
             character.statusIndicators.destroy();
@@ -956,25 +956,23 @@ class BattleScene extends Phaser.Scene {
 
     isCharacterFrozenOrStunned(character) {
         console.log('isCharacterFrozenOrStunned... character: ', character);
-
+    
         const frozenStatus = character.statusEffects.find(effect => effect.type === 'Freeze');
         const stunnedStatus = character.statusEffects.find(effect => effect.type === 'Stun');
-
+    
         console.log('isCharacterFrozenOrStunned... frozenStatus: ', frozenStatus);
         if (frozenStatus) {
             frozenStatus.turns--;
             if (frozenStatus.turns <= 0) {
                 character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Freeze');
-                console.log('isCharacterFrozenOrStunned... character.statusEffects: ', character.statusEffects
-                
-                );
+                console.log('isCharacterFrozenOrStunned... character.statusEffects: ', character.statusEffects);
                 this.updateStatusIndicators(character);
                 return false;
             }
             this.helpText.setText(`${character.name} is frozen and skips a turn!`);
             return true;
         }
-
+    
         if (stunnedStatus) {
             stunnedStatus.turns--;
             if (stunnedStatus.turns <= 0) {
@@ -985,10 +983,10 @@ class BattleScene extends Phaser.Scene {
             this.helpText.setText(`${character.name} is stunned and skips a turn!`);
             return true;
         }
-
+    
         return false;
     }
-
+    
     handleStatusEffects() {
         const currentCharacter = this.turnOrder[this.currentTurnIndex].name === 'Player' ? this.player : this.enemy;
         currentCharacter.statusEffects.forEach((effect, index) => {
@@ -1005,15 +1003,15 @@ class BattleScene extends Phaser.Scene {
                     break;
                 // Stun and Freeze are handled in isCharacterFrozenOrStunned method
             }
-
+    
             if (currentCharacter.health <= 0) {
                 this.endBattle(currentCharacter.name === 'Player' ? 'lose' : 'win');
             }
         });
-
+    
         this.updateStatusIndicators(currentCharacter);
     }
-
+    
     showPlayerActions() {
         this.actions.children.each(action => action.setVisible(true));
         this.actionBox.setVisible(true);
