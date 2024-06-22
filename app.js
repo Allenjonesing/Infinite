@@ -233,7 +233,7 @@ class BattleScene extends Phaser.Scene {
     
         // Adjust other elements like UI, if necessary
     }
-    
+
     generateEnemyActions(stats) {
         let actions = {
             physical: ['Attack'],
@@ -324,7 +324,7 @@ class BattleScene extends Phaser.Scene {
         this.enemyManaText = this.add.text(this.scale.width - 250, 130, `Mana: ${this.enemy.mana}`, { fontSize: '16px', fill: '#fff' });
 
         // Turn order list
-        this.turnOrderText = this.add.text(this.scale.width / 2, 80, 'Turn List', { fontSize: '16px', fill: '#fff' }).setOrigin(0.5);
+        this.turnOrderText = this.add.text(this.scale.width - 200, this.scale.height / 2, 'Turn List', { fontSize: '16px', fill: '#fff' }).setOrigin(0.5);
         this.updateTurnOrderDisplay();
 
         // Action buttons at the bottom
@@ -333,7 +333,7 @@ class BattleScene extends Phaser.Scene {
 
         actionNames.forEach((actionName, index) => {
             const x = textPadding + index * actionButtonWidth + actionButtonWidth / 2;
-            let actionText = this.add.text(x, this.scale.height - 50, actionName, {
+            let actionText = this.add.text(x, this.scale.height * 0.75, actionName, {
                 fontSize: '20px',
                 fill: '#fff',
                 backgroundColor: '#000',
@@ -361,7 +361,7 @@ class BattleScene extends Phaser.Scene {
         this.add.graphics().lineStyle(2, 0xff0000).strokeRect(this.scale.width - 260, 90, 200, 75);
 
         // Add border around action buttons
-        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(textPadding, this.scale.height - 200, this.scale.width - 50, 150);
+        this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(textPadding, this.scale.height * 0.5, this.scale.width - 50, 200);
     }
 
     chooseElement() {
@@ -401,7 +401,7 @@ class BattleScene extends Phaser.Scene {
             orderText += `${this.turnOrder[(this.currentTurnIndex + i) % this.turnOrder.length].name}\n`;
         }
 
-        this.turnOrderList = this.add.text(700, 110, orderText, { fontSize: '20px', fill: '#fff' });
+        this.turnOrderList = this.add.text(this.scale.width - 200, this.scale.height / 2 - 50, orderText, { fontSize: '20px', fill: '#fff' });
 
         this.turnOrderList.alpha = 0;
         this.tweens.add({
@@ -849,6 +849,7 @@ class BattleScene extends Phaser.Scene {
     }
 
     startCooldown() {
+        console.log('startCooldown...');
         this.isCooldown = true;
 
         this.time.delayedCall(1000, () => {  // Delay of 1 second for a more natural response
@@ -859,6 +860,7 @@ class BattleScene extends Phaser.Scene {
     }
 
     nextTurn() {
+        console.log('nextTurn...');
         if (this.turnOrder[this.currentTurnIndex].name === 'Player' && this.player.isDefending) {
             this.player.def /= 2; // Reset defense boost after turn
             this.player.isDefending = false;
