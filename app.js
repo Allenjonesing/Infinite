@@ -305,7 +305,7 @@ class BattleScene extends Phaser.Scene {
         this.uiContainer = this.add.container(0, 0);
 
         // Set padding and element dimensions
-        const padding = 20;
+        const padding = 50;
         const elementHeight = 30;
         const actionButtonHeight = 50;
         const actionButtonWidth = 120;
@@ -357,7 +357,7 @@ class BattleScene extends Phaser.Scene {
         this.uiContainer.add(this.enemy.sprite);
 
         // Turn order list
-        this.turnOrderText = this.add.text(this.scale.width - 50, this.scale.height / 2, 'Turn List', { fontSize: '16px', fill: '#fff' }).setOrigin(0.5);
+        this.turnOrderText = this.add.text(this.scale.width - 150, this.scale.height / 2, 'Turn List', { fontSize: '36px', fill: '#fff' }).setOrigin(0.5);
         this.updateTurnOrderDisplay();
 
         // Add elements to the UI container
@@ -436,7 +436,7 @@ class BattleScene extends Phaser.Scene {
             orderText += `${this.turnOrder[(this.currentTurnIndex + i) % this.turnOrder.length].name}\n`;
         }
 
-        this.turnOrderList = this.add.text(this.scale.width - 50, this.scale.height / 2 + 30, orderText, { fontSize: '30px', fill: '#fff' });
+        this.turnOrderList = this.add.text(this.scale.width - 150, this.scale.height / 2 + 30, orderText, { fontSize: '30px', fill: '#fff' });
 
         this.turnOrderList.alpha = 0;
         this.tweens.add({
@@ -547,7 +547,7 @@ class BattleScene extends Phaser.Scene {
         // Create a new action box for skills above the original action box
         const skillBoxY = this.scale.height - 200 - 50; // Adjust as necessary
         const skillBoxWidth = this.scale.width - 40; // Adjust as necessary
-        const skillBox = this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(20, skillBoxY, skillBoxWidth, 50);
+        this.skillBox = this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(20, skillBoxY, skillBoxWidth, 50);
 
         // Add skill buttons to the new action box
         skills.forEach((skill, index) => {
@@ -593,7 +593,7 @@ class BattleScene extends Phaser.Scene {
         // Create a new action box for elements above the original action box
         const elementBoxY = this.scale.height - 200 - 50; // Adjust as necessary
         const elementBoxWidth = this.scale.width - 40; // Adjust as necessary
-        const elementBox = this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(20, elementBoxY, elementBoxWidth, 50);
+        this.elementBox = this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(20, elementBoxY, elementBoxWidth, 50);
 
         // Add element buttons to the new action box
         elements.forEach((element, index) => {
@@ -631,12 +631,13 @@ class BattleScene extends Phaser.Scene {
         console.log('hideSubOptions... this.skillButtons: ', this.skillButtons);
         console.log('hideSubOptions... this.elementButtons: ', this.elementButtons);
         if (this.skillButtons) {
+            this.skillBox.clear();
             this.skillButtons.clear(true, true);
         }
         if (this.elementButtons) {
+            this.elementBox.clear();
             this.elementButtons.clear(true, true);
         }
-        this.actionBox.clear(); // Ensure the action box is the correct size
     }
 
     enemyAction() {
