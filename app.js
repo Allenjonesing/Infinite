@@ -22,6 +22,7 @@ class ExplorationScene extends Phaser.Scene {
     }
 
     async create() {
+        this.scale.on('resize', this.resize, this);
         // Add a loading text
         let loadingText = this.add.text(window.innerWidth / 2, window.innerHeight / 2, 'Loading...', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5);
         // Create player
@@ -91,6 +92,18 @@ class ExplorationScene extends Phaser.Scene {
             });
         }
     }
+
+    resize(gameSize, baseSize, displaySize, resolution) {
+        let width = gameSize.width;
+        let height = gameSize.height;
+    
+        if (width === undefined) { width = this.sys.game.config.width; }
+        if (height === undefined) { height = this.sys.game.config.height; }
+    
+        this.cameras.resize(width, height);
+    
+        // Adjust other elements like UI, if necessary
+    }
 }
 
 class BattleScene extends Phaser.Scene {
@@ -99,6 +112,8 @@ class BattleScene extends Phaser.Scene {
     }
 
     async create(data) {
+        this.scale.on('resize', this.resize, this);
+
         this.player = data.player;
         this.enemy = data.enemy;
 
@@ -207,6 +222,18 @@ class BattleScene extends Phaser.Scene {
         }
     }
 
+    resize(gameSize, baseSize, displaySize, resolution) {
+        let width = gameSize.width;
+        let height = gameSize.height;
+    
+        if (width === undefined) { width = this.sys.game.config.width; }
+        if (height === undefined) { height = this.sys.game.config.height; }
+    
+        this.cameras.resize(width, height);
+    
+        // Adjust other elements like UI, if necessary
+    }
+    
     generateEnemyActions(stats) {
         let actions = {
             physical: ['Attack'],
@@ -998,11 +1025,11 @@ class BattleScene extends Phaser.Scene {
 
 const config = {
     type: Phaser.AUTO,
+    width: window.innerWidth,
+    height: window.innerHeight,
     scale: {
         mode: Phaser.Scale.RESIZE,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: window.innerWidth,
-        height: window.innerHeight
+        autoCenter: Phaser.Scale.CENTER_BOTH
     },
     scene: [ExplorationScene, BattleScene],
     physics: {
