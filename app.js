@@ -37,6 +37,7 @@ class ExplorationScene extends Phaser.Scene {
         // Fetch news data and generate AI responses
         await fetchNews();
         loadingText.setText(loadingText.text + `\nBased on the article: ${newsData[0].title}\n${newsData[0].description}`);
+        await generateAIResponses();
         loadingText.setText(loadingText.text + `\n\nYou'll play as: ${persona.name}, ${persona.description}`);
         loadingText.setText(loadingText.text + `\n\nYou'll be fighting: ${monsterDescription}`);
     
@@ -1200,12 +1201,11 @@ async function fetchNews() {
         }
 
         newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
-        let generatedAIResponses = await generateAIResponses();
-        return generatedAIResponses;
+        return;
     } catch (error) {
         location.reload();
         console.error('Error fetching news:', error);
-        return [];
+        return;
     }
 }
 
