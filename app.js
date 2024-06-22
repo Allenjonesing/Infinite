@@ -177,6 +177,9 @@ class BattleScene extends Phaser.Scene {
         if (newsData.length > 0) {
             if (enemyImageBase64) {
                 // In the `create` method, ensure the player and enemy sprites are correctly positioned:
+                // Set padding and element dimensions
+                const padding = 20;
+                const elementHeight = 30;
 
                 this.player.sprite = this.add.sprite(padding + 100, padding + elementHeight * 3 + 50, 'npcBase64image'); // Adjust position as necessary
                 this.enemy.sprite = this.add.sprite(this.scale.width - padding - 100, padding + elementHeight * 3 + 50, 'enemyImageBase64'); // Adjust position as necessary
@@ -534,19 +537,19 @@ class BattleScene extends Phaser.Scene {
 
     showSkillSelection() {
         this.hideSubOptions(); // Hide any existing sub-options
-    
+
         const skills = ['Poison', 'Stun', 'Burn', 'Freeze']; // Example status effects
         this.skillButtons = this.add.group();
-    
+
         // Create a new action box for skills above the original action box
         const skillBoxY = this.scale.height - 200 - 50; // Adjust as necessary
         const skillBoxWidth = this.scale.width - 40; // Adjust as necessary
         const skillBox = this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(20, skillBoxY, skillBoxWidth, 50);
-    
+
         // Add skill buttons to the new action box
         skills.forEach((skill, index) => {
-            const x = 30 + index * 200; // Adjust spacing as necessary
-            const skillText = this.add.text(x, skillBoxY + 15, skill, {
+            const x = 40 + index * 150; // Adjust spacing as necessary
+            const skillText = this.add.text(x, skillBoxY + 25, skill, {
                 fontSize: '20px',
                 fill: '#fff',
                 backgroundColor: '#000',
@@ -562,26 +565,37 @@ class BattleScene extends Phaser.Scene {
                 skillBox.destroy();
             });
             this.skillButtons.add(skillText);
+
+            // Add animation and colorful effect
+            this.tweens.add({
+                targets: skillText,
+                scaleX: 1.1,
+                scaleY: 1.1,
+                duration: 500,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Power1'
+            });
         });
-    
+
         this.helpText.setText('Choose a skill to inflict status effects.');
     }
-    
+
     showElementSelection() {
         this.hideSubOptions(); // Hide any existing sub-options
-    
+
         const elements = ['fire', 'ice', 'water', 'lightning'];
         this.elementButtons = this.add.group();
-    
+
         // Create a new action box for elements above the original action box
         const elementBoxY = this.scale.height - 200 - 50; // Adjust as necessary
         const elementBoxWidth = this.scale.width - 40; // Adjust as necessary
         const elementBox = this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(20, elementBoxY, elementBoxWidth, 50);
-    
+
         // Add element buttons to the new action box
         elements.forEach((element, index) => {
-            const x = 30 + index * 200; // Adjust spacing as necessary
-            const elementText = this.add.text(x, elementBoxY + 15, element, {
+            const x = 40 + index * 150; // Adjust spacing as necessary
+            const elementText = this.add.text(x, elementBoxY + 25, element, {
                 fontSize: '20px',
                 fill: '#fff',
                 backgroundColor: '#000',
@@ -594,11 +608,22 @@ class BattleScene extends Phaser.Scene {
                 elementBox.destroy();
             });
             this.elementButtons.add(elementText);
+
+            // Add animation and colorful effect
+            this.tweens.add({
+                targets: elementText,
+                scaleX: 1.1,
+                scaleY: 1.1,
+                duration: 500,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Power1'
+            });
         });
-    
+
         this.helpText.setText('Choose an element for your Magic Attack:');
     }
-    
+
     hideSubOptions() {
         if (this.skillButtons) {
             this.skillButtons.clear(true, true);
@@ -609,7 +634,7 @@ class BattleScene extends Phaser.Scene {
         this.actionBox.clear(); // Ensure the action box is the correct size
         this.actionBox.lineStyle(2, 0xffff00).strokeRect(20, this.scale.height - 100 - 40, this.scale.width - 40, 50); // Re-draw the action box
     }
-    
+
     enemyAction() {
         console.log('enemyAction...');
         const performEnemyAction = () => {
