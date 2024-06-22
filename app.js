@@ -176,8 +176,10 @@ class BattleScene extends Phaser.Scene {
         // Generate enemy image based on news article and setting
         if (newsData.length > 0) {
             if (enemyImageBase64) {
-                this.player.sprite = this.add.sprite(150, 300, 'npcBase64image'); // Use the cached player image
-                this.enemy.sprite = this.add.sprite(this.scale.width - 250, 300, 'enemyImageBase64');
+                // In the `create` method, ensure the player and enemy sprites are correctly positioned:
+
+                this.player.sprite = this.add.sprite(padding + 100, padding + elementHeight * 3 + 50, 'npcBase64image'); // Adjust position as necessary
+                this.enemy.sprite = this.add.sprite(this.scale.width - padding - 100, padding + elementHeight * 3 + 50, 'enemyImageBase64'); // Adjust position as necessary
 
                 // Add hover animations
                 this.add.tween({
@@ -209,7 +211,7 @@ class BattleScene extends Phaser.Scene {
                 this.createUI();
 
                 // Check whose turn it is and start the action immediately if it's the enemy's turn
-console.log('create... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
+                console.log('create... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
                 if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
                     this.enemyAction();
                 } else {
@@ -313,36 +315,52 @@ console.log('create... this.turnOrder[this.currentTurnIndex].name: ', this.turnO
         if (this.uiContainer) {
             this.uiContainer.destroy(true);
         }
-    
+
         // Create a container for all UI elements
         this.uiContainer = this.add.container(0, 0);
-    
+
         // Set padding and element dimensions
         const padding = 20;
         const elementHeight = 30;
         const actionButtonHeight = 50;
         const actionButtonWidth = 120;
         const halfWidth = this.scale.width / 2;
-    
+
+        // Help text at the very top
+        this.helpText = this.add.text(padding, padding, 'A battle has begun...', { fontSize: '14px', fill: '#fff' });
+        this.uiContainer.add(this.helpText);
+
         // Player health and mana
-        this.playerHealthText = this.add.text(padding, padding, `Health: ${this.player.health}`, { fontSize: '16px', fill: '#fff' });
-        this.playerManaText = this.add.text(padding, padding + elementHeight, `Mana: ${this.player.mana}`, { fontSize: '16px', fill: '#fff' });
-    
+        this.playerHealthText = this.add.text(padding, padding + elementHeight, `Health: ${this.player.health}`, { fontSize: '16px', fill: '#fff' });
+        this.playerManaText = this.add.text(padding, padding + elementHeight * 2, `Mana: ${this.player.mana}`, { fontSize: '16px', fill: '#fff' });
+
         // Enemy health and mana
-        this.enemyHealthText = this.add.text(this.scale.width - padding - 200, padding, `Health: ${this.enemy.health}`, { fontSize: '16px', fill: '#fff' });
-        this.enemyManaText = this.add.text(this.scale.width - padding - 200, padding + elementHeight, `Mana: ${this.enemy.mana}`, { fontSize: '16px', fill: '#fff' });
-    
+        this.enemyHealthText = this.add.text(this.scale.width - padding - 200, padding + elementHeight, `Health: ${this.enemy.health}`, { fontSize: '16px', fill: '#fff' });
+        this.enemyManaText = this.add.text(this.scale.width - padding - 200, padding + elementHeight * 2, `Mana: ${this.enemy.mana}`, { fontSize: '16px', fill: '#fff' });
+
+        // Add borders around health and mana areas
+        const playerHealthBox = this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(padding - 10, padding + elementHeight - 10, 200, 75);
+        const enemyHealthBox = this.add.graphics().lineStyle(2, 0xff0000).strokeRect(this.scale.width - padding - 210, padding + elementHeight - 10, 200, 75);
+        this.uiContainer.add(playerHealthBox);
+        this.uiContainer.add(enemyHealthBox);
+
+        // Player and enemy sprites
+        this.player.sprite = this.add.sprite(padding + 100, padding + elementHeight * 3 + 50, 'npcBase64image'); // Adjust position as necessary
+        this.enemy.sprite = this.add.sprite(this.scale.width - padding - 100, padding + elementHeight * 3 + 50, 'enemyImageBase64'); // Adjust position as necessary
+        this.uiContainer.add(this.player.sprite);
+        this.uiContainer.add(this.enemy.sprite);
+
         // Turn order list
-        this.turnOrderText = this.add.text(this.scale.width - padding - 200, padding + elementHeight * 2 + 20, 'Turn List', { fontSize: '16px', fill: '#fff' }).setOrigin(0.5);
+        this.turnOrderText = this.add.text(this.scale.width - padding - 100, padding + elementHeight * 3 + 120, 'Turn List', { fontSize: '16px', fill: '#fff' }).setOrigin(0.5);
         this.updateTurnOrderDisplay();
-    
+
         // Add elements to the UI container
         this.uiContainer.add([this.playerHealthText, this.playerManaText, this.enemyHealthText, this.enemyManaText, this.turnOrderText]);
-    
+
         // Action buttons at the bottom
         this.actions = this.add.group();
         const actionNames = ['Attack', 'Defend', 'Magic Attack', 'Skills', 'Heal'];
-    
+
         actionNames.forEach((actionName, index) => {
             const x = halfWidth - (actionNames.length * actionButtonWidth) / 2 + index * actionButtonWidth;
             const actionText = this.add.text(x, this.scale.height - actionButtonHeight - padding, actionName, {
@@ -356,7 +374,7 @@ console.log('create... this.turnOrder[this.currentTurnIndex].name: ', this.turnO
             this.actions.add(actionText);
             this.uiContainer.add(actionText);
         });
-    
+
         // Add animation and colorful effect to action buttons
         this.actions.children.iterate(actionText => {
             this.tweens.add({
@@ -369,16 +387,12 @@ console.log('create... this.turnOrder[this.currentTurnIndex].name: ', this.turnO
                 ease: 'Power1'
             });
         });
-    
+
         // Add action box around action buttons
         this.actionBox = this.add.graphics().lineStyle(2, 0xffff00).strokeRect(padding, this.scale.height - actionButtonHeight - padding * 2, this.scale.width - padding * 2, actionButtonHeight + padding);
         this.uiContainer.add(this.actionBox);
-    
-        // Help text at the top
-        this.helpText = this.add.text(padding, padding + elementHeight * 3 + 20, 'A battle has begun...', { fontSize: '14px', fill: '#fff' });
-        this.uiContainer.add(this.helpText);
     }
-    
+
     chooseElement() {
         const elements = ['fire', 'ice', 'water', 'lightning'];
         return elements[Math.floor(Math.random() * elements.length)];
