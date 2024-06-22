@@ -996,21 +996,24 @@ class BattleScene extends Phaser.Scene {
     }
 }
 
-var config = {
+const config = {
     type: Phaser.AUTO,
-    scene: {
-      preload: preload,
-      create: create,
-      update: update,
-    },
-    // Allows Phaser canvas to be responsive to browser sizing
     scale: {
-      mode: Phaser.Scale.ENVELOP,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
-      width: 1920,
-      height: 1080,
+        mode: Phaser.Scale.RESIZE,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: window.innerWidth,
+        height: window.innerHeight
     },
-  };
+    scene: [ExplorationScene, BattleScene],
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: false
+        }
+    }
+};
+
 const game = new Phaser.Game(config);
 
 window.addEventListener('resize', () => {
