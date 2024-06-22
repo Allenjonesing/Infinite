@@ -23,36 +23,44 @@ class ExplorationScene extends Phaser.Scene {
 
     async create() {
         this.scale.on('resize', this.resize, this);
-
+    
         // Add a loading text
-        let loadingText = this.add.text(window.innerWidth / 2, window.innerHeight / 2, 'Loading...', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5);
-
+        let loadingText = this.add.text(window.innerWidth / 2, window.innerHeight / 2, 'Loading...', { 
+            fontSize: '32px', 
+            fill: '#fff', 
+            wordWrap: { width: window.innerWidth - 40 }
+        }).setOrigin(0.5).setAlign('center');
+    
         // Create player
         this.player = this.physics.add.sprite(400, 300, 'player');
         this.player.setCollideWorldBounds(true);
-
+    
         // Initialize enemies group
         this.enemies = this.physics.add.group();
-
+    
+        // Update loading text
+        loadingText.setText(loadingText.text + '\nInitialized player and enemies...');
+    
         // Fetch news data and generate AI responses
         await fetchNews();
-        loadingText.setText(loadingText.text + `\nBased on the article: ${newsData[0].title}\n${newsData[0].description}`);
+        loadingText.setText(loadingText.text + `\n\nBased on the article: ${newsData[0].title}\n${newsData[0].description}`);
+        
         await generateAIResponses();
         loadingText.setText(loadingText.text + `\n\nYou'll play as: ${persona.name}, ${persona.description}`);
         loadingText.setText(loadingText.text + `\n\nYou'll be fighting: ${monsterDescription}`);
-
+    
         const newsArticle = newsData[0]; // Use the first article for the enemy
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
-
+            
         // Prep Base64 images
         this.prepBase64Images();
-
+            
         // Spawn enemies after data is ready
         spawnEnemies(this);
-        // Remove the loading text after all steps are complete
+                // Remove the loading text after all steps are complete
         loadingText.destroy();
     }
-
+    
     prepBase64Images() {
         if (enemyImageBase64 && npcBase64image) {
             this.textures.addBase64('enemyImageBase64', enemyImageBase64);
