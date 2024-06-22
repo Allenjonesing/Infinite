@@ -322,8 +322,8 @@ class BattleScene extends Phaser.Scene {
         this.uiContainer.add(enemyHealthBox);
 
         // Player and enemy sprites
-        this.player.sprite = this.add.sprite(padding + 100, padding + elementHeight * 6 + 50, 'npcBase64image'); // Adjust position as necessary
-        this.enemy.sprite = this.add.sprite(this.scale.width - padding - 100, padding + elementHeight * 6 + 50, 'enemyImageBase64'); // Adjust position as necessary
+        this.player.sprite = this.add.sprite(padding + 100, padding + elementHeight * 10 + 50, 'npcBase64image'); // Adjust position as necessary
+        this.enemy.sprite = this.add.sprite(this.scale.width - padding - 100, padding + elementHeight * 10 + 50, 'enemyImageBase64'); // Adjust position as necessary
 
         // Add hover animations
         this.add.tween({
@@ -349,7 +349,7 @@ class BattleScene extends Phaser.Scene {
         this.uiContainer.add(this.enemy.sprite);
 
         // Turn order list
-        this.turnOrderText = this.add.text(this.scale.width - padding - 100, padding + elementHeight * 3 + 120, 'Turn List', { fontSize: '16px', fill: '#fff' }).setOrigin(0.5);
+        this.turnOrderText = this.add.text(this.scale.width - 50, this.scale.height / 2, 'Turn List', { fontSize: '16px', fill: '#fff' }).setOrigin(0.5);
         this.updateTurnOrderDisplay();
 
         // Add elements to the UI container
@@ -428,7 +428,7 @@ class BattleScene extends Phaser.Scene {
             orderText += `${this.turnOrder[(this.currentTurnIndex + i) % this.turnOrder.length].name}\n`;
         }
 
-        this.turnOrderList = this.add.text(this.scale.width - 200, this.scale.height / 2 + 30, orderText, { fontSize: '30px', fill: '#fff' });
+        this.turnOrderList = this.add.text(this.scale.width - 50, this.scale.height / 2 + 30, orderText, { fontSize: '30px', fill: '#fff' });
 
         this.turnOrderList.alpha = 0;
         this.tweens.add({
@@ -620,6 +620,8 @@ class BattleScene extends Phaser.Scene {
     }
 
     hideSubOptions() {
+        console.log('hideSubOptions... this.skillButtons: ', this.skillButtons);
+        console.log('hideSubOptions... this.elementButtons: ', this.elementButtons);
         if (this.skillButtons) {
             this.skillButtons.clear(true, true);
         }
@@ -627,7 +629,6 @@ class BattleScene extends Phaser.Scene {
             this.elementButtons.clear(true, true);
         }
         this.actionBox.clear(); // Ensure the action box is the correct size
-        this.actionBox.lineStyle(2, 0xffff00).strokeRect(20, this.scale.height - 100 - 40, this.scale.width - 40, 50); // Re-draw the action box
     }
 
     enemyAction() {
