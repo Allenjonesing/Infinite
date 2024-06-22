@@ -798,7 +798,7 @@ class BattleScene extends Phaser.Scene {
                     this.enemy.learnedStatusImmunities[statusEffect] = true;
                 }
             } else if (!targetCharacter.statusEffects.find(effect => effect.type === statusEffect)) {
-                let turns = statusEffect === 'Stun' || statusEffect === 'Freeze' ? 5 : -1; // -1 means it doesn't expire automatically
+                let turns = (statusEffect === 'Stun' ? 1 : (statusEffect === 'Freeze' ? 5 : -1)); // -1 means it doesn't expire automatically
                 targetCharacter.statusEffects.push({ type: statusEffect, turns });
                 this.helpText.setText(`${targetCharacter.name} is now affected by ${statusEffect}!`);
             } else {
@@ -955,14 +955,19 @@ class BattleScene extends Phaser.Scene {
     }
 
     isCharacterFrozenOrStunned(character) {
+        console.log('isCharacterFrozenOrStunned... character: ', character);
 
         const frozenStatus = character.statusEffects.find(effect => effect.type === 'Freeze');
         const stunnedStatus = character.statusEffects.find(effect => effect.type === 'Stun');
 
+        console.log('isCharacterFrozenOrStunned... frozenStatus: ', frozenStatus);
         if (frozenStatus) {
             frozenStatus.turns--;
             if (frozenStatus.turns <= 0) {
                 character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Freeze');
+                console.log('isCharacterFrozenOrStunned... character.statusEffects: ', character.statusEffects
+                
+                );
                 this.updateStatusIndicators(character);
                 return false;
             }
