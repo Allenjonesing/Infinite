@@ -23,44 +23,41 @@ class ExplorationScene extends Phaser.Scene {
 
     async create() {
         this.scale.on('resize', this.resize, this);
-    
+
         // Add a loading text
-        let loadingText = this.add.text(window.innerWidth / 2, window.innerHeight / 2, 'Loading...', { 
-            fontSize: '32px', 
-            fill: '#fff', 
+        let loadingText = this.add.text(window.innerWidth / 2, window.innerHeight / 2, 'Loading...', {
+            fontSize: '32px',
+            fill: '#fff',
             wordWrap: { width: window.innerWidth - 40 }
         }).setOrigin(0.5).setAlign('center');
-    
+
         // Create player
         this.player = this.physics.add.sprite(400, 300, 'player');
         this.player.setCollideWorldBounds(true);
-    
+
         // Initialize enemies group
         this.enemies = this.physics.add.group();
-    
-        // Update loading text
-        loadingText.setText(loadingText.text + '\nInitialized player and enemies...');
-    
+
         // Fetch news data and generate AI responses
         await fetchNews();
-        loadingText.setText(loadingText.text + `\n\nBased on the article: ${newsData[0].title}\n${newsData[0].description}`);
-        
+        loadingText.setText(loadingText.text + `\n\nBased on the article: ${newsData[0].title}`);
+
         await generateAIResponses();
         loadingText.setText(loadingText.text + `\n\nYou'll play as: ${persona.name}, ${persona.description}`);
         loadingText.setText(loadingText.text + `\n\nYou'll be fighting: ${monsterDescription}`);
-    
+
         const newsArticle = newsData[0]; // Use the first article for the enemy
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
-            
+
         // Prep Base64 images
         this.prepBase64Images();
-            
+
         // Spawn enemies after data is ready
         spawnEnemies(this);
-                // Remove the loading text after all steps are complete
+        // Remove the loading text after all steps are complete
         loadingText.destroy();
     }
-    
+
     prepBase64Images() {
         if (enemyImageBase64 && npcBase64image) {
             this.textures.addBase64('enemyImageBase64', enemyImageBase64);
@@ -791,30 +788,35 @@ class BattleScene extends Phaser.Scene {
         this.time.delayedCall(150, () => {  // Delay of 1 second for a more natural response
             let targetCharacter = target === 'Player' ? this.player : this.enemy;
             let casterCharacter = caster === 'Player' ? this.player : this.enemy;
-    
+
             if (targetCharacter.immunities.includes(statusEffect)) {
                 this.helpText.setText(`${targetCharacter.name} is immune to ${statusEffect}!`);
                 if (caster === 'Enemy') {
                     this.enemy.learnedStatusImmunities[statusEffect] = true;
                 }
-            } else if (!targetCharacter.statusEffects.find(effect => effect.type === statusEffect)) {
-                let turns = (statusEffect === 'Stun' ? 1 : (statusEffect === 'Freeze' ? 5 : -1)); // -1 means it doesn't expire automatically
-                targetCharacter.statusEffects.push({ type: statusEffect, turns });
-                this.helpText.setText(`${targetCharacter.name} is now affected by ${statusEffect}!`);
             } else {
-                this.helpText.setText(`${targetCharacter.name} is already affected by ${statusEffect}.`);
+                let existingEffect = targetCharacter.statusEffects.find(effect => effect.type === statusEffect);
+                if (existingEffect) {
+                    if (statusEffect === 'Stun') existingEffect.turns = 1;
+                    else if (statusEffect === 'Freeze') existingEffect.turns = 5;
+                    else existingEffect.turns = -1;
+                    this.helpText.setText(`${targetCharacter.name} is already affected by ${statusEffect}. Duration refreshed.`);
+                } else {
+                    let turns = (statusEffect === 'Stun' ? 1 : (statusEffect === 'Freeze' ? 5 : -1)); // -1 means it doesn't expire automatically
+                    targetCharacter.statusEffects.push({ type: statusEffect, turns });
+                    this.helpText.setText(`${targetCharacter.name} is now affected by ${statusEffect}!`);
+                }
             }
-    
+
             this.updateStatusIndicators(targetCharacter);
-            //this.startCooldown();
         }, [], this);
     }
-    
+
     updateStatusIndicators(character) {
         if (character.statusIndicators) {
-            character.statusIndicators.destroy();
+            character.statusIndicators.clear(true, true);
         }
-
+    
         character.statusIndicators = this.add.group();
         const statusEffects = character.statusEffects;
         for (let i = 0; i < statusEffects.length; i++) {
@@ -822,7 +824,7 @@ class BattleScene extends Phaser.Scene {
             character.statusIndicators.add(statusText);
         }
     }
-
+    
     showDamageIndicator(target, damage, critical, elementValue) {
         let fontColor = '#f0d735';
         let delaytime = 0;
@@ -956,10 +958,10 @@ class BattleScene extends Phaser.Scene {
 
     isCharacterFrozenOrStunned(character) {
         console.log('isCharacterFrozenOrStunned... character: ', character);
-    
+
         const frozenStatus = character.statusEffects.find(effect => effect.type === 'Freeze');
         const stunnedStatus = character.statusEffects.find(effect => effect.type === 'Stun');
-    
+
         console.log('isCharacterFrozenOrStunned... frozenStatus: ', frozenStatus);
         if (frozenStatus) {
             frozenStatus.turns--;
@@ -972,7 +974,7 @@ class BattleScene extends Phaser.Scene {
             this.helpText.setText(`${character.name} is frozen and skips a turn!`);
             return true;
         }
-    
+
         if (stunnedStatus) {
             stunnedStatus.turns--;
             if (stunnedStatus.turns <= 0) {
@@ -983,13 +985,16 @@ class BattleScene extends Phaser.Scene {
             this.helpText.setText(`${character.name} is stunned and skips a turn!`);
             return true;
         }
-    
+
         return false;
     }
-    
+
     handleStatusEffects() {
         const currentCharacter = this.turnOrder[this.currentTurnIndex].name === 'Player' ? this.player : this.enemy;
-        currentCharacter.statusEffects.forEach((effect, index) => {
+
+        for (let i = currentCharacter.statusEffects.length - 1; i >= 0; i--) {
+            let effect = currentCharacter.statusEffects[i];
+
             switch (effect.type) {
                 case 'Poison':
                     currentCharacter.health -= 10; // Example poison damage
@@ -998,20 +1003,25 @@ class BattleScene extends Phaser.Scene {
                 case 'Burn':
                     currentCharacter.health -= 15; // Example burn damage
                     this.helpText.setText(`${currentCharacter.name} takes burn damage!`);
-                    // Cure Freeze if the character is burned
-                    currentCharacter.statusEffects = currentCharacter.statusEffects.filter(eff => eff.type !== 'Freeze');
                     break;
                 // Stun and Freeze are handled in isCharacterFrozenOrStunned method
             }
-    
+
+            if (effect.turns > 0) {
+                effect.turns--;
+                if (effect.turns === 0) {
+                    currentCharacter.statusEffects.splice(i, 1);
+                }
+            }
+
             if (currentCharacter.health <= 0) {
                 this.endBattle(currentCharacter.name === 'Player' ? 'lose' : 'win');
             }
-        });
-    
+        }
+
         this.updateStatusIndicators(currentCharacter);
     }
-    
+
     showPlayerActions() {
         this.actions.children.each(action => action.setVisible(true));
         this.actionBox.setVisible(true);
