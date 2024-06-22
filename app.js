@@ -23,36 +23,36 @@ class ExplorationScene extends Phaser.Scene {
 
     async create() {
         this.scale.on('resize', this.resize, this);
-        
+
         // Add a loading text
         let loadingText = this.add.text(window.innerWidth / 2, window.innerHeight / 2, 'Loading...', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5);
-    
+
         // Create player
         this.player = this.physics.add.sprite(400, 300, 'player');
         this.player.setCollideWorldBounds(true);
-        
+
         // Initialize enemies group
         this.enemies = this.physics.add.group();
-    
+
         // Fetch news data and generate AI responses
         await fetchNews();
         loadingText.setText(loadingText.text + `\nBased on the article: ${newsData[0].title}\n${newsData[0].description}`);
         await generateAIResponses();
         loadingText.setText(loadingText.text + `\n\nYou'll play as: ${persona.name}, ${persona.description}`);
         loadingText.setText(loadingText.text + `\n\nYou'll be fighting: ${monsterDescription}`);
-    
+
         const newsArticle = newsData[0]; // Use the first article for the enemy
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
-    
+
         // Prep Base64 images
         this.prepBase64Images();
-    
+
         // Spawn enemies after data is ready
-        spawnEnemies(this);    
+        spawnEnemies(this);
         // Remove the loading text after all steps are complete
         loadingText.destroy();
     }
-    
+
     prepBase64Images() {
         if (enemyImageBase64 && npcBase64image) {
             this.textures.addBase64('enemyImageBase64', enemyImageBase64);
@@ -177,33 +177,6 @@ class BattleScene extends Phaser.Scene {
         // Generate enemy image based on news article and setting
         if (newsData.length > 0) {
             if (enemyImageBase64) {
-                // In the `create` method, ensure the player and enemy sprites are correctly positioned:
-                // Set padding and element dimensions
-                const padding = 20;
-                const elementHeight = 30;
-
-                this.player.sprite = this.add.sprite(padding + 100, padding + elementHeight * 3 + 50, 'npcBase64image'); // Adjust position as necessary
-                this.enemy.sprite = this.add.sprite(this.scale.width - padding - 100, padding + elementHeight * 3 + 50, 'enemyImageBase64'); // Adjust position as necessary
-
-                // Add hover animations
-                this.add.tween({
-                    targets: this.player.sprite,
-                    y: this.player.sprite.y - 10,
-                    duration: 1000,
-                    yoyo: true,
-                    repeat: -1,
-                    ease: 'Sine.easeInOut'
-                });
-
-                this.add.tween({
-                    targets: this.enemy.sprite,
-                    y: this.enemy.sprite.y - 10,
-                    duration: 1000,
-                    yoyo: true,
-                    repeat: -1,
-                    ease: 'Sine.easeInOut'
-                });
-
                 // Initialize turn order and current turn index
                 this.turnOrder = this.calculateTurnOrder();
                 this.currentTurnIndex = 0;
@@ -349,8 +322,29 @@ class BattleScene extends Phaser.Scene {
         this.uiContainer.add(enemyHealthBox);
 
         // Player and enemy sprites
-        this.player.sprite = this.add.sprite(padding + 100, padding + elementHeight * 3 + 50, 'npcBase64image'); // Adjust position as necessary
-        this.enemy.sprite = this.add.sprite(this.scale.width - padding - 100, padding + elementHeight * 3 + 50, 'enemyImageBase64'); // Adjust position as necessary
+        this.player.sprite = this.add.sprite(padding + 100, padding + elementHeight * 6 + 50, 'npcBase64image'); // Adjust position as necessary
+        this.enemy.sprite = this.add.sprite(this.scale.width - padding - 100, padding + elementHeight * 6 + 50, 'enemyImageBase64'); // Adjust position as necessary
+
+        // Add hover animations
+        this.add.tween({
+            targets: this.player.sprite,
+            y: this.player.sprite.y - 10,
+            duration: 1000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+
+        this.add.tween({
+            targets: this.enemy.sprite,
+            y: this.enemy.sprite.y - 10,
+            duration: 1000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+
+
         this.uiContainer.add(this.player.sprite);
         this.uiContainer.add(this.enemy.sprite);
 
