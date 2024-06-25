@@ -1,3 +1,8 @@
+const costSavingMode = false;
+const genericEnemyBase64 = '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';
+const genericPlayerBase64 = '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';
+const version = 'Alpha v0.2'
+
 let health = 100;
 let healthText;
 let target = null;
@@ -25,26 +30,29 @@ class ExplorationScene extends Phaser.Scene {
         this.scale.on('resize', this.resize, this);
 
         // Add a loading text
-        let loadingText = this.add.text(window.innerWidth / 2, window.innerHeight / 2, 'Loading...', {
+        let loadingText = this.add.text(window.innerWidth / 2, window.innerHeight / 2, `Loading Version: ${version}...`, {
             fontSize: '32px',
             fill: '#fff',
             wordWrap: { width: window.innerWidth - 40 }
         }).setOrigin(0.5).setAlign('center');
 
-        // Create player
-        this.player = this.physics.add.sprite(400, 300, 'player');
-        this.player.setCollideWorldBounds(true);
+        // Add a warning text
+        let warningText = this.add.text(window.innerWidth / 2, window.innerHeight - 50,
+            'Warning: This game may contain flashing lights that could potentially trigger seizures for people with photosensitive epilepsy. Viewer discretion is advised. Content generated by AI is not rated. Any resemblance to real persons, living or dead, brands, companies, or games is purely coincidental. By using this website, you agree to our terms and policies found at https://www.jonesingstudio.com/. Powered by OpenAI, NewsAPI.org, and Phaser. Game not yet rated. Copyright 2024 Jonesing Studio.', {
+            fontSize: '16px',
+            fill: '#fff',
+            wordWrap: { width: window.innerWidth - 40 },
+            align: 'center'
+        }).setOrigin(0.5);
 
-        // Initialize enemies group
-        this.enemies = this.physics.add.group();
 
         // Fetch news data and generate AI responses
         await fetchNews();
-        loadingText.setText(loadingText.text + `\n\nBased on the article: ${newsData[0].title}`);
+        loadingText.setText(`${loadingText.text}\n\nBased on the article: ${newsData[0].title}`);
 
         await generateAIResponses();
-        loadingText.setText(loadingText.text + `\n\nYou'll play as: ${persona.name}, ${persona.description}`);
-        loadingText.setText(loadingText.text + `\n\nYou'll be fighting: ${monsterDescription}`);
+        loadingText.setText(`${loadingText.text}\n\nYou'll play as: ${persona.name}, ${persona.description}`);
+        loadingText.setText(`${loadingText.text}\n\nYou'll be fighting: ${monsterDescription}`);
 
         const newsArticle = newsData[0]; // Use the first article for the enemy
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
@@ -52,10 +60,18 @@ class ExplorationScene extends Phaser.Scene {
         // Prep Base64 images
         this.prepBase64Images();
 
+        // Create player
+        this.player = this.physics.add.sprite(400, 300, 'player');
+        this.player.description = `${persona.name}, ${persona.description}`;
+        this.player.setCollideWorldBounds(true);
+
+        // Initialize enemies group
+        this.enemies = this.physics.add.group();
         // Spawn enemies after data is ready
         spawnEnemies(this);
-        // Remove the loading text after all steps are complete
+        // Remove the loading text and warning text after all steps are complete
         loadingText.destroy();
+        warningText.destroy();
     }
 
     prepBase64Images() {
@@ -115,6 +131,8 @@ class ExplorationScene extends Phaser.Scene {
 class BattleScene extends Phaser.Scene {
     constructor() {
         super({ key: 'BattleScene' });
+        this.helpMessages = [];
+        this.loadingIndicator = null;
     }
 
     async create(data) {
@@ -123,10 +141,14 @@ class BattleScene extends Phaser.Scene {
         this.player = data.player;
         this.enemy = data.enemy;
 
+        // Show loading indicator
+        this.showLoadingIndicator();
+
         // Initialize player and enemy data
         const playerStats = await fetchPlayerStats();
         this.player = {
             name: 'Player',
+            description: `${persona.name}, ${persona.description}`,
             health: playerStats.health,
             mana: playerStats.mana,
             atk: playerStats.atk,
@@ -138,7 +160,7 @@ class BattleScene extends Phaser.Scene {
             luk: playerStats.luk,
             wis: playerStats.wis,
             sprite: null,
-            actions: ['Attack', 'Defend', 'Magic Attack', 'Skills'],
+            actions: ['Attack', 'Defend', 'Spells', 'Skills'],
             element: playerStats.element,
             statusEffects: [],
             immunities: playerStats.immunities || []
@@ -147,6 +169,7 @@ class BattleScene extends Phaser.Scene {
         const enemyStats = await fetchEnemyStats();
         this.enemy = {
             name: 'Enemy',
+            description: monsterDescription,
             health: enemyStats.health,
             mana: enemyStats.mana,
             atk: enemyStats.atk,
@@ -179,6 +202,9 @@ class BattleScene extends Phaser.Scene {
             immunities: enemyStats.immunities || []
         };
 
+        // Hide loading indicator
+        this.hideLoadingIndicator();
+
         // Generate enemy image based on news article and setting
         if (newsData.length > 0) {
             if (enemyImageBase64) {
@@ -193,7 +219,6 @@ class BattleScene extends Phaser.Scene {
                 this.createUI();
 
                 // Check whose turn it is and start the action immediately if it's the enemy's turn
-                console.log('create... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
                 if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
                     this.enemyAction();
                 } else {
@@ -202,6 +227,46 @@ class BattleScene extends Phaser.Scene {
             } else {
                 console.error('Failed to generate enemy image');
             }
+        }
+    }
+
+    showLoadingIndicator() {
+        this.loadingIndicator = this.add.text(this.scale.width / 2, this.scale.height / 2, 'Loading...', {
+            fontSize: '32px',
+            fill: '#fff',
+            backgroundColor: '#000',
+            padding: { left: 10, right: 10, top: 10, bottom: 10 }
+        }).setOrigin(0.5);
+
+        this.tweens.add({
+            targets: this.loadingIndicator,
+            alpha: { from: 1, to: 0.3 },
+            duration: 500,
+            yoyo: true,
+            repeat: -1
+        });
+    }
+
+    hideLoadingIndicator() {
+        if (this.loadingIndicator) {
+            this.loadingIndicator.destroy();
+            this.loadingIndicator = null;
+        }
+    }
+
+    addHelpText(message) {
+        this.helpMessages.push(message);
+        if (this.helpMessages.length > 3) {
+            this.helpMessages.shift(); // Remove the oldest message if we have more than 3
+        }
+        this.updateHelpTextDisplay();
+    }
+
+    updateHelpTextDisplay() {
+        if (this.helpMessages && Array.isArray(this.helpMessages)) {
+            this.helpText.setText(this.helpMessages.join('\n'));
+        } else {
+            this.helpText.setText('');
         }
     }
 
@@ -241,16 +306,16 @@ class BattleScene extends Phaser.Scene {
         if (!isPhysicalOnly) {
             for (const [element, value] of Object.entries(stats.element)) {
                 if (value <= 0) { // Strong in this element
-                    actions.magic.push(`${element.charAt(0).toUpperCase() + element.slice(1)} Magic Attack`);
+                    actions.magic.push(`${element.charAt(0).toUpperCase() + element.slice(1)} Spells`);
                 }
             }
 
             // Add more magic attacks if magAtk is high
             if (stats.magAtk > stats.atk) {
-                if (stats.element.fire <= 0) actions.magic.push('Fire Magic Attack');
-                if (stats.element.ice <= 0) actions.magic.push('Ice Magic Attack');
-                if (stats.element.lightning <= 0) actions.magic.push('Lightning Magic Attack');
-                if (stats.element.water <= 0) actions.magic.push('Water Magic Attack');
+                if (stats.element.fire <= 0) actions.magic.push('Fire Spells');
+                if (stats.element.ice <= 0) actions.magic.push('Ice Spells');
+                if (stats.element.lightning <= 0) actions.magic.push('Lightning Spells');
+                if (stats.element.water <= 0) actions.magic.push('Water Spells');
             }
 
             // Add healing spells
@@ -261,7 +326,7 @@ class BattleScene extends Phaser.Scene {
     }
 
     update() {
-        if (battleEnded == false) {
+        if (!battleEnded) {
             if (this.player.health <= 0) {
                 this.endBattle('lose');
             } else if (this.enemy.health <= 0) {
@@ -277,11 +342,11 @@ class BattleScene extends Phaser.Scene {
 
             if (result === 'win') {
                 // Handle victory logic
-                this.helpText.setText('You Won! Please wait for the window to reload...');
+                this.addHelpText('You Won! Please wait for the window to reload...');
                 this.enemy.sprite.destroy(); // Remove enemy sprite
             } else {
                 // Handle defeat logic
-                this.helpText.setText('You Lost! Please wait for the window to reload...');
+                this.addHelpText('You Lost! Please wait for the window to reload...');
                 this.player.sprite.destroy(); // Remove player sprite
             }
 
@@ -302,33 +367,38 @@ class BattleScene extends Phaser.Scene {
         this.uiContainer = this.add.container(0, 0);
 
         // Set padding and element dimensions
-        const padding = 50;
+        const padding = this.scale.width / 15;
+        const topMargin = 200;
         const elementHeight = 30;
         const actionButtonHeight = 50;
-        const actionButtonWidth = 120;
         const halfWidth = this.scale.width / 2;
 
         // Help text at the very top
-        this.helpText = this.add.text(padding, padding, 'A battle has begun...', { fontSize: '14px', fill: '#fff' });
+        this.helpText = this.add.text(padding, padding, '', {
+            fontSize: '24px',
+            fill: '#fff',
+            wordWrap: { width: this.scale.width - 2 * padding }
+        });
         this.uiContainer.add(this.helpText);
+        this.addHelpText(`A battle has begun based on the article: ${newsData[0].title}`);
 
         // Player health and mana
-        this.playerHealthText = this.add.text(padding, padding + elementHeight, `Health: ${this.player.health}`, { fontSize: '16px', fill: '#fff' });
-        this.playerManaText = this.add.text(padding, padding + elementHeight * 2, `Mana: ${this.player.mana}`, { fontSize: '16px', fill: '#fff' });
+        this.playerHealthText = this.add.text(padding, topMargin + elementHeight, `Health: ${this.player.health}`, { fontSize: '26px', fill: '#fff' });
+        this.playerManaText = this.add.text(padding, topMargin + elementHeight * 2, `Mana: ${this.player.mana}`, { fontSize: '20px', fill: '#fff' });
 
         // Enemy health and mana
-        this.enemyHealthText = this.add.text(this.scale.width - padding - 200, padding + elementHeight, `Health: ${this.enemy.health}`, { fontSize: '16px', fill: '#fff' });
-        this.enemyManaText = this.add.text(this.scale.width - padding - 200, padding + elementHeight * 2, `Mana: ${this.enemy.mana}`, { fontSize: '16px', fill: '#fff' });
+        this.enemyHealthText = this.add.text(this.scale.width - padding - 200, topMargin + elementHeight, `Health: ${this.enemy.health}`, { fontSize: '26px', fill: '#fff' });
+        this.enemyManaText = this.add.text(this.scale.width - padding - 200, topMargin + elementHeight * 2, `Mana: ${this.enemy.mana}`, { fontSize: '20px', fill: '#fff' });
 
         // Add borders around health and mana areas
-        const playerHealthBox = this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(padding - 10, padding + elementHeight - 10, 200, 75);
-        const enemyHealthBox = this.add.graphics().lineStyle(2, 0xff0000).strokeRect(this.scale.width - padding - 210, padding + elementHeight - 10, 200, 75);
+        const playerHealthBox = this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(padding - 10, topMargin + elementHeight - 10, 200, 75);
+        const enemyHealthBox = this.add.graphics().lineStyle(2, 0xff0000).strokeRect(this.scale.width - padding - 210, topMargin + elementHeight - 10, 200, 75);
         this.uiContainer.add(playerHealthBox);
         this.uiContainer.add(enemyHealthBox);
 
         // Player and enemy sprites
-        this.player.sprite = this.add.sprite(padding + 100, padding + elementHeight * 10 + 50, 'npcBase64image'); // Adjust position as necessary
-        this.enemy.sprite = this.add.sprite(this.scale.width - padding - 100, padding + elementHeight * 10 + 50, 'enemyImageBase64'); // Adjust position as necessary
+        this.player.sprite = this.add.sprite(padding + 100, topMargin + elementHeight * 10 + 50, 'npcBase64image'); // Adjust position as necessary
+        this.enemy.sprite = this.add.sprite(this.scale.width - padding - 100, topMargin + elementHeight * 10 + 50, 'enemyImageBase64'); // Adjust position as necessary
 
         // Add hover animations
         this.add.tween({
@@ -349,12 +419,27 @@ class BattleScene extends Phaser.Scene {
             ease: 'Sine.easeInOut'
         });
 
-
         this.uiContainer.add(this.player.sprite);
         this.uiContainer.add(this.enemy.sprite);
 
+        // Player and enemy names and descriptions
+        const playerDescriptionText = `${this.player.name}: ${this.player.description}`;
+        const enemyDescriptionText = `${this.enemy.name}: ${this.enemy.description}`;
+
+        const playerDescription = this.add.text(padding, this.scale.height / 2, playerDescriptionText, { fontSize: '24px', fill: '#fff', wordWrap: { width: 200 } });
+        const enemyDescription = this.add.text(this.scale.width - padding - 200, this.scale.height / 2, enemyDescriptionText, { fontSize: '24px', fill: '#fff', wordWrap: { width: 200 } });
+
+        // Add borders around descriptions
+        const playerDescriptionBox = this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(padding - 10, this.scale.height / 2, 200, playerDescription.height + 20);
+        const enemyDescriptionBox = this.add.graphics().lineStyle(2, 0xff0000).strokeRect(this.scale.width - padding - 210, this.scale.height / 2, 200, enemyDescription.height + 20);
+        this.uiContainer.add(playerDescriptionBox);
+        this.uiContainer.add(enemyDescriptionBox);
+
+        this.uiContainer.add(playerDescription);
+        this.uiContainer.add(enemyDescription);
+
         // Turn order list
-        this.turnOrderText = this.add.text(this.scale.width - 150, this.scale.height / 2, 'Turn List', { fontSize: '36px', fill: '#fff' }).setOrigin(0.5);
+        this.turnOrderText = this.add.text(this.scale.width / 2, this.scale.height / 2, 'Turns:', { fontSize: '36px', fill: '#fff' }).setOrigin(0.5);
         this.updateTurnOrderDisplay();
 
         // Add elements to the UI container
@@ -362,12 +447,13 @@ class BattleScene extends Phaser.Scene {
 
         // Action buttons at the bottom
         this.actions = this.add.group();
-        const actionNames = ['Attack', 'Defend', 'Magic Attack', 'Skills', 'Heal'];
+        const actionNames = ['Attack', 'Defend', 'Spells', 'Skills', 'Heal'];
+        const actionButtonWidth = (this.scale.width - padding * 2) / 5;
 
         actionNames.forEach((actionName, index) => {
-            const x = halfWidth - (actionNames.length * actionButtonWidth) / 2 + index * actionButtonWidth;
+            const x = (padding + halfWidth) - (actionNames.length * actionButtonWidth) / 2 + index * actionButtonWidth;
             const actionText = this.add.text(x, this.scale.height - actionButtonHeight - padding, actionName, {
-                fontSize: '20px',
+                fontSize: '30px',
                 fill: '#fff',
                 backgroundColor: '#000',
                 padding: { left: 20, right: 20, top: 10, bottom: 10 }
@@ -433,7 +519,7 @@ class BattleScene extends Phaser.Scene {
             orderText += `${this.turnOrder[(this.currentTurnIndex + i) % this.turnOrder.length].name}\n`;
         }
 
-        this.turnOrderList = this.add.text(this.scale.width - 150, this.scale.height / 2 + 30, orderText, { fontSize: '30px', fill: '#fff' });
+        this.turnOrderList = this.add.text(this.scale.width / 2, this.scale.height / 2 + 200, orderText, { fontSize: '30px', fill: '#fff' }).setOrigin(0.5);
 
         this.turnOrderList.alpha = 0;
         this.tweens.add({
@@ -460,16 +546,16 @@ class BattleScene extends Phaser.Scene {
     }
 
     applyEffect(target, color) {
-        let healingLight = this.add.graphics();
-        healingLight.fillStyle(color, 0.5); // Green color with some transparency
-        healingLight.fillCircle(target.x, target.y, 50);
+        let effectLight = this.add.graphics();
+        effectLight.fillStyle(color, 0.5);
+        effectLight.fillCircle(target.x, target.y, 50);
         this.tweens.add({
-            targets: healingLight,
+            targets: effectLight,
             alpha: { from: 1, to: 0 },
             duration: 1000,
             ease: 'Power1',
             onComplete: () => {
-                healingLight.destroy();
+                effectLight.destroy();
             }
         });
     }
@@ -478,48 +564,51 @@ class BattleScene extends Phaser.Scene {
         this.hideSubOptions(); // Ensure sub-options are hidden when a main action is chosen
 
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
-            if (action === 'Magic Attack' && !elementType) {
+            let damage = 0;
+            let healing = 0;
+            let critical = false;
+
+            if (action === 'Spells' && !elementType) {
                 this.showElementSelection();
                 return;
             }
 
-            let damage = 0;
-            let critical = false;
             if (action === 'Attack') {
                 damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.luk, this.enemy.eva);
                 this.showDamageIndicator(this.enemy.sprite, damage, critical);
-                this.helpText.setText(`Player attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                this.addHelpText(`Player attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                 this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
-            } else if (action === 'Magic Attack') {
+            } else if (action === 'Spells') {
                 if (this.player.mana >= 10) {
                     damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.enemy.element[elementType], this.player.luk, this.enemy.eva);
                     this.player.mana -= 10;
-                    this.helpText.setText(`Player uses ${elementType} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                    this.addHelpText(`Player uses ${elementType} Spells! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                     this.playMagicAttackAnimation(this.player.sprite, this.enemy.sprite, elementType, damage, critical, this.enemy.element[elementType]);
                 } else {
-                    this.helpText.setText("Not enough mana!");
+                    this.addHelpText("Not enough mana!");
                     return;
                 }
             } else if (action === 'Defend') {
-                this.player.def *= 2; // Temporary defense boost
-                this.player.isDefending = true; // Temporary defense boost
-                this.helpText.setText('Player defends, boosting defense for this turn.');
+                this.player.def *= 4; // Temporary defense boost
+                this.player.isDefending = true;
+                this.addHelpText('Player defends, boosting defense for this turn.');
             } else if (action === 'Skills') {
                 this.showSkillSelection();
                 return;
             } else if (action === 'Heal') {
                 if (this.player.mana >= 15) {
-                    damage = -this.calculateHealing(this.player.magAtk);
+                    healing = this.calculateHealing(this.player.magAtk);
                     this.player.mana -= 15;
-                    this.player.health -= damage; // Assuming 100 is max health
-                    this.helpText.setText(`Player uses Heal! Restores ${damage} health.`);
-                    this.showDamageIndicator(this.player.sprite, damage, critical);
+                    this.player.health += healing;
+                    this.addHelpText(`Player uses Heal! Restores ${healing} health.`);
+                    this.showDamageIndicator(this.player.sprite, -healing, critical);
                     this.applyHealingEffect(this.player.sprite);
                 } else {
-                    this.helpText.setText("Not enough mana!");
+                    this.addHelpText("Not enough mana!");
                     return;
                 }
             }
+
             this.enemy.health -= damage;
             this.playerHealthText.setText(`Health: ${this.player.health}`);
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
@@ -531,7 +620,7 @@ class BattleScene extends Phaser.Scene {
 
     calculateHealing(magAtk) {
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
-        let baseHealing = Math.floor(2 * magAtk * variance);
+        let baseHealing = Math.floor((4 * magAtk + 200) * variance);
         return Math.max(1, baseHealing); // Ensure minimum healing is 1
     }
 
@@ -548,9 +637,10 @@ class BattleScene extends Phaser.Scene {
 
         // Add skill buttons to the new action box
         skills.forEach((skill, index) => {
-            const x = 40 + index * 150; // Adjust spacing as necessary
+            const elementWidth = (this.scale.width - 100) / skills.length;
+            const x = 100 + index * elementWidth; // Adjust spacing as necessary
             const skillText = this.add.text(x, skillBoxY + 25, skill, {
-                fontSize: '20px',
+                fontSize: '30px',
                 fill: '#fff',
                 backgroundColor: '#000',
                 padding: { left: 10, right: 10, top: 5, bottom: 5 }
@@ -562,7 +652,7 @@ class BattleScene extends Phaser.Scene {
                 this.skillButtons.clear(true, true);
                 this.startCooldown();
                 this.hidePlayerActions();
-                skillBox.destroy();
+                this.skillBox.destroy();
             });
             this.skillButtons.add(skillText);
 
@@ -577,14 +667,12 @@ class BattleScene extends Phaser.Scene {
                 ease: 'Power1'
             });
         });
-
-        this.helpText.setText('Choose a skill to inflict status effects.');
     }
 
     showElementSelection() {
         this.hideSubOptions(); // Hide any existing sub-options
 
-        const elements = ['fire', 'ice', 'water', 'lightning'];
+        const elements = ['Fire', 'Ice', 'Water', 'Lightning'];
         this.elementButtons = this.add.group();
 
         // Create a new action box for elements above the original action box
@@ -594,18 +682,19 @@ class BattleScene extends Phaser.Scene {
 
         // Add element buttons to the new action box
         elements.forEach((element, index) => {
-            const x = 40 + index * 150; // Adjust spacing as necessary
+            const elementWidth = (this.scale.width - 100) / elements.length;
+            const x = 100 + index * elementWidth; // Adjust spacing as necessary
             const elementText = this.add.text(x, elementBoxY + 25, element, {
-                fontSize: '20px',
+                fontSize: '30px',
                 fill: '#fff',
                 backgroundColor: '#000',
                 padding: { left: 10, right: 10, top: 5, bottom: 5 }
             }).setOrigin(0.5);
             elementText.setInteractive();
             elementText.on('pointerdown', () => {
-                this.handlePlayerAction('Magic Attack', element);
+                this.handlePlayerAction('Spells', element.toLowerCase());
                 this.elementButtons.clear(true, true);
-                elementBox.destroy();
+                this.elementBox.destroy();
             });
             this.elementButtons.add(elementText);
 
@@ -620,13 +709,9 @@ class BattleScene extends Phaser.Scene {
                 ease: 'Power1'
             });
         });
-
-        this.helpText.setText('Choose an element for your Magic Attack:');
     }
 
     hideSubOptions() {
-        console.log('hideSubOptions... this.skillButtons: ', this.skillButtons);
-        console.log('hideSubOptions... this.elementButtons: ', this.elementButtons);
         if (this.skillButtons) {
             this.skillBox.clear();
             this.skillButtons.clear(true, true);
@@ -639,172 +724,184 @@ class BattleScene extends Phaser.Scene {
 
     enemyAction() {
         console.log('enemyAction...');
-        const performEnemyAction = () => {
-            console.log('performEnemyAction...');
-            console.log('performEnemyAction... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
-            console.log('performEnemyAction... this.isCooldown: ', this.isCooldown);
-            if (this.turnOrder[this.currentTurnIndex].name === 'Enemy' && !this.isCooldown) {
-                let damage = 0;
-                let critical = false;
-                let actionType;
-                let action;
-                let highestDamage = 0;
-                let bestElement = 'physical';
+        console.log('performEnemyAction... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
+        if ((this.turnOrder[this.currentTurnIndex].name === 'Enemy')) {
+            const performEnemyAction = () => {
+                console.log('performEnemyAction...');
+                console.log('performEnemyAction... this.isCooldown: ', this.isCooldown);
+                if (!this.isCooldown) {
+                    let damage = 0;
+                    let critical = false;
+                    let actionType;
+                    let action;
+                    let highestDamage = 0;
+                    let bestElement = 'physical';
 
-                // Periodically reset tried attacks and skills
-                if (this.enemy.triedElements.resetCounter === undefined || this.enemy.triedElements.resetCounter >= 20) {
-                    this.enemy.triedElements = {
-                        fire: this.enemy.learnedElementalWeaknesses.fire < 0 ? this.enemy.triedElements.fire : false,
-                        ice: this.enemy.learnedElementalWeaknesses.ice < 0 ? this.enemy.triedElements.fire : false,
-                        water: this.enemy.learnedElementalWeaknesses.water < 0 ? this.enemy.triedElements.fire : false,
-                        lightning: this.enemy.learnedElementalWeaknesses.lightning < 0 ? this.enemy.triedElements.fire : false,
-                        physical: this.enemy.learnedElementalWeaknesses.physical < 0 ? this.enemy.triedElements.fire : false,
-                        skills: this.enemy.triedElements.skills || [],
-                        resetCounter: 0
-                    };
-                } else {
-                    this.enemy.triedElements.resetCounter++;
-                }
+                    // Periodically reset tried attacks and skills
+                    if (this.enemy.triedElements.resetCounter === undefined || this.enemy.triedElements.resetCounter >= 20) {
+                        console.log('performEnemyAction... Resetting learned damages...');
+                        this.enemy.triedElements = {
+                            fire: this.enemy.learnedElementalWeaknesses.fire < 0 ? this.enemy.triedElements.fire : false,
+                            ice: this.enemy.learnedElementalWeaknesses.ice < 0 ? this.enemy.triedElements.fire : false,
+                            water: this.enemy.learnedElementalWeaknesses.water < 0 ? this.enemy.triedElements.fire : false,
+                            lightning: this.enemy.learnedElementalWeaknesses.lightning < 0 ? this.enemy.triedElements.fire : false,
+                            physical: this.enemy.learnedElementalWeaknesses.physical < 0 ? this.enemy.triedElements.fire : false,
+                            skills: this.enemy.triedElements.skills || [],
+                            resetCounter: 0
+                        };
+                    } else {
+                        this.enemy.triedElements.resetCounter++;
+                    }
 
-                // Determine if there's an element, physical attack, or skill that hasn't been tried yet
-                const elements = Object.keys(this.enemy.triedElements).filter(e => e !== 'resetCounter' && e !== 'skills');
-                let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
+                    // Determine if there's an element, physical attack, or skill that hasn't been tried yet
+                    const elements = Object.keys(this.enemy.triedElements).filter(e => e !== 'resetCounter' && e !== 'skills');
+                    let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
 
-                const skills = this.enemy.actions.skills || [];
-                let untriedSkill = skills.find(skill => !this.enemy.triedElements.skills.includes(skill));
+                    const skills = this.enemy.actions.skills || [];
+                    let untriedSkill = skills.find(skill => !this.enemy.triedElements.skills.includes(skill));
 
-                if (!untriedElement && untriedSkill) {
-                    actionType = 'skills';
-                    action = untriedSkill;
-                } else if (!untriedElement && !untriedSkill) {
-                    // Determine the best attack based on the highest damage dealt so far
-                    for (const [element, dmg] of Object.entries(this.enemy.learnedElementalWeaknesses)) {
-                        console.log(`Checking damage for element ${element}: ${dmg}`);
-                        if (dmg > highestDamage) {
-                            highestDamage = dmg;
-                            bestElement = element;
+                    if (!untriedElement && untriedSkill) {
+                        actionType = 'skills';
+                        action = untriedSkill;
+                    } else if (!untriedElement && !untriedSkill) {
+                        // Determine the best attack based on the highest damage dealt so far
+                        for (const [element, dmg] of Object.entries(this.enemy.learnedElementalWeaknesses)) {
+                            console.log(`performEnemyAction... Checking damage for element ${element}: ${dmg}`);
+                            if (dmg > highestDamage) {
+                                highestDamage = dmg;
+                                bestElement = element;
+                            }
+                        }
+                        if (bestElement === 'physical') {
+                            actionType = 'physical';
+                            action = 'Attack';
+                        } else {
+                            actionType = 'magic';
+                            action = `${bestElement.charAt(0).toUpperCase() + bestElement.slice(1)} Spells`;
+                        }
+                    } else if (untriedElement) {
+                        if (untriedElement === 'physical') {
+                            actionType = 'physical';
+                            action = 'Attack';
+                        } else {
+                            actionType = 'magic';
+                            action = `${untriedElement.charAt(0).toUpperCase() + untriedElement.slice(1)} Spells`;
                         }
                     }
-                    if (bestElement === 'physical') {
-                        actionType = 'physical';
-                        action = 'Attack';
-                    } else {
-                        actionType = 'magic';
-                        action = `${bestElement.charAt(0).toUpperCase() + bestElement.slice(1)} Magic Attack`;
-                    }
-                } else if (untriedElement) {
-                    if (untriedElement === 'physical') {
-                        actionType = 'physical';
-                        action = 'Attack';
-                    } else {
-                        actionType = 'magic';
-                        action = `${untriedElement.charAt(0).toUpperCase() + untriedElement.slice(1)} Magic Attack`;
-                    }
-                }
 
-                console.log('performEnemyAction... actionType: ', actionType);
-                console.log('performEnemyAction... action: ', action);
-                if (actionType === 'physical') {
-                    damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
-                    this.showDamageIndicator(this.player.sprite, damage, critical);
-                    this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-                    this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
-                    this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
-                    this.enemy.triedElements.physical = true; // Mark physical attack as tried
-                } else if (actionType === 'magic') {
-                    const elementType = action.split(' ')[0].toLowerCase();
-
-                    if (this.enemy.mana >= 10) {
-                        damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.luk);
-                        this.enemy.mana -= 10;
-                        this.helpText.setText(`Enemy uses ${elementType.charAt(0).toUpperCase() + elementType.slice(1)} Magic Attack! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-                        this.playMagicAttackAnimation(this.enemy.sprite, this.player.sprite, elementType, damage, critical, this.player.element[elementType]);
-
-                        // Learn about player's elemental weaknesses
-                        this.enemy.learnedElementalWeaknesses[elementType] = Math.max(this.enemy.learnedElementalWeaknesses[elementType], damage);
-                        this.enemy.triedElements[elementType] = true; // Mark this element as tried
-                    } else {
-                        // Fallback to physical attack if not enough mana
+                    console.log('performEnemyAction... actionType: ', actionType);
+                    console.log('performEnemyAction... action: ', action);
+                    if (actionType === 'physical') {
                         damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                         this.showDamageIndicator(this.player.sprite, damage, critical);
-                        this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                        this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                         this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                         this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
                         this.enemy.triedElements.physical = true; // Mark physical attack as tried
-                    }
-                } else if (actionType === 'skills') {
-                    this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
-                    if (skills.includes(action)) {
-                        this.helpText.setText(`Enemy uses ${action}!`);
-                        this.applyStatusEffect('Enemy', 'Player', action);
-                        this.enemy.triedElements.skills.push(action); // Mark skill as tried
-                    } else {
-                        damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
-                        this.showDamageIndicator(this.player.sprite, damage, critical);
-                        this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-                        this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
-                    }
-                } else if (actionType === 'Heal') {
-                    if (this.enemy.mana >= 15) {
-                        damage = -this.calculateHealing(this.enemy.magAtk);
-                        this.enemy.mana -= 15;
-                        this.enemy.health -= damage; // Assuming 100 is max health
-                        this.helpText.setText(`Enemy uses Heal! Restores ${-damage} health.`);
-                        this.showDamageIndicator(this.enemy.sprite, damage, critical);
-                        this.applyHealingEffect(this.enemy.sprite);
-                    } else {
-                        // Fallback to physical attack if not enough mana
-                        damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
-                        this.showDamageIndicator(this.player.sprite, damage, critical);
-                        this.helpText.setText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-                        this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
-                        this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
-                        this.enemy.triedElements.physical = true; // Mark physical attack as tried
-                    }
-                } else if (actionType === 'Defend') {
-                    this.enemy.def *= 2; // Temporary defense boost
-                    this.enemy.isDefending = true; // Temporary defense boost
-                    this.helpText.setText('Enemy defends, boosting defense for this turn.');
-                }
-                console.log('performEnemyAction... damage: ', damage);
+                    } else if (actionType === 'magic') {
+                        const elementType = action.split(' ')[0].toLowerCase();
 
-                this.player.health -= damage;
-                this.playerHealthText.setText(`Health: ${this.player.health}`);
-                this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
-                this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
-                this.startCooldown();
-            } else {
-                console.log('Delaying Call to performEnemyAction...');
-                this.time.delayedCall(200, performEnemyAction, [], this);
-            }
-        };
-        performEnemyAction();
+                        if (this.enemy.mana >= 10) {
+                            damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.luk);
+                            this.enemy.mana -= 10;
+                            this.addHelpText(`Enemy uses ${elementType.charAt(0).toUpperCase() + elementType.slice(1)} Spells! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                            this.playMagicAttackAnimation(this.enemy.sprite, this.player.sprite, elementType, damage, critical, this.player.element[elementType]);
+
+                            // Learn about player's elemental weaknesses
+                            this.enemy.learnedElementalWeaknesses[elementType] = Math.max(this.enemy.learnedElementalWeaknesses[elementType], damage);
+                            this.enemy.triedElements[elementType] = true; // Mark this element as tried
+                        } else {
+                            // Fallback to physical attack if not enough mana
+                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
+                            this.showDamageIndicator(this.player.sprite, damage, critical);
+                            this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                            this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
+                            this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
+                            this.enemy.triedElements.physical = true; // Mark physical attack as tried
+                        }
+                    } else if (actionType === 'skills') {
+                        this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
+                        if (skills.includes(action)) {
+                            this.addHelpText(`Enemy uses ${action}!`);
+                            this.applyStatusEffect('Enemy', 'Player', action);
+                            this.enemy.triedElements.skills.push(action); // Mark skill as tried
+                        } else {
+                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
+                            this.showDamageIndicator(this.player.sprite, damage, critical);
+                            this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                            this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
+                        }
+                    } else if (actionType === 'Heal') {
+                        if (this.enemy.mana >= 15) {
+                            damage = -this.calculateHealing(this.enemy.magAtk);
+                            this.enemy.mana -= 15;
+                            this.enemy.health -= damage; // Assuming 100 is max health
+                            this.addHelpText(`Enemy uses Heal! Restores ${-damage} health.`);
+                            this.showDamageIndicator(this.enemy.sprite, damage, critical);
+                            this.applyHealingEffect(this.enemy.sprite);
+                        } else {
+                            // Fallback to physical attack if not enough mana
+                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
+                            this.showDamageIndicator(this.player.sprite, damage, critical);
+                            this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                            this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
+                            this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
+                            this.enemy.triedElements.physical = true; // Mark physical attack as tried
+                        }
+                    } else if (actionType === 'Defend') {
+                        this.enemy.def *= 4; // Temporary defense boost
+                        this.enemy.isDefending = true; // Temporary defense boost
+                        this.addHelpText('Enemy defends, boosting defense for this turn.');
+                    }
+                    console.log('performEnemyAction... damage: ', damage);
+
+                    this.player.health -= damage;
+                    this.playerHealthText.setText(`Health: ${this.player.health}`);
+                    this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
+                    this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
+                    this.startCooldown();
+                } else {
+                    console.log('Delaying Call to performEnemyAction...');
+                    this.time.delayedCall(200, performEnemyAction, [], this);
+                }
+            };
+            performEnemyAction();
+        } else {
+            console.error('It is not currently the enemy\'s turn');
+        }
     }
 
     applyStatusEffect(caster, target, statusEffect) {
         console.log('applyStatusEffect... caster: ', caster);
         console.log('applyStatusEffect... target: ', target);
         console.log('applyStatusEffect... statusEffect: ', statusEffect);
-        this.time.delayedCall(150, () => {  // Delay of 1 second for a more natural response
+
+        this.time.delayedCall(150, () => {
             let targetCharacter = target === 'Player' ? this.player : this.enemy;
             let casterCharacter = caster === 'Player' ? this.player : this.enemy;
 
-            if (targetCharacter.immunities.includes(statusEffect)) {
-                this.helpText.setText(`${targetCharacter.name} is immune to ${statusEffect}!`);
+            console.log('applyStatusEffect... targetCharacter.immunities: ', targetCharacter.immunities);
+            if (targetCharacter.immunities && targetCharacter.immunities.includes(statusEffect)) {
+                console.log('applyStatusEffect... IMMUNE');
+                this.addHelpText(`${targetCharacter.name} is immune to ${statusEffect}!`);
+                this.showPhraseIndicator(targetCharacter.sprite, 'IMMUNE', '#2bf1ff');
                 if (caster === 'Enemy') {
                     this.enemy.learnedStatusImmunities[statusEffect] = true;
                 }
             } else {
+                console.log('applyStatusEffect... Not Immune');
                 let existingEffect = targetCharacter.statusEffects.find(effect => effect.type === statusEffect);
+                console.log('applyStatusEffect... existingEffect: ', existingEffect);
                 if (existingEffect) {
-                    if (statusEffect === 'Stun') existingEffect.turns = 1;
-                    else if (statusEffect === 'Freeze') existingEffect.turns = 5;
-                    else existingEffect.turns = -1;
-                    this.helpText.setText(`${targetCharacter.name} is already affected by ${statusEffect}. Duration refreshed.`);
+                    if (existingEffect.turns !== -1) { // Only refresh if it is not infinite
+                        if (statusEffect === 'Stun') existingEffect.turns = 1;
+                        else if (statusEffect === 'Freeze') existingEffect.turns = 5;
+                        this.addHelpText(`${targetCharacter.name} is already affected by ${statusEffect}. Duration refreshed.`);
+                    }
                 } else {
-                    let turns = (statusEffect === 'Stun' ? 1 : (statusEffect === 'Freeze' ? 5 : -1)); // -1 means it doesn't expire automatically
+                    let turns = (statusEffect === 'Stun' ? 1 : (statusEffect === 'Freeze' ? 5 : 3)); // 3 turns for non-infinite status effects
                     targetCharacter.statusEffects.push({ type: statusEffect, turns });
-                    this.helpText.setText(`${targetCharacter.name} is now affected by ${statusEffect}!`);
+                    this.addHelpText(`${targetCharacter.name} is now affected by ${statusEffect}!`);
                 }
             }
 
@@ -816,21 +913,21 @@ class BattleScene extends Phaser.Scene {
         if (character.statusIndicators) {
             character.statusIndicators.clear(true, true);
         }
-    
+
         character.statusIndicators = this.add.group();
         const statusEffects = character.statusEffects;
         for (let i = 0; i < statusEffects.length; i++) {
-            let statusText = this.add.text(character.sprite.x - 100, 200 + i * 30, `${statusEffects[i].type} (${statusEffects[i].turns > 0 ? statusEffects[i].turns : '∞'})`, { fontSize: '20px', fill: '#fff', backgroundColor: '#000', padding: { left: 10, right: 10, top: 5, bottom: 5 } });
+            let statusText = this.add.text(character.sprite.x - 100, 300 + i * 30, `${statusEffects[i].type} (${statusEffects[i].turns > 0 ? statusEffects[i].turns : '∞'})`, { fontSize: '20px', fill: '#fff', backgroundColor: '#000', padding: { left: 10, right: 10, top: 5, bottom: 5 } });
             character.statusIndicators.add(statusText);
         }
     }
-    
+
     showDamageIndicator(target, damage, critical, elementValue) {
         let fontColor = '#f0d735';
         let delaytime = 0;
 
         if (elementValue <= 0.0) {
-            delaytime = 500;
+            delaytime = 300;
             fontColor = elementValue < 0.0 ? '#0cc43d' : '#2bf1ff';
             const immunityText = elementValue < 0.0 ? 'BUFF' : 'IMMUNE';
             const displayText = this.add.text(target.x, target.y - 50, immunityText, { fontSize: '50px', fill: fontColor, fontStyle: 'bold' });
@@ -868,6 +965,24 @@ class BattleScene extends Phaser.Scene {
 
         this.time.delayedCall(delaytime, () => {
             const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '60px', fill: fontColor, fontStyle: 'bold' });
+            this.tweens.add({
+                targets: damageText,
+                y: target.y - 250,
+                alpha: { from: 1, to: 0 },
+                duration: 2500,
+                ease: 'Power1',
+                onComplete: () => {
+                    damageText.destroy();
+                }
+            });
+        }, [], this);
+    }
+
+    showPhraseIndicator(target, phrase, color) {
+        let delaytime = 0;
+
+        this.time.delayedCall(delaytime, () => {
+            const damageText = this.add.text(target.x, target.y - 50, phrase, { fontSize: '60px', fill: color, fontStyle: 'bold' });
             this.tweens.add({
                 targets: damageText,
                 y: target.y - 250,
@@ -929,11 +1044,11 @@ class BattleScene extends Phaser.Scene {
     nextTurn() {
         console.log('nextTurn...');
         if (this.turnOrder[this.currentTurnIndex].name === 'Player' && this.player.isDefending) {
-            this.player.def /= 2; // Reset defense boost after turn
+            this.player.def /= 4; // Reset defense boost after turn
             this.player.isDefending = false;
         }
         if (this.turnOrder[this.currentTurnIndex].name === 'Enemy' && this.enemy.isDefending) {
-            this.enemy.def /= 2; // Reset defense boost after turn
+            this.enemy.def /= 4; // Reset defense boost after turn
             this.enemy.isDefending = false;
         }
 
@@ -943,17 +1058,26 @@ class BattleScene extends Phaser.Scene {
 
         if (this.isCharacterFrozenOrStunned(currentCharacter)) {
             this.startCooldown();
+        } else {
+            if (this.turnOrder[this.currentTurnIndex].name === 'Player') {
+                this.showPlayerActions();
+            } else if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
+                this.hidePlayerActions();
+                this.enemyAction();
+            } else {
+                console.error('this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
+            }
+            this.updateTurnOrderDisplay();
+        }
+
+        // Decrement status effect turns only here
+        for (let effect of currentCharacter.statusEffects) {
+            if (effect.turns > 0) {
+                effect.turns--;
+            }
         }
 
         this.handleStatusEffects();
-
-        if (this.turnOrder[this.currentTurnIndex].name === 'Player') {
-            this.showPlayerActions();
-        } else {
-            this.hidePlayerActions();
-            this.enemyAction();
-        }
-        this.updateTurnOrderDisplay();
     }
 
     isCharacterFrozenOrStunned(character) {
@@ -962,27 +1086,13 @@ class BattleScene extends Phaser.Scene {
         const frozenStatus = character.statusEffects.find(effect => effect.type === 'Freeze');
         const stunnedStatus = character.statusEffects.find(effect => effect.type === 'Stun');
 
-        console.log('isCharacterFrozenOrStunned... frozenStatus: ', frozenStatus);
         if (frozenStatus) {
-            frozenStatus.turns--;
-            if (frozenStatus.turns <= 0) {
-                character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Freeze');
-                console.log('isCharacterFrozenOrStunned... character.statusEffects: ', character.statusEffects);
-                this.updateStatusIndicators(character);
-                return false;
-            }
-            this.helpText.setText(`${character.name} is frozen and skips a turn!`);
+            this.addHelpText(`${character.name} is frozen and skips a turn!`);
             return true;
         }
 
         if (stunnedStatus) {
-            stunnedStatus.turns--;
-            if (stunnedStatus.turns <= 0) {
-                character.statusEffects = character.statusEffects.filter(effect => effect.type !== 'Stun');
-                this.updateStatusIndicators(character);
-                return false;
-            }
-            this.helpText.setText(`${character.name} is stunned and skips a turn!`);
+            this.addHelpText(`${character.name} is stunned and skips a turn!`);
             return true;
         }
 
@@ -993,31 +1103,37 @@ class BattleScene extends Phaser.Scene {
         const currentCharacter = this.turnOrder[this.currentTurnIndex].name === 'Player' ? this.player : this.enemy;
 
         for (let i = currentCharacter.statusEffects.length - 1; i >= 0; i--) {
-            let effect = currentCharacter.statusEffects[i];
+            this.time.delayedCall(500 * i, () => {
+                let effect = currentCharacter.statusEffects[i];
+                let damage = 0;
 
-            switch (effect.type) {
-                case 'Poison':
-                    currentCharacter.health -= 10; // Example poison damage
-                    this.helpText.setText(`${currentCharacter.name} takes poison damage!`);
-                    break;
-                case 'Burn':
-                    currentCharacter.health -= 15; // Example burn damage
-                    this.helpText.setText(`${currentCharacter.name} takes burn damage!`);
-                    break;
-                // Stun and Freeze are handled in isCharacterFrozenOrStunned method
-            }
+                if (effect && effect.type) {
 
-            if (effect.turns > 0) {
-                effect.turns--;
-                if (effect.turns === 0) {
-                    currentCharacter.statusEffects.splice(i, 1);
+                    switch (effect.type) {
+                        case 'Poison':
+                            damage = Math.floor(currentCharacter.health * 0.05);
+                            currentCharacter.health -= damage;
+                            this.addHelpText(`${currentCharacter.name} takes poison damage!`);
+                            this.showDamageIndicator(currentCharacter.sprite, damage);
+                            break;
+                        case 'Burn':
+                            damage = Math.floor(currentCharacter.health * 0.05);
+                            currentCharacter.health -= damage;
+                            this.addHelpText(`${currentCharacter.name} takes burn damage!`);
+                            this.showDamageIndicator(currentCharacter.sprite, damage);
+                            break;
+                        // Stun and Freeze are handled in isCharacterFrozenOrStunned method
+                    }
+
+                    if (currentCharacter.health <= 0) {
+                        this.endBattle(currentCharacter.name === 'Player' ? 'lose' : 'win');
+                    }
                 }
-            }
-
-            if (currentCharacter.health <= 0) {
-                this.endBattle(currentCharacter.name === 'Player' ? 'lose' : 'win');
-            }
+            }, [], this);
         }
+
+        // Filter out status effects with 0 turns left
+        currentCharacter.statusEffects = currentCharacter.statusEffects.filter(effect => effect.turns !== 0);
 
         this.updateStatusIndicators(currentCharacter);
     }
@@ -1049,19 +1165,26 @@ class BattleScene extends Phaser.Scene {
                 duration: 50,
                 yoyo: true,
                 repeat: 5,
-                ease: 'Sine.easeInOut'
+                ease: 'Sine.easeInOut',
+                onComplete: () => {
+                    defender.angle = 0; // Reset defender angle
+                }
             });
         }, [], this);
     }
 
     playMagicAttackAnimation(attacker, defender, elementType, damage, critical, elementValue) {
         let color;
+        let statusEffect = null;
+
         switch (elementType) {
             case 'fire':
                 color = 0xff4500; // Orange
+                statusEffect = 'Burn';
                 break;
             case 'ice':
                 color = 0x00ffff; // Cyan
+                statusEffect = 'Freeze';
                 break;
             case 'water':
                 color = 0x1e90ff; // DodgerBlue
@@ -1082,23 +1205,11 @@ class BattleScene extends Phaser.Scene {
             magicBall.destroy();
             this.applyEffect(defender, color);
             this.showDamageIndicator(defender, damage, critical, elementValue);
-        });
-    }
 
-    createExplosion(x, y, color) {
-        let particles = this.add.particles('particle');
-        let emitter = particles.createEmitter({
-            x: x,
-            y: y,
-            speed: { min: -800, max: 800 },
-            angle: { min: 0, max: 360 },
-            scale: { start: 0.5, end: 0 },
-            blendMode: 'ADD',
-            lifespan: 500,
-            tint: color
-        });
-        this.time.delayedCall(500, () => {
-            particles.destroy();
+            // Inflict status effect if applicable and defender has immunities property
+            if (statusEffect && defender.immunities && !defender.immunities.includes(statusEffect)) {
+                this.applyStatusEffect(attacker.name, defender.name, statusEffect);
+            }
         });
     }
 }
@@ -1143,46 +1254,47 @@ async function generateEnemyImage(newsArticle, setting) {
     const prompt = `Generate an image of an enemy based on the following description:${monsterDescription}`;
     const encodedPrompt = encodeURIComponent(prompt);
 
-    try {
-        const imageResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodedPrompt}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ prompt: prompt, generateImage: true })
-        });
+    if (!costSavingMode) {
+        try {
+            const imageResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodedPrompt}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ prompt: prompt, generateImage: true })
+            });
 
-        if (!imageResponse.ok) {
-            throw new Error('Network response was not ok');
-        }
+            if (!imageResponse.ok) {
+                throw new Error('Network response was not ok');
+            }
 
-        const data = await imageResponse.json();
-        const parsedBody = JSON.parse(data.body);
-        if (parsedBody && parsedBody.base64_image) {
-            return `data:image/png;base64,${parsedBody.base64_image}`;
-        } else {
-            location.reload();
-            throw new Error('No image generated');
+            const data = await imageResponse.json();
+            const parsedBody = JSON.parse(data.body);
+            if (parsedBody && parsedBody.base64_image) {
+                return `data:image/png;base64,${parsedBody.base64_image}`;
+            } else {
+                throw new Error('No image generated');
+            }
+        } catch (error) {
+            console.error('Error generating enemy image:', error);
+            return generateEnemyImage(newsArticle, setting); // Retry on failure
         }
-    } catch (error) {
-        location.reload();
-        console.error('Error generating enemy image:', error);
-        throw new Error('No image generated');
+    } else {
+        // Cost Saving Mode
+        console.warn('Cost Saving Mode Enabled, No image generation.');
+        return `data:image/png;base64,${genericEnemyBase64}`;
     }
 }
 
 function spawnEnemies(scene) {
     if (newsData.length > 0) {
-        for (let i = 0; i < 3; i++) {
-            let x = Phaser.Math.Between(50, window.innerWidth - 50);
-            let y = Phaser.Math.Between(50, window.innerHeight - 50);
-            let enemy = scene.enemies.create(x, y, 'enemy');
-            enemy.setCollideWorldBounds(true);
-        }
+        let enemy = scene.enemies.create(400, 300, 'enemy');
+        enemy.setCollideWorldBounds(true);
         scene.physics.add.collider(scene.player, scene.enemies, scene.startBattle, null, scene);
         scene.physics.add.collider(scene.enemies, scene.enemies);
+        enemy.description = `${monsterDescription}`;
+
     } else {
-        location.reload();
         console.error('No news data available to generate enemies');
     }
 }
@@ -1194,35 +1306,30 @@ async function fetchNews() {
         const response = await fetch(apiUrl + newsEndpoint);
 
         if (!response.ok) {
-            location.reload();
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const jsonData = await response.json();
 
         if (!jsonData) {
-            location.reload();
             throw new Error('No Data gathered!');
         }
 
         const bodyData = JSON.parse(jsonData.body);
 
         if (!bodyData) {
-            location.reload();
             throw new Error('No body found in the response!');
         }
 
         if (!bodyData.articles) {
-            location.reload();
             throw new Error('No articles found in the body!');
         }
 
         newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
         return;
     } catch (error) {
-        location.reload();
         console.error('Error fetching news:', error);
-        return;
+        return fetchNews(); // Retry on failure
     }
 }
 
@@ -1285,41 +1392,48 @@ async function generateAIResponses() {
                         monsterDescription = monsterDescriptionResponseJson.choices[0].message.content;
                         const imgPrompt = `Generate an image of ${persona.name}, ${persona.description} in the setting chosen: ${setting}.`;
 
-                        try {
-                            const imageResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodeURIComponent(imgPrompt)}`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ prompt: imgPrompt, generateImage: true })
-                            });
+                        if (!costSavingMode) {
+                            try {
+                                const imageResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodeURIComponent(imgPrompt)}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ prompt: imgPrompt, generateImage: true })
+                                });
 
-                            if (!imageResponse.ok) {
-                                throw new Error('Network response was not ok');
-                            }
+                                if (!imageResponse.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
 
-                            const data = await imageResponse.json();
-                            const parsedBody = JSON.parse(data.body);
-                            if (parsedBody && parsedBody.base64_image) {
-                                const base64string = `data:image/png;base64,${parsedBody.base64_image}`;
-                                responses.push({ response: monsterDescription, persona: persona, imageBase64: base64string });
-                                npcBase64image = base64string; // Cache player image correctly
-                            } else {
-                                throw new Error('No image generated');
+                                const data = await imageResponse.json();
+                                const parsedBody = JSON.parse(data.body);
+                                if (parsedBody && parsedBody.base64_image) {
+                                    const base64string = `data:image/png;base64,${parsedBody.base64_image}`;
+                                    responses.push({ response: monsterDescription, persona: persona, imageBase64: base64string });
+                                    npcBase64image = base64string; // Cache player image correctly
+                                } else {
+                                    throw new Error('No image generated');
+                                }
+                            } catch (error) {
+                                console.error('Error generating AI response:', error);
+                                return generateAIResponses(); // Retry on failure
                             }
-                        } catch (error) {
-                            loacation.reload();
-                            console.error('Error generating AI response:', error);
+                        } else {
+                            // Cost Saving Mode
+                            console.warn('Cost Saving Mode Enabled, No image generation.');
+                            npcBase64image = `data:image/png;base64,${genericPlayerBase64}`;
+                            responses.push({ response: monsterDescription, persona: persona, imageBase64: npcBase64image });
                         }
                     }
                 } catch (error) {
-                    loacation.reload();
                     console.error('Error generating AI response:', error);
+                    return generateAIResponses(); // Retry on failure
                 }
             }
         } catch (error) {
-            loacation.reload();
             console.error('Error generating AI response:', error);
+            return generateAIResponses(); // Retry on failure
         }
     }
     return responses;
@@ -1381,7 +1495,7 @@ async function fetchEnemyStats() {
         }
     } catch (error) {
         console.error('Error fetching enemy stats:', error);
-        throw new Error('No stats generated');
+        return fetchEnemyStats(); // Retry on failure
     }
 }
 
@@ -1410,6 +1524,6 @@ async function fetchPlayerStats() {
         }
     } catch (error) {
         console.error('Error fetching player stats:', error);
-        throw new Error('No stats generated');
+        return fetchPlayerStats(); // Retry on failure
     }
 }
