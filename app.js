@@ -1301,7 +1301,6 @@ function spawnEnemies(scene) {
 
 async function fetchNews() {
     if (!costSavingMode) {
-
         try {
             const apiUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
             const newsEndpoint = '/test';
