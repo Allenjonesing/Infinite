@@ -1300,36 +1300,54 @@ function spawnEnemies(scene) {
 }
 
 async function fetchNews() {
-    try {
-        const apiUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
-        const newsEndpoint = '/test';
-        const response = await fetch(apiUrl + newsEndpoint);
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+    if (!costSavingMode) {
+        try {
+            const apiUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
+            const newsEndpoint = '/test';
+            const response = await fetch(apiUrl + newsEndpoint);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            
+            const jsonData = await response.json();
+            
+            if (!jsonData) {
+                throw new Error('No Data gathered!');
+            }
+            
+            const bodyData = JSON.parse(jsonData.body);
+            
+            if (!bodyData) {
+                throw new Error('No body found in the response!');
+            }
+            
+            if (!bodyData.articles) {
+                throw new Error('No articles found in the body!');
+            }
+            
+            newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
+            return;
+        } catch (error) {
+            console.error('Error fetching news:', error);
+            return fetchNews(); // Retry on failure
         }
-
-        const jsonData = await response.json();
-
-        if (!jsonData) {
-            throw new Error('No Data gathered!');
-        }
-
-        const bodyData = JSON.parse(jsonData.body);
-
-        if (!bodyData) {
-            throw new Error('No body found in the response!');
-        }
-
-        if (!bodyData.articles) {
-            throw new Error('No articles found in the body!');
-        }
-
-        newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
+    } else {
+        console.warn('Cost Saving Mode Enabled, returning mock news data.');
+        // Mock news data for cost-saving mode
+        newsData = structureNewsData([
+            {
+                title: 'Local Hero Saves Cat from Tree',
+                description: 'A brave individual scaled a tall oak tree to rescue a cat stuck for hours.',
+                url: 'https://mocknews.com/hero-saves-cat'
+            },
+            {
+                title: 'Mysterious Lights Spotted Over City',
+                description: 'Residents reported seeing strange, glowing lights hovering over downtown.',
+                url: 'https://mocknews.com/mysterious-lights'
+            }
+        ]);
         return;
-    } catch (error) {
-        console.error('Error fetching news:', error);
-        return fetchNews(); // Retry on failure
     }
 }
 
@@ -1533,7 +1551,7 @@ async function fetchEnemyStats() {
             immunities: ["Freeze", "Poison"]
         };
     }
-}
+} 
 
 async function fetchPlayerStats() {
     const prompt = `Generate stats for the player based on this description: ${persona.name}, ${persona.description}. ${statRequirements}`;
