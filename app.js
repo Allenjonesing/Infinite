@@ -1360,21 +1360,21 @@ async function generateAIResponses() {
                     },
                     body: JSON.stringify({ prompt: prompt })
                 });
-                
+
                 if (!settingResponse.ok) {
                     throw new Error('Network response was not ok');
                 }
-                
+
                 const settingResponseJson = await settingResponse.json();
-                
+
                 if (settingResponseJson && settingResponseJson.choices && settingResponseJson.choices[0] && settingResponseJson.choices[0].message && settingResponseJson.choices[0].message.content) {
                     const textContent = settingResponseJson.choices[0].message.content;
-                    
+
                     personas = await generatePersonas(textContent);
                     let foundPersonas = personas.characters && Array.isArray(personas.characters) ? personas.characters : personas;
                     persona = foundPersonas[i % foundPersonas.length]; // Cycle through personas
                     prompt = `As ${persona.name}, ${persona.description}, in the setting chosen: ${setting}. Describe in 10-20 words a Monster that we'll be faced to fight due to a made up reason that makes sense.`;
-                    
+
                     try {
                         const monsterDescriptionResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test?prompt=${encodeURIComponent(prompt)}`, {
                             method: 'POST',
@@ -1383,17 +1383,17 @@ async function generateAIResponses() {
                             },
                             body: JSON.stringify({ prompt: prompt })
                         });
-                        
+
                         if (!monsterDescriptionResponse.ok) {
                             throw new Error('Network response was not ok');
                         }
-                        
+
                         const monsterDescriptionResponseJson = await monsterDescriptionResponse.json();
-                        
+
                         if (monsterDescriptionResponseJson && monsterDescriptionResponseJson.choices && monsterDescriptionResponseJson.choices[0] && monsterDescriptionResponseJson.choices[0].message && monsterDescriptionResponseJson.choices[0].message.content) {
                             monsterDescription = monsterDescriptionResponseJson.choices[0].message.content;
                             const imgPrompt = `Generate an image of ${persona.name}, ${persona.description} in the setting chosen: ${setting}.`;
-                            
+
                             if (!costSavingMode) {
                                 try {
                                     const imageResponse = await fetch(`https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com/test/db?prompt=${encodeURIComponent(imgPrompt)}`, {
@@ -1407,7 +1407,7 @@ async function generateAIResponses() {
                                     if (!imageResponse.ok) {
                                         throw new Error('Network response was not ok');
                                     }
-                                    
+
                                     const data = await imageResponse.json();
                                     const parsedBody = JSON.parse(data.body);
                                     if (parsedBody && parsedBody.base64_image) {
@@ -1501,11 +1501,11 @@ async function fetchEnemyStats() {
                 },
                 body: JSON.stringify({ prompt: prompt })
             });
-            
+
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            
+
             const data = await response.json();
             if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
                 return JSON.parse(data.choices[0].message.content);
@@ -1549,11 +1549,11 @@ async function fetchPlayerStats() {
                 },
                 body: JSON.stringify({ prompt: prompt })
             });
-            
+
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            
+
             const data = await response.json();
             if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
                 return JSON.parse(data.choices[0].message.content);
