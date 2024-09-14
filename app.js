@@ -76,6 +76,7 @@ class ExplorationScene extends Phaser.Scene {
 
         // Randomly select a location
         const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
+        this.selectedLocation = randomLocation;
 
         // Fetch news data and generate AI responses
         await fetchNews();
@@ -181,6 +182,7 @@ class BattleScene extends Phaser.Scene {
     async create(data) {
         // Randomly select a location
         const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
+        this.selectedLocation = randomLocation;
         this.scale.on('resize', this.resize, this), null, randomLocation;
 
         this.player = data.player;
@@ -1934,7 +1936,7 @@ function displayHeroStats(hero) {
 
 function getGameState() {
     return {
-        hero: hero,  // Returning hero's stats, XP, level, etc.
+        hero: this.player,  // Returning hero's stats, XP, level, etc.
         location: selectedLocation,  // Current location data
         progress: { /* Add any game progress variables here */ },
         inventory: { /* If your game has an inventory system, add it here */ }
