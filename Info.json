@@ -927,7 +927,7 @@
                             "water": 0,
                             "lightning": 2
                         },
-                        "immunities": ["Burn", "Poison"]
+                        "immunities": ["Burn"]
                     }
                 },
                 {
