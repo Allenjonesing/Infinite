@@ -373,27 +373,50 @@ class BattleScene extends Phaser.Scene {
         }
     }
 
+    saveGameState() {
+        const gameData = getGameState();  // Fetch current game state
+        saveGame('save1', gameData);      // Save to IndexedDB
+        console.log('Game saved after battle.');
+    }
+    
     endBattle(result) {
         battleEnded = true;
         this.time.delayedCall(1000, () => {
-
             if (result === 'win') {
                 // Handle victory logic
-                this.addHelpText('You Won! Please wait for the window to reload...');
+                this.addHelpText('You Won! Gaining XP...');
                 this.enemy.sprite.destroy(); // Remove enemy sprite
+                                
+                // Save the game state
+                this.saveGameState();
             } else {
                 // Handle defeat logic
                 this.addHelpText('You Lost! Please wait for the window to reload...');
                 this.player.sprite.destroy(); // Remove player sprite
             }
-
+    
             this.time.delayedCall(4000, () => {
                 // Refresh the whole page after the battle ends
                 location.reload();
             }, [], this);
         }, [], this);
     }
-
+    
+    checkForLevelUp() {
+        // Check if the player has enough XP to level up
+        const XP_THRESHOLD = 100; // Example XP threshold for leveling up
+    
+        if (hero.Experience.atkXP >= XP_THRESHOLD) {
+            hero.Level++;
+            hero.Experience.atkXP -= XP_THRESHOLD;  // Carry over excess XP
+    
+            console.log(`You've leveled up! Now level: ${hero.Level}`);
+    
+            // Trigger skill selection
+            this.displayLevelUpScreen();  // Allow player to choose new skills/spells
+        }
+    }
+    
     createUI() {
         // Clear existing UI elements if any
         if (this.uiContainer) {
@@ -599,27 +622,35 @@ class BattleScene extends Phaser.Scene {
 
     handlePlayerAction(action, elementType = null) {
         this.hideSubOptions(); // Ensure sub-options are hidden when a main action is chosen
-
+    
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
             let damage = 0;
             let healing = 0;
             let critical = false;
-
+    
             if (action === 'Spells' && !elementType) {
                 this.showElementSelection();
                 return;
             }
-
+    
             if (action === 'Attack') {
                 damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.luk, this.enemy.eva);
                 this.showDamageIndicator(this.enemy.sprite, damage, critical);
                 this.addHelpText(`Player attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+    
+                // Gain XP for attacking
+                this.gainXP('attack'); // Gain XP for attack action
+    
                 this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
             } else if (action === 'Spells') {
                 if (this.player.mana >= 10) {
                     damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.enemy.element[elementType], this.player.luk, this.enemy.eva);
                     this.player.mana -= 10;
                     this.addHelpText(`Player uses ${elementType} Spells! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+    
+                    // Gain XP for casting a spell
+                    this.gainXP('magic'); // Gain XP for magic action
+    
                     this.playMagicAttackAnimation(this.player.sprite, this.enemy.sprite, elementType, damage, critical, this.enemy.element[elementType]);
                 } else {
                     this.addHelpText("Not enough mana!");
@@ -629,6 +660,9 @@ class BattleScene extends Phaser.Scene {
                 this.player.def *= 4; // Temporary defense boost
                 this.player.isDefending = true;
                 this.addHelpText('Player defends, boosting defense for this turn.');
+    
+                // Gain XP for defending
+                this.gainXP('defend'); // Gain XP for defend action
             } else if (action === 'Skills') {
                 this.showSkillSelection();
                 return;
@@ -638,6 +672,10 @@ class BattleScene extends Phaser.Scene {
                     this.player.mana -= 15;
                     this.player.health += healing;
                     this.addHelpText(`Player uses Heal! Restores ${healing} health.`);
+    
+                    // Gain XP for healing
+                    this.gainXP('magic'); // Gain XP for magic/healing action
+    
                     this.showDamageIndicator(this.player.sprite, -healing, critical);
                     this.applyHealingEffect(this.player.sprite);
                 } else {
@@ -645,7 +683,7 @@ class BattleScene extends Phaser.Scene {
                     return;
                 }
             }
-
+    
             this.enemy.health -= damage;
             this.playerHealthText.setText(`Health: ${this.player.health}`);
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
@@ -654,7 +692,40 @@ class BattleScene extends Phaser.Scene {
             this.hidePlayerActions();
         }
     }
-
+    
+    gainXP(action) {
+        switch(action) {
+            case 'attack':
+                hero.Experience.atkXP += XP_GAIN.attack;
+                console.log(`Gained ${XP_GAIN.attack} XP in Attack`);
+                this.levelUpStat('atk', hero.Experience.atkXP);
+                break;
+            case 'defend':
+                hero.Experience.defXP += XP_GAIN.defend;
+                console.log(`Gained ${XP_GAIN.defend} XP in Defense`);
+                this.levelUpStat('def', hero.Experience.defXP);
+                break;
+            case 'magic':
+                hero.Experience.magAtkXP += XP_GAIN.magic;
+                console.log(`Gained ${XP_GAIN.magic} XP in Magic Attack`);
+                this.levelUpStat('magAtk', hero.Experience.magAtkXP);
+                break;
+            case 'speed':
+                hero.Experience.spdXP += XP_GAIN.speed;
+                console.log(`Gained ${XP_GAIN.speed} XP in Speed`);
+                this.levelUpStat('spd', hero.Experience.spdXP);
+                break;
+            default:
+                console.log("No XP gained");
+        }
+    
+        // After gaining XP, check for level up
+        this.checkForLevelUp();
+    
+        // Optionally save the game state after each turn
+        this.saveGameState();
+    }
+        
     calculateHealing(magAtk) {
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
         let baseHealing = Math.floor((4 * magAtk + 200) * variance);
@@ -1637,3 +1708,167 @@ async function fetchPlayerStats() {
         };
     }
 }
+
+// Function to display the level-up screen where the player can choose a new skill/spell
+function displayLevelUpScreen() {
+    console.log("Congratulations! You've leveled up!");
+
+    // Filter the skill tree to show only skills/spells that are available based on the current level
+    let availableSkills = skillTree.attackSkills.concat(skillTree.magicSkills).filter(skill => skill.requiredLevel <= hero.Level && !hero.KnownSkills.includes(skill));
+
+    if (availableSkills.length > 0) {
+        console.log("You can now unlock a new skill or spell. Choose one from the list:");
+
+        availableSkills.forEach((skill, index) => {
+            console.log(`${index + 1}. ${skill.name} - ${skill.description} (Requires Level: ${skill.requiredLevel})`);
+        });
+
+        console.log("Enter the number of the skill/spell you'd like to unlock.");
+    } else {
+        console.log("No new skills or spells are available to unlock.");
+    }
+}
+
+// Function to handle the player's choice of which skill/spell to unlock
+function unlockSkill(skillIndex) {
+    let availableSkills = skillTree.attackSkills.concat(skillTree.magicSkills).filter(skill => skill.requiredLevel <= hero.Level && !hero.KnownSkills.includes(skill));
+
+    if (skillIndex > 0 && skillIndex <= availableSkills.length) {
+        let chosenSkill = availableSkills[skillIndex - 1];
+        hero.KnownSkills.push(chosenSkill);
+        console.log(`${chosenSkill.name} has been unlocked!`);
+    } else {
+        console.log("Invalid selection. Please try again.");
+        displayLevelUpScreen();  // Let the player choose again
+    }
+}
+
+// Example of leveling up and choosing a new skill/spell
+function levelUp() {
+    hero.Level++;
+    console.log(`You've reached level ${hero.Level}!`);
+    displayLevelUpScreen();
+}
+
+// Save game state
+function saveGame(saveID, gameData) {
+    const transaction = db.transaction([STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+
+    const saveData = {
+        saveID: saveID,
+        data: gameData, // Store structured game data here
+        timestamp: new Date().toISOString()
+    };
+
+    const request = store.put(saveData);
+
+    request.onsuccess = () => {
+        console.log(`Game saved successfully under ID: ${saveID}`);
+    };
+
+    request.onerror = (event) => {
+        console.error('Error saving game:', event.target.errorCode);
+    };
+}
+
+// Load game state
+function loadGame(saveID, callback) {
+    const transaction = db.transaction([STORE_NAME], 'readonly');
+    const store = transaction.objectStore(STORE_NAME);
+
+    const request = store.get(saveID);
+
+    request.onsuccess = (event) => {
+        const saveData = event.target.result;
+        if (saveData) {
+            console.log(`Game loaded successfully:`, saveData.data);
+            callback(saveData.data);
+        } else {
+            console.log('No save found for this ID.');
+        }
+    };
+
+    request.onerror = (event) => {
+        console.error('Error loading game:', event.target.errorCode);
+    };
+}
+
+// Initialize database and set up auto-save
+initDB();
+startAutoSave('save1', getGameState);
+
+// Example of manual save when the player clicks a button
+document.querySelector('#saveButton').addEventListener('click', () => {
+    const gameData = getGameState();
+    saveGame('save1', gameData);
+});
+
+// Example of loading the game when the page is loaded
+window.onload = () => {
+    loadGame('save1', (gameData) => {
+        if (gameData) {
+            // Restore game state from saved data
+            hero = gameData.hero;
+            currentProgress = gameData.progress;
+            inventory = gameData.inventory;
+        }
+    });
+};
+
+let selectedLocation;
+let locationHeroes = [];
+let selectedHero;
+
+// Function to randomly select a location
+function selectRandomLocation() {
+    selectedLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
+    console.log(`Location chosen: ${selectedLocation.Name}`);
+    locationHeroes = selectedLocation.Heros;
+    displayHeroChoices();
+}
+
+// Function to display hero options from the selected location
+function displayHeroChoices() {
+    console.log(`Choose a hero from the following list in ${selectedLocation.Name}:`);
+
+    // List heroes by index
+    locationHeroes.forEach((hero, index) => {
+        console.log(`${index + 1}. ${hero.Name} - ${hero.Description}`);
+    });
+
+    console.log("Enter the number of the hero you'd like to choose:");
+}
+
+// Function to handle the user's hero choice based on input
+function chooseHero(heroIndex) {
+    if (heroIndex > 0 && heroIndex <= locationHeroes.length) {
+        selectedHero = locationHeroes[heroIndex - 1];
+        displayHeroStats(selectedHero);
+
+        // After selecting a hero, start the game or transition to another scene
+        console.log(`Hero chosen: ${selectedHero.Name}`);
+
+        // Start the exploration or battle
+        this.scene.start('ExplorationScene', { player: selectedHero });
+    } else {
+        console.log("Invalid selection. Please choose a valid number from the list.");
+        displayHeroChoices();
+    }
+}
+
+// Example of handling hero selection by index input
+function handleHeroSelectionInput(input) {
+    let heroIndex = parseInt(input);
+    if (!isNaN(heroIndex)) {
+        chooseHero(heroIndex); // Step 2: Choose a hero from the location by index
+    } else {
+        console.log("Invalid input. Please enter a number.");
+    }
+}
+
+// Start the hero selection process
+function startHeroSelection() {
+    selectRandomLocation();  // Step 1: Choose a random location
+}
+
