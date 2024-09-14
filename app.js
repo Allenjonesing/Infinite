@@ -16,6 +16,18 @@ let persona;
 let statRequirements = 'Ensure that the stats match the described creature. They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 1000-10000, mana is 100-500, atk through wis are each 1-100, and the 4 elements are each a int between -1 and 3, where -1 is the strongest (Given to those of that element) and 3 is the weakest (Given to those that oppose this element). Include status immunities in the format {immunities: ["Poison", "Stun", "Burn", "Freeze"]}, only immune half of the statuses in this example.';
 let battleEnded = false;
 
+async function loadGameData() {
+    try {
+        const response = await fetch('info.json'); // Fetch the JSON file from the same directory
+        if (!response.ok) throw new Error('Failed to load game data.');
+        gameData = await response.json();
+        console.log("Game data loaded: ", gameData);
+        return gameData;
+    } catch (error) {
+        console.error('Error loading game data:', error);
+    }
+}
+
 class ExplorationScene extends Phaser.Scene {
     constructor() {
         super({ key: 'ExplorationScene' });
@@ -45,7 +57,6 @@ class ExplorationScene extends Phaser.Scene {
             align: 'center'
         }).setOrigin(0.5);
 
-
         // Fetch news data and generate AI responses
         await fetchNews();
         loadingText.setText(`${loadingText.text}\n\nBased on the article: ${newsData[0].title}`);
@@ -60,13 +71,29 @@ class ExplorationScene extends Phaser.Scene {
         // Prep Base64 images
         this.prepBase64Images();
 
-        // Create player
+        // Load the game data from info.json
+        await loadGameData();
+        
+        // Randomly select a location
+        const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
+
+        // Randomly select a hero and an enemy from the selected location
+        const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
+        const enemy = randomLocation.Enemies[Math.floor(Math.random() * randomLocation.Enemies.length)];
+
+        // Create player and set random hero from JSON data
         this.player = this.physics.add.sprite(400, 300, 'player');
-        this.player.description = `${persona.name}, ${persona.description}`;
+        this.player.description = `${hero.Name}, ${hero.Description}`;
+        this.player.stats = hero.Stats;
+
+        // Create enemy and set random enemy from JSON data
+        this.enemies = this.physics.add.group();
+        let enemySprite = this.enemies.create(600, 300, 'enemy');
+        enemySprite.description = `${enemy.Name}, ${enemy.Description}`;
+        enemySprite.stats = enemy.Stats;
+
         this.player.setCollideWorldBounds(true);
 
-        // Initialize enemies group
-        this.enemies = this.physics.add.group();
         // Spawn enemies after data is ready
         spawnEnemies(this);
         // Remove the loading text and warning text after all steps are complete
@@ -126,6 +153,8 @@ class ExplorationScene extends Phaser.Scene {
 
         // Adjust other elements like UI, if necessary
     }
+
+    
 }
 
 class BattleScene extends Phaser.Scene {
