@@ -23,6 +23,13 @@ let persona;
 let statRequirements = 'Ensure that the stats match the described creature. They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 1000-10000, mana is 100-500, atk through wis are each 1-100, and the 4 elements are each a int between -1 and 3, where -1 is the strongest (Given to those of that element) and 3 is the weakest (Given to those that oppose this element). Include status immunities in the format {immunities: ["Poison", "Stun", "Burn", "Freeze"]}, only immune half of the statuses in this example.';
 let battleEnded = false;
 
+document.addEventListener('click', () => {
+    if (yourAudioContext.state === 'suspended') {
+        yourAudioContext.resume();
+    }
+});
+
+
 async function loadGameData() {
     try {
         const response = await fetch('./Info.json'); // Fetch the JSON file from the same directory
@@ -1856,12 +1863,6 @@ document.querySelector('#saveButton').addEventListener('click', () => {
     saveGame('save1', gameData);
 });
 
-document.addEventListener('click', () => {
-    if (yourAudioContext.state === 'suspended') {
-        yourAudioContext.resume();
-    }
-});
-
 function startAutoSave(saveID, gameData) {
     setInterval(() => {
         saveGame(saveID, gameData);
@@ -1929,6 +1930,15 @@ function displayHeroStats(hero) {
     hero.KnownSkills.forEach(skill => {
         console.log(`${skill.name} - ${skill.description}`);
     });
+}
+
+function getGameState() {
+    return {
+        hero: hero,  // Returning hero's stats, XP, level, etc.
+        location: selectedLocation,  // Current location data
+        progress: { /* Add any game progress variables here */ },
+        inventory: { /* If your game has an inventory system, add it here */ }
+    };
 }
 
 function displaySkills() {
