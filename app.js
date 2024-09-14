@@ -218,7 +218,7 @@ class BattleScene extends Phaser.Scene {
             luk: enemy.Stats.luk,
             wis: enemy.Stats.wis,
             sprite: null,
-            actions: this.generateEnemyActions(hero.Stats),
+            actions: this.generateEnemyActions(enemy.Stats),
             element: enemy.Stats.element, // Example element multipliers
             learnedElementalWeaknesses: {
                 fire: 0,
@@ -406,11 +406,11 @@ class BattleScene extends Phaser.Scene {
         // Check if the player has enough XP to level up
         const XP_THRESHOLD = 100; // Example XP threshold for leveling up
     
-        if (hero.Experience.atkXP >= XP_THRESHOLD) {
-            hero.Level++;
-            hero.Experience.atkXP -= XP_THRESHOLD;  // Carry over excess XP
+        if (this.player.Experience.atkXP >= XP_THRESHOLD) {
+            this.player.Level++;
+            this.player.Experience.atkXP -= XP_THRESHOLD;  // Carry over excess XP
     
-            console.log(`You've leveled up! Now level: ${hero.Level}`);
+            console.log(`You've leveled up! Now level: ${this.player.Level}`);
     
             // Trigger skill selection
             this.displayLevelUpScreen();  // Allow player to choose new skills/spells
@@ -696,24 +696,24 @@ class BattleScene extends Phaser.Scene {
     gainXP(action) {
         switch(action) {
             case 'attack':
-                hero.Experience.atkXP += XP_GAIN.attack;
+                this.player.Experience.atkXP += XP_GAIN.attack;
                 console.log(`Gained ${XP_GAIN.attack} XP in Attack`);
-                this.levelUpStat('atk', hero.Experience.atkXP);
+                this.levelUpStat('atk', this.player.Experience.atkXP);
                 break;
             case 'defend':
-                hero.Experience.defXP += XP_GAIN.defend;
+                this.player.Experience.defXP += XP_GAIN.defend;
                 console.log(`Gained ${XP_GAIN.defend} XP in Defense`);
-                this.levelUpStat('def', hero.Experience.defXP);
+                this.levelUpStat('def', this.player.Experience.defXP);
                 break;
             case 'magic':
-                hero.Experience.magAtkXP += XP_GAIN.magic;
+                this.player.Experience.magAtkXP += XP_GAIN.magic;
                 console.log(`Gained ${XP_GAIN.magic} XP in Magic Attack`);
-                this.levelUpStat('magAtk', hero.Experience.magAtkXP);
+                this.levelUpStat('magAtk', this.player.Experience.magAtkXP);
                 break;
             case 'speed':
-                hero.Experience.spdXP += XP_GAIN.speed;
+                this.player.Experience.spdXP += XP_GAIN.speed;
                 console.log(`Gained ${XP_GAIN.speed} XP in Speed`);
-                this.levelUpStat('spd', hero.Experience.spdXP);
+                this.levelUpStat('spd', this.player.Experience.spdXP);
                 break;
             default:
                 console.log("No XP gained");
