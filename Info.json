@@ -621,16 +621,16 @@
                     "Description": "A massive being made of molten rock.",
                     "Stats": {
                         "health": 13000,
-                        "mana": 200,
+                        "mana": 600,
                         "atk": 95,
                         "def": 90,
-                        "spd": 45,
-                        "eva": 30,
+                        "spd": 35,
+                        "eva": 10,
                         "acc": 65,
                         "magAtk": 70,
-                        "magDef": 80,
-                        "luk": 55,
-                        "wis": 60,
+                        "magDef": 40,
+                        "luk": 25,
+                        "wis": 30,
                         "element": {
                             "fire": -1,
                             "ice": 3,
@@ -649,19 +649,19 @@
                         "atk": 90,
                         "def": 80,
                         "spd": 70,
-                        "eva": 60,
+                        "eva": 80,
                         "acc": 70,
                         "magAtk": 85,
-                        "magDef": 75,
+                        "magDef": 55,
                         "luk": 65,
-                        "wis": 75,
+                        "wis": 55,
                         "element": {
                             "fire": -1,
                             "ice": 3,
-                            "water": 1,
+                            "water": 2,
                             "lightning": 2
                         },
-                        "immunities": ["Burn", "Freeze"]
+                        "immunities": ["Burn", "Freeze", "Stun"]
                     }
                 },
                 {
@@ -670,22 +670,22 @@
                     "Stats": {
                         "health": 11000,
                         "mana": 300,
-                        "atk": 85,
-                        "def": 70,
+                        "atk": 35,
+                        "def": 40,
                         "spd": 65,
-                        "eva": 55,
-                        "acc": 70,
-                        "magAtk": 60,
-                        "magDef": 65,
+                        "eva": 45,
+                        "acc": 50,
+                        "magAtk": 90,
+                        "magDef": 85,
                         "luk": 55,
-                        "wis": 65,
+                        "wis": 95,
                         "element": {
                             "fire": -1,
                             "ice": 3,
-                            "water": 1,
-                            "lightning": 2
+                            "water": 0,
+                            "lightning": 0
                         },
-                        "immunities": ["Burn", "Poison"]
+                        "immunities": ["Burn", "Poison", "Freeze"]
                     }
                 },
                 {
@@ -694,46 +694,46 @@
                     "Stats": {
                         "health": 10000,
                         "mana": 450,
-                        "atk": 70,
-                        "def": 65,
+                        "atk": 30,
+                        "def": 95,
                         "spd": 75,
-                        "eva": 65,
+                        "eva": 55,
                         "acc": 75,
                         "magAtk": 90,
                         "magDef": 85,
                         "luk": 60,
-                        "wis": 80,
+                        "wis": 90,
                         "element": {
-                            "fire": 1,
+                            "fire": -1,
                             "ice": 3,
-                            "water": 0,
-                            "lightning": 2
+                            "water": 2,
+                            "lightning": 0
                         },
-                        "immunities": ["Burn", "Freeze"]
+                        "immunities": ["Burn", "Freeze", "Poison", "Stun"]
                     }
                 },
                 {
                     "Name": "Torr, Magma Golem",
                     "Description": "Colossal being of molten lava and stone.",
                     "Stats": {
-                        "health": 13000,
-                        "mana": 100,
+                        "health": 25000,
+                        "mana": 150,
                         "atk": 90,
                         "def": 95,
-                        "spd": 40,
-                        "eva": 25,
+                        "spd": 10,
+                        "eva": 5,
                         "acc": 55,
-                        "magAtk": 70,
-                        "magDef": 85,
-                        "luk": 35,
-                        "wis": 50,
+                        "magAtk": 50,
+                        "magDef": 20,
+                        "luk": 85,
+                        "wis": 20,
                         "element": {
                             "fire": -1,
                             "ice": 3,
-                            "water": 1,
-                            "lightning": 2
+                            "water": 2,
+                            "lightning": -1
                         },
-                        "immunities": ["Burn", "Freeze", "Poison"]
+                        "immunities": ["Burn", "Freeze", "Poison", "Stun"]
                     }
                 }
             ],
