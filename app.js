@@ -677,7 +677,7 @@ class BattleScene extends Phaser.Scene {
                     // Gain XP for casting a spell
                     this.gainXP('magic'); // Gain XP for magic action
     
-                    this.playMagicAttackAnimation(this.player.sprite, this.enemy.sprite, elementType, damage, critical, this.enemy.element[elementType]);
+                    this.playMagicAttackAnimation(this.player, this.enemy, elementType, damage, critical, this.enemy.element[elementType]);
                 } else {
                     this.addHelpText("Not enough mana!");
                     return;
@@ -710,7 +710,6 @@ class BattleScene extends Phaser.Scene {
                 }
             }
     
-            this.enemy.health -= damage;
             this.playerHealthText.setText(`Health: ${this.player.health}`);
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
             this.playerManaText.setText(`Mana: ${this.player.mana}`);
@@ -949,7 +948,7 @@ class BattleScene extends Phaser.Scene {
                             damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.luk);
                             this.enemy.mana -= 10;
                             this.addHelpText(`Enemy uses ${elementType.charAt(0).toUpperCase() + elementType.slice(1)} Spells! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-                            this.playMagicAttackAnimation(this.enemy.sprite, this.player.sprite, elementType, damage, critical, this.player.element[elementType]);
+                            this.playMagicAttackAnimation(this.enemy, this.player, elementType, damage, critical, this.player.element[elementType]);
 
                             // Learn about player's elemental weaknesses
                             this.enemy.learnedElementalWeaknesses[elementType] = Math.max(this.enemy.learnedElementalWeaknesses[elementType], damage);
@@ -1108,6 +1107,8 @@ class BattleScene extends Phaser.Scene {
         }
 
         this.time.delayedCall(delaytime, () => {
+            target.health -= damage;
+
             const damageText = this.add.text(target.x, target.y - 50, damage, { fontSize: '60px', fill: fontColor, fontStyle: 'bold' });
             this.tweens.add({
                 targets: damageText,
@@ -1341,18 +1342,19 @@ class BattleScene extends Phaser.Scene {
                 break;
         }
 
-        let magicBall = this.add.circle(attacker.x, attacker.y, 30, color);
+        let magicBall = this.add.circle(attacker.sprite.x, attacker.sprite.y, 30, color);
         this.physics.add.existing(magicBall);
-        this.physics.moveTo(magicBall, defender.x, defender.y, 500);
+        this.physics.moveTo(magicBall, defender.sprite.x, defender.sprite.y, 500);
 
         this.time.delayedCall(500, () => {
             magicBall.destroy();
-            this.applyEffect(defender, color);
-            this.showDamageIndicator(defender, damage, critical, elementValue);
+            this.applyEffect(defender.sprite, color);
+            this.showDamageIndicator(defender.sprite, damage, critical, elementValue);
+            defender.health -= damage;
 
             // Inflict status effect if applicable and defender has immunities property
             if (statusEffect && defender.immunities && !defender.immunities.includes(statusEffect)) {
-                this.applyStatusEffect(attacker.name, defender.name, statusEffect);
+                this.applyStatusEffect(attacker.sprite.name, defender.name, statusEffect);
             }
         });
     }
