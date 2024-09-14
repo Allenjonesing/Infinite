@@ -79,7 +79,7 @@ class ExplorationScene extends Phaser.Scene {
 
         // Randomly select a hero and an enemy from the selected location
         const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
-        const enemy = randomLocation.Bosses[Math.floor(Math.random() * randomLocation.Enemies.length)];
+        const enemy = randomLocation.Bosses[Math.floor(Math.random() * randomLocation.Bosses.length)];
 
         // Create player and set random hero from JSON data
         this.player = this.physics.add.sprite(400, 300, 'player');
