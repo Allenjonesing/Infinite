@@ -1790,24 +1790,24 @@ function levelUp() {
 
 // Save game state
 function saveGame(saveID, gameData) {
-    const transaction = db.transaction([STORE_NAME], 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
+    // const transaction = db.transaction([STORE_NAME], 'readwrite');
+    // const store = transaction.objectStore(STORE_NAME);
 
-    const saveData = {
-        saveID: saveID,
-        data: gameData, // Store structured game data here
-        timestamp: new Date().toISOString()
-    };
+    // const saveData = {
+    //     saveID: saveID,
+    //     data: gameData, // Store structured game data here
+    //     timestamp: new Date().toISOString()
+    // };
 
-    const request = store.put(saveData);
+    // const request = store.put(saveData);
 
-    request.onsuccess = () => {
-        console.log(`Game saved successfully under ID: ${saveID}`);
-    };
+    // request.onsuccess = () => {
+    //     console.log(`Game saved successfully under ID: ${saveID}`);
+    // };
 
-    request.onerror = (event) => {
-        console.error('Error saving game:', event.target.errorCode);
-    };
+    // request.onerror = (event) => {
+    //     console.error('Error saving game:', event.target.errorCode);
+    // };
 }
 
 // Load game state
