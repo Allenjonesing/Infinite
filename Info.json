@@ -8,17 +8,17 @@
                     "Name": "Aeron, Windblade",
                     "Description": "Aerial combat expert with dual swords.",
                     "Stats": {
-                        "health": 5000,
-                        "mana": 300,
+                        "health": 2000,
+                        "mana": 50,
                         "atk": 80,
-                        "def": 70,
-                        "spd": 90,
-                        "eva": 80,
+                        "def": 50,
+                        "spd": 80,
+                        "eva": 30,
                         "acc": 85,
-                        "magAtk": 40,
-                        "magDef": 50,
-                        "luk": 60,
-                        "wis": 50,
+                        "magAtk": 20,
+                        "magDef": 10,
+                        "luk": 20,
+                        "wis": 0,
                         "element": {
                             "fire": 1,
                             "ice": 2,
@@ -32,22 +32,22 @@
                     "Name": "Elara, Sky Sorceress",
                     "Description": "Uses weather magic to fight.",
                     "Stats": {
-                        "health": 4000,
+                        "health": 2500,
                         "mana": 450,
-                        "atk": 30,
-                        "def": 40,
-                        "spd": 75,
-                        "eva": 65,
-                        "acc": 70,
+                        "atk": 20,
+                        "def": 20,
+                        "spd": 60,
+                        "eva": 40,
+                        "acc": 60,
                         "magAtk": 90,
                         "magDef": 80,
                         "luk": 50,
                         "wis": 85,
                         "element": {
-                            "fire": 3,
+                            "fire": 1,
                             "ice": 1,
                             "water": 0,
-                            "lightning": 1
+                            "lightning":-1
                         },
                         "immunities": ["Freeze", "Burn"]
                     }
@@ -56,8 +56,8 @@
                     "Name": "Rokar, Thunder Knight",
                     "Description": "Wields a thunder-charged hammer.",
                     "Stats": {
-                        "health": 8000,
-                        "mana": 200,
+                        "health": 2000,
+                        "mana": 50,
                         "atk": 90,
                         "def": 85,
                         "spd": 60,
@@ -142,9 +142,9 @@
                         "luk": 70,
                         "wis": 90,
                         "element": {
-                            "fire": 1,
-                            "ice": 2,
-                            "water": 3,
+                            "fire": 2,
+                            "ice": 1,
+                            "water": 0,
                             "lightning": -1
                         },
                         "immunities": ["Stun", "Burn", "Freeze"]
@@ -160,8 +160,8 @@
                         "def": 70,
                         "spd": 65,
                         "eva": 60,
-                        "acc": 75,
-                        "magAtk": 40,
+                        "acc": 95,
+                        "magAtk": 30,
                         "magDef": 60,
                         "luk": 60,
                         "wis": 65,
@@ -171,7 +171,7 @@
                             "water": 1,
                             "lightning": 0
                         },
-                        "immunities": ["Poison", "Stun"]
+                        "immunities": ["Poison", "Stun", "Burn"]
                     }
                 },
                 {
@@ -185,17 +185,17 @@
                         "spd": 40,
                         "eva": 30,
                         "acc": 60,
-                        "magAtk": 50,
+                        "magAtk": 20,
                         "magDef": 85,
                         "luk": 30,
                         "wis": 40,
                         "element": {
-                            "fire": 2,
+                            "fire": 0,
                             "ice": 3,
-                            "water": 1,
+                            "water": 0,
                             "lightning": 0
                         },
-                        "immunities": ["Burn", "Freeze"]
+                        "immunities": ["Poison", "Stun", "Burn"]
                     }
                 },
                 {
@@ -204,10 +204,10 @@
                     "Stats": {
                         "health": 9000,
                         "mana": 500,
-                        "atk": 40,
-                        "def": 50,
-                        "spd": 75,
-                        "eva": 70,
+                        "atk": 30,
+                        "def": 30,
+                        "spd": 85,
+                        "eva": 90,
                         "acc": 65,
                         "magAtk": 95,
                         "magDef": 80,
@@ -216,10 +216,10 @@
                         "element": {
                             "fire": 3,
                             "ice": 1,
-                            "water": 0,
-                            "lightning": 1
+                            "water": -1,
+                            "lightning": -1
                         },
-                        "immunities": ["Stun", "Freeze"]
+                        "immunities": ["Poison", "Stun", "Freeze"]
                     }
                 },
                 {
@@ -231,19 +231,19 @@
                         "atk": 85,
                         "def": 60,
                         "spd": 90,
-                        "eva": 85,
+                        "eva": 100,
                         "acc": 70,
                         "magAtk": 80,
-                        "magDef": 70,
-                        "luk": 75,
-                        "wis": 80,
+                        "magDef": 90,
+                        "luk": 20,
+                        "wis": 20,
                         "element": {
                             "fire": -1,
-                            "ice": 3,
-                            "water": 2,
-                            "lightning": 1
+                            "ice": -1,
+                            "water": -1,
+                            "lightning": -1
                         },
-                        "immunities": ["Poison", "Burn"]
+                        "immunities": ["Burn", "Stun", "Freeze"]
                     }
                 }
             ],
