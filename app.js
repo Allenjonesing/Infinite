@@ -1794,6 +1794,31 @@ function loadGame(saveID, callback) {
     };
 }
 
+function initDB() {
+    const request = indexedDB.open('GameDatabase', 1); // Open a database with name 'GameDatabase'
+    
+    request.onerror = function(event) {
+        console.error('Database error: ', event.target.errorCode);
+    };
+
+    request.onsuccess = function(event) {
+        console.log('Database initialized successfully');
+        const db = event.target.result;
+
+        // Optional: Perform any operations if you need to handle the DB right after init
+    };
+
+    request.onupgradeneeded = function(event) {
+        const db = event.target.result;
+        // Create an object store (like a table) for your game save data
+        const objectStore = db.createObjectStore('gameSaves', { keyPath: 'saveID' });
+
+        objectStore.createIndex('saveID', 'saveID', { unique: true });
+        console.log('Database upgrade successful: ObjectStore and indexes created');
+    };
+}
+
+
 // Initialize database and set up auto-save
 initDB();
 startAutoSave('save1', getGameState);
