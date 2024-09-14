@@ -23,11 +23,11 @@ let persona;
 let statRequirements = 'Ensure that the stats match the described creature. They must be in JSON like {health,mana,atk,def,spd,eva,magAtk,magDef,luk,wis,element: {fire, ice, water, lightning }, where health is 1000-10000, mana is 100-500, atk through wis are each 1-100, and the 4 elements are each a int between -1 and 3, where -1 is the strongest (Given to those of that element) and 3 is the weakest (Given to those that oppose this element). Include status immunities in the format {immunities: ["Poison", "Stun", "Burn", "Freeze"]}, only immune half of the statuses in this example.';
 let battleEnded = false;
 
-document.addEventListener('click', () => {
-    if (yourAudioContext.state === 'suspended') {
-        yourAudioContext.resume();
-    }
-});
+// document.addEventListener('click', () => {
+//     if (yourAudioContext.state === 'suspended') {
+//         yourAudioContext.resume();
+//     }
+// });
 
 
 async function loadGameData() {
@@ -1861,11 +1861,11 @@ function initDB() {
 initDB();
 startAutoSave('save1', getGameState);
 
-// Example of manual save when the player clicks a button
-document.querySelector('#saveButton').addEventListener('click', () => {
-    const gameData = getGameState();
-    saveGame('save1', gameData);
-});
+// // Example of manual save when the player clicks a button
+// document.querySelector('#saveButton').addEventListener('click', () => {
+//     const gameData = getGameState();
+//     saveGame('save1', gameData);
+// });
 
 function startAutoSave(saveID, gameData) {
     setInterval(() => {
@@ -1885,7 +1885,6 @@ window.onload = () => {
     });
 };
 
-let selectedLocation;
 let locationHeroes = [];
 let selectedHero;
 
@@ -1899,7 +1898,7 @@ function selectRandomLocation() {
 
 // Function to display hero options from the selected location
 function displayHeroChoices() {
-    console.log(`Choose a hero from the following list in ${selectedLocation.Name}:`);
+    console.log(`Choose a hero from the following list in ${this.selectedLocation.Name}:`);
 
     // List heroes by index
     locationHeroes.forEach((hero, index) => {
@@ -1939,7 +1938,7 @@ function displayHeroStats(hero) {
 function getGameState() {
     return {
         hero: this.player,  // Returning hero's stats, XP, level, etc.
-        location: selectedLocation,  // Current location data
+        location: this.selectedLocation,  // Current location data
         progress: { /* Add any game progress variables here */ },
         inventory: { /* If your game has an inventory system, add it here */ }
     };
