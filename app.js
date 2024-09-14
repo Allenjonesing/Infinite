@@ -218,7 +218,7 @@ class BattleScene extends Phaser.Scene {
             luk: enemy.Stats.luk,
             wis: enemy.Stats.wis,
             sprite: null,
-            actions: this.generateEnemyActions(enemyStats),
+            actions: this.generateEnemyActions(hero.Stats),
             element: enemy.Stats.element, // Example element multipliers
             learnedElementalWeaknesses: {
                 fire: 0,
