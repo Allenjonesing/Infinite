@@ -57,6 +57,12 @@ class ExplorationScene extends Phaser.Scene {
             align: 'center'
         }).setOrigin(0.5);
 
+        // Load the game data from info.json
+        await loadGameData();
+
+        // Randomly select a location
+        const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
+
         // Fetch news data and generate AI responses
         await fetchNews();
         loadingText.setText(`${loadingText.text}\n\nBased on the article: ${newsData[0].title}`);
@@ -69,13 +75,7 @@ class ExplorationScene extends Phaser.Scene {
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
 
         // Prep Base64 images
-        this.prepBase64Images();
-
-        // Load the game data from info.json
-        await loadGameData();
-        
-        // Randomly select a location
-        const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
+        this.prepBase64Images();        
 
         // Randomly select a hero and an enemy from the selected location
         const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
@@ -114,7 +114,7 @@ class ExplorationScene extends Phaser.Scene {
     }
 
     displayNewsInfo(news, persona) {
-        this.add.text(20, 20, `Based on the news article: ${news.title}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: window.innerWidth - 40 } });
+        this.add.text(20, 20, `In the ${randomLocation.Name}, ${randomLocation.Description}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: window.innerWidth - 40 } });
         this.add.text(20, 60, `You'll play as: ${persona.name}, ${persona.description}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: window.innerWidth - 40 } });
         this.add.text(20, 100, `You'll be fighting: ${monsterDescription}`, { fontSize: '24px', fill: '#fff', wordWrap: { width: window.innerWidth - 40 } });
 
