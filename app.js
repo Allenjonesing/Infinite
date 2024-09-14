@@ -18,7 +18,7 @@ let battleEnded = false;
 
 async function loadGameData() {
     try {
-        const response = await fetch('./info.json'); // Fetch the JSON file from the same directory
+        const response = await fetch('./Info.json'); // Fetch the JSON file from the same directory
         if (!response.ok) throw new Error('Failed to load game data.');
         gameData = await response.json();
         console.log("Game data loaded: ", gameData);
