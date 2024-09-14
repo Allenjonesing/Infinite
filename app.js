@@ -173,45 +173,53 @@ class BattleScene extends Phaser.Scene {
         // Show loading indicator
         this.showLoadingIndicator();
 
+        // Randomly select a location
+        const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
+
+        // Randomly select a hero and an enemy from the selected location
+        const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
+        const enemy = randomLocation.Enemies[Math.floor(Math.random() * randomLocation.Enemies.length)];
+
+        
         // Initialize player and enemy data
-        const playerStats = await fetchPlayerStats();
+        // const playerStats = await fetchPlayerStats();
         this.player = {
             name: 'Player',
-            description: `${persona.name}, ${persona.description}`,
-            health: playerStats.health,
-            mana: playerStats.mana,
-            atk: playerStats.atk,
-            def: playerStats.def,
-            spd: playerStats.spd,
-            eva: playerStats.eva,
-            magAtk: playerStats.magAtk,
-            magDef: playerStats.magDef,
-            luk: playerStats.luk,
-            wis: playerStats.wis,
+            description: `${hero.Name}, ${hero.Description}`,
+            health: hero.Stats.health,
+            mana: hero.Stats.mana,
+            atk: hero.Stats.atk,
+            def: hero.Stats.def,
+            spd: hero.Stats.spd,
+            eva: hero.Stats.eva,
+            magAtk: hero.Stats.magAtk,
+            magDef: hero.Stats.magDef,
+            luk: hero.Stats.luk,
+            wis: hero.Stats.wis,
             sprite: null,
             actions: ['Attack', 'Defend', 'Spells', 'Skills'],
-            element: playerStats.element,
+            element: hero.Stats.element,
             statusEffects: [],
-            immunities: playerStats.immunities || []
+            immunities: hero.Stats.immunities || []
         };
 
-        const enemyStats = await fetchEnemyStats();
+        // const enemyStats = await fetchEnemyStats();
         this.enemy = {
             name: 'Enemy',
-            description: monsterDescription,
-            health: enemyStats.health,
-            mana: enemyStats.mana,
-            atk: enemyStats.atk,
-            def: enemyStats.def,
-            spd: enemyStats.spd,
-            eva: enemyStats.eva,
-            magAtk: enemyStats.magAtk,
-            magDef: enemyStats.magDef,
-            luk: enemyStats.luk,
-            wis: enemyStats.wis,
+            description: `${enemy.Name}, ${enemy.Description}`,
+            health: enemy.Stats.health,
+            mana: enemy.Stats.mana,
+            atk: enemy.Stats.atk,
+            def: enemy.Stats.def,
+            spd: enemy.Stats.spd,
+            eva: enemy.Stats.eva,
+            magAtk: enemy.Stats.magAtk,
+            magDef: enemy.Stats.magDef,
+            luk: enemy.Stats.luk,
+            wis: enemy.Stats.wis,
             sprite: null,
             actions: this.generateEnemyActions(enemyStats),
-            element: enemyStats.element, // Example element multipliers
+            element: enemy.Stats.element, // Example element multipliers
             learnedElementalWeaknesses: {
                 fire: 0,
                 ice: 0,
@@ -228,7 +236,7 @@ class BattleScene extends Phaser.Scene {
                 physical: false
             },
             statusEffects: [],
-            immunities: enemyStats.immunities || []
+            immunities: enemy.Stats.immunities || []
         };
 
         // Hide loading indicator
