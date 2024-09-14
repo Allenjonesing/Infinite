@@ -1106,6 +1106,10 @@ class BattleScene extends Phaser.Scene {
         this.time.delayedCall(delaytime, () => {
             target.health -= damage;
 
+            this.playerHealthText.setText(`Health: ${this.player.health}`);
+            this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
+
+
             const damageText = this.add.text(target.sprite.x, target.sprite.y - 50, damage, { fontSize: '60px', fill: fontColor, fontStyle: 'bold' });
             this.tweens.add({
                 targets: damageText,
@@ -1341,7 +1345,7 @@ class BattleScene extends Phaser.Scene {
         this.physics.add.existing(magicBall);
         this.physics.moveTo(magicBall, defender.sprite.x, defender.sprite.y, 500);
 
-        this.time.delayedCall(500, () => {
+        this.time.delayedCall(800, () => {
             magicBall.destroy();
             this.applyEffect(defender.sprite, color);
             this.showDamageIndicator(defender, damage, critical, elementValue);
