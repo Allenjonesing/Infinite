@@ -172,7 +172,9 @@ class BattleScene extends Phaser.Scene {
     }
 
     async create(data) {
-        this.scale.on('resize', this.resize, this);
+        // Randomly select a location
+        const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
+        this.scale.on('resize', this.resize, this), null, randomLocation;
 
         this.player = data.player;
         this.enemy = data.enemy;
@@ -180,8 +182,6 @@ class BattleScene extends Phaser.Scene {
         // Show loading indicator
         this.showLoadingIndicator();
 
-        // Randomly select a location
-        const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
 
         // Randomly select a hero and an enemy from the selected location
         const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
@@ -207,7 +207,17 @@ class BattleScene extends Phaser.Scene {
             actions: ['Attack', 'Defend', 'Spells', 'Skills'],
             element: hero.Stats.element,
             statusEffects: [],
-            immunities: hero.Stats.immunities || []
+            immunities: hero.Stats.immunities || [],
+            Experience: {
+                atkXP: 0,
+                defXP: 0,
+                spdXP: 0,
+                magAtkXP: 0
+            },
+            KnownSkills: [
+                { name: "Slash", requiredLevel: 1, type: "physical", description: "A basic physical attack." }
+            ],
+            Level: 1
         };
 
         // const enemyStats = await fetchEnemyStats();
@@ -260,7 +270,7 @@ class BattleScene extends Phaser.Scene {
                 this.isCooldown = false;
 
                 // Display UI elements
-                this.createUI();
+                this.createUI(randomLocation);
 
                 // Check whose turn it is and start the action immediately if it's the enemy's turn
                 if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
@@ -314,7 +324,7 @@ class BattleScene extends Phaser.Scene {
         }
     }
 
-    resize(gameSize, baseSize, displaySize, resolution) {
+    resize(gameSize, baseSize, displaySize, resolution, randomLocation) {
         let width = gameSize.width;
         let height = gameSize.height;
 
@@ -324,7 +334,7 @@ class BattleScene extends Phaser.Scene {
         this.cameras.resize(width, height);
 
         // Adjust other elements like UI, if necessary
-        this.createUI(); // Recreate the UI on resize
+        this.createUI(randomLocation); // Recreate the UI on resize
     }
 
     generateEnemyActions(stats) {
@@ -424,7 +434,7 @@ class BattleScene extends Phaser.Scene {
         }
     }
     
-    createUI() {
+    createUI(location) {
         // Clear existing UI elements if any
         if (this.uiContainer) {
             this.uiContainer.destroy(true);
@@ -731,6 +741,16 @@ class BattleScene extends Phaser.Scene {
     
         // Optionally save the game state after each turn
         this.saveGameState();
+    }
+
+
+    levelUpStat(stat, xp) {
+        const XP_THRESHOLD = 100;  // Example threshold for leveling up
+        if (xp >= XP_THRESHOLD) {
+            hero.Stats[stat] += Math.floor(xp / XP_THRESHOLD);  // Level up stat
+            hero.Experience[`${stat}XP`] = xp % XP_THRESHOLD;  // Carry over leftover XP
+            console.log(`${stat.toUpperCase()} leveled up! New ${stat} stat: ${hero.Stats[stat]}`);
+        }
     }
         
     calculateHealing(magAtk) {
@@ -1882,6 +1902,49 @@ function displayHeroChoices() {
     });
 
     console.log("Enter the number of the hero you'd like to choose:");
+}
+
+function checkForNewSkills() {
+    let availableSkills = skillTree.attackSkills.concat(skillTree.magicSkills).filter(skill => skill.requiredLevel <= hero.Level && !hero.KnownSkills.includes(skill));
+
+    availableSkills.forEach(skill => {
+        hero.KnownSkills.push(skill); // Add the new skill to KnownSkills
+        console.log(`New skill unlocked: ${skill.name} - ${skill.description}`);
+    });
+}
+
+function displayHeroStats(hero) {
+    console.log(`Hero: ${hero.Name}`);
+    console.log(`Health: ${hero.Stats.health}`);
+    console.log(`Attack: ${hero.Stats.atk}`);
+    console.log(`Defense: ${hero.Stats.def}`);
+    console.log(`Speed: ${hero.Stats.spd}`);
+    console.log(`Magic Attack: ${hero.Stats.magAtk}`);
+    console.log(`Magic Defense: ${hero.Stats.magDef}`);
+    console.log(`XP for Attack: ${hero.Experience.atkXP}`);
+    console.log(`XP for Defense: ${hero.Experience.defXP}`);
+    console.log(`XP for Speed: ${hero.Experience.spdXP}`);
+    console.log(`XP for Magic Attack: ${hero.Experience.magAtkXP}`);
+    console.log(`Known Skills:`);
+    hero.KnownSkills.forEach(skill => {
+        console.log(`${skill.name} - ${skill.description}`);
+    });
+}
+
+function displaySkills() {
+    let skillButtons = [];
+    hero.KnownSkills.forEach(skill => {
+        let button = this.add.text(100, 200, skill.name, {
+            fontSize: '32px',
+            fill: '#fff',
+        });
+        button.setInteractive();
+        button.on('pointerdown', () => {
+            console.log(`Used ${skill.name}`);
+            // Add skill usage logic here
+        });
+        skillButtons.push(button);
+    });
 }
 
 // Function to handle the user's hero choice based on input
