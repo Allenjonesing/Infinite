@@ -979,6 +979,286 @@
                     }
                 }
             ]
-        }
+        },
+        {
+        "Name": "Frostgarde Tundra",
+        "Description": "An icy wasteland where temperatures drop far below freezing. The tundra is home to ferocious creatures adapted to the cold and is guarded by powerful ice spirits. Frozen caverns and glaciers dominate the landscape.",
+        "Heros": [
+          {
+            "Name": "Bryn, Frostborne",
+            "Description": "A warrior who thrives in cold environments.",
+            "Stats": {
+              "health": 8000,
+              "mana": 250,
+              "atk": 85,
+              "def": 70,
+              "spd": 60,
+              "eva": 50,
+              "acc": 60,
+              "magAtk": 50,
+              "magDef": 70,
+              "luk": 40,
+              "wis": 60,
+              "element": {
+                "ice": -1,
+                "fire": 3,
+                "lightning": 1,
+                "water": 2
+              },
+              "immunities": ["Freeze", "Poison"]
+            }
+          },
+          {
+            "Name": "Lirien, Fire Mage",
+            "Description": "Master of flames in the cold tundra.",
+            "Stats": {
+              "health": 6000,
+              "mana": 400,
+              "atk": 40,
+              "def": 50,
+              "spd": 65,
+              "eva": 55,
+              "acc": 70,
+              "magAtk": 95,
+              "magDef": 60,
+              "luk": 65,
+              "wis": 90,
+              "element": {
+                "fire": 0,
+                "ice": 3,
+                "lightning": 1,
+                "water": 2
+              },
+              "immunities": ["Burn", "Freeze"]
+            }
+          }
+
+        ],
+        "Bosses": [
+          {
+            "Name": "Glacius, The Frozen King",
+            "Description": "Ruler of the frozen wasteland.",
+            "Stats": {
+              "health": 12000,
+              "mana": 300,
+              "atk": 90,
+              "def": 80,
+              "spd": 50,
+              "eva": 40,
+              "acc": 65,
+              "magAtk": 80,
+              "magDef": 85,
+              "luk": 60,
+              "wis": 80,
+              "element": {
+                "ice": -1,
+                "fire": 3,
+                "lightning": 1,
+                "water": 2
+              },
+              "immunities": ["Freeze", "Stun"]
+            }
+          }
+
+        ],
+        "Enemies": [
+          {
+            "Name": "Snow Wolf",
+            "Description": "Predator of the tundra.",
+            "Stats": {
+              "health": 3000,
+              "mana": 150,
+              "atk": 65,
+              "def": 50,
+              "spd": 70,
+              "eva": 60,
+              "acc": 55,
+              "magAtk": 40,
+              "magDef": 45,
+              "luk": 40,
+              "wis": 50,
+              "element": {
+                "ice": 1,
+                "fire": 3,
+                "lightning": 2,
+                "water": 1
+              },
+              "immunities": ["Freeze", "Poison"]
+            }
+          }
+
+        ]
+      },
+      {
+        "Name": "Thunderpeak Canyon",
+        "Description": "A jagged canyon where thunderstorms rage constantly. The air crackles with lightning, and the ground is treacherous with steep drops and unstable rock formations. Creatures that thrive on electricity roam freely here.",
+        "Heros": [
+          {
+            "Name": "Taryn, Storm Knight",
+            "Description": "Lightning-infused swordfighter.",
+            "Stats": {
+              "health": 7500,
+              "mana": 300,
+              "atk": 85,
+              "def": 60,
+              "spd": 70,
+              "eva": 50,
+              "acc": 65,
+              "magAtk": 70,
+              "magDef": 60,
+              "luk": 50,
+              "wis": 60,
+              "element": {
+                "lightning": -1,
+                "water": 3,
+                "fire": 2,
+                "ice": 1
+              },
+              "immunities": ["Stun", "Shock"]
+            }
+          }
+
+        ],
+        "Bosses": [
+          {
+            "Name": "Zorkan, Storm Titan",
+            "Description": "Massive being that controls thunder.",
+            "Stats": {
+              "health": 14000,
+              "mana": 200,
+              "atk": 100,
+              "def": 85,
+              "spd": 45,
+              "eva": 30,
+              "acc": 60,
+              "magAtk": 90,
+              "magDef": 80,
+              "luk": 70,
+              "wis": 85,
+              "element": {
+                "lightning": -1,
+                "ice": 3,
+                "water": 2,
+                "fire": 1
+              },
+              "immunities": ["Shock", "Burn"]
+            }
+          }
+
+        ],
+        "Enemies": [
+          {
+            "Name": "Thunderbat",
+            "Description": "Small flying creature that channels electricity.",
+            "Stats": {
+              "health": 2500,
+              "mana": 100,
+              "atk": 60,
+              "def": 45,
+              "spd": 80,
+              "eva": 70,
+              "acc": 65,
+              "magAtk": 50,
+              "magDef": 40,
+              "luk": 55,
+              "wis": 60,
+              "element": {
+                "lightning": 0,
+                "water": 3,
+                "fire": 1,
+                "ice": 2
+              },
+              "immunities": ["Shock", "Stun"]
+            }
+          }
+
+        ]
+      },
+      {
+        "Name": "Abyssal Ruins",
+        "Description": "An ancient city sunk deep beneath the ocean, filled with coral-covered ruins and submerged caverns. The dark waters are home to strange and dangerous creatures, and only those who can breathe underwater or possess magical means can survive the descent.",
+        "Heros": [
+          {
+            "Name": "Neriah, Tidecaller",
+            "Description": "A water mage who commands the ocean.",
+            "Stats": {
+              "health": 7000,
+              "mana": 400,
+              "atk": 50,
+              "def": 60,
+              "spd": 55,
+              "eva": 60,
+              "acc": 70,
+              "magAtk": 90,
+              "magDef": 80,
+              "luk": 65,
+              "wis": 85,
+              "element": {
+                "water": -1,
+                "lightning": 3,
+                "fire": 2,
+                "ice": 1
+              },
+              "immunities": ["Water", "Freeze"]
+            }
+          }
+
+        ],
+        "Bosses": [
+          {
+            "Name": "Krakenos, Abyssal Beast",
+            "Description": "Giant sea monster that terrorizes the ruins.",
+            "Stats": {
+              "health": 15000,
+              "mana": 300,
+              "atk": 100,
+              "def": 90,
+              "spd": 40,
+              "eva": 30,
+              "acc": 65,
+              "magAtk": 85,
+              "magDef": 80,
+              "luk": 70,
+              "wis": 75,
+              "element": {
+                "water": -1,
+                "lightning": 3,
+                "fire": 1,
+                "ice": 2
+              },
+              "immunities": ["Water", "Stun"]
+            }
+          }
+
+        ],
+        "Enemies": [
+          {
+            "Name": "Deep Sea Serpent",
+            "Description": "A long, slithering sea snake.",
+            "Stats": {
+              "health": 3000,
+              "mana": 200,
+              "atk": 60,
+              "def": 50,
+              "spd": 60,
+              "eva": 50,
+              "acc": 65,
+              "magAtk": 55,
+              "magDef": 45,
+              "luk": 55,
+              "wis": 60,
+              "element": {
+                "water": 0,
+                "lightning": 3,
+                "fire": 1,
+                "ice": 2
+              },
+              "immunities": ["Water", "Freeze"]
+            }
+          }
+
+        ]
+      }
     ]
-}
+  }
+  
