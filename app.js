@@ -140,6 +140,8 @@ class ExplorationScene extends Phaser.Scene {
         // Create enemies group and add small enemies
         this.enemies = this.physics.add.group();
         console.log('this.enemies: ', this.enemies);
+        this.formattedEnemyObjects = [];
+        console.log('this.formattedEnemyObjects: ', this.formattedEnemyObjects);
         this.enemyObjects.forEach((enemyData, index) => {
             console.log('enemyData: ', enemyData);
             let enemySprite = this.enemies.create(600, 300, 'enemy');
@@ -181,7 +183,10 @@ class ExplorationScene extends Phaser.Scene {
                 statusEffects: [],
                 immunities: enemyData.Stats.immunities || []
             };
+            console.log('enemyObject: ', enemyObject);
+
             this.formattedEnemyObjects.push(enemyObject);
+            console.log('this.formattedEnemyObjects: ', this.formattedEnemyObjects);
         });
 
 
