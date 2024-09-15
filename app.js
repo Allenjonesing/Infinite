@@ -248,71 +248,71 @@ class BattleScene extends Phaser.Scene {
         
         // Initialize player and enemy data
         // const playerStats = await fetchPlayerStats();
-        this.player = {
-            // name: 'Player',
-            // description: `${hero.Name}, ${hero.Description}`,
-            // health: hero.Stats.health,
-            // mana: hero.Stats.mana,
-            // atk: hero.Stats.atk,
-            // def: hero.Stats.def,
-            // spd: hero.Stats.spd,
-            // eva: hero.Stats.eva,
-            // magAtk: hero.Stats.magAtk,
-            // magDef: hero.Stats.magDef,
-            // luk: hero.Stats.luk,
-            // wis: hero.Stats.wis,
-            sprite: null,
-            actions: ['Attack', 'Defend', 'Spells', 'Skills'],
-            //element: hero.Stats.element,
-            statusEffects: [],
-            //immunities: hero.Stats.immunities || [],
-            Experience: {
-                atkXP: 0,
-                defXP: 0,
-                spdXP: 0,
-                magAtkXP: 0
-            },
-            KnownSkills: [
-                { name: "Slash", requiredLevel: 1, type: "physical", description: "A basic physical attack." }
-            ],
-            Level: 1
-        };
+        // this.player = {
+        //     // name: 'Player',
+        //     // description: `${hero.Name}, ${hero.Description}`,
+        //     // health: hero.Stats.health,
+        //     // mana: hero.Stats.mana,
+        //     // atk: hero.Stats.atk,
+        //     // def: hero.Stats.def,
+        //     // spd: hero.Stats.spd,
+        //     // eva: hero.Stats.eva,
+        //     // magAtk: hero.Stats.magAtk,
+        //     // magDef: hero.Stats.magDef,
+        //     // luk: hero.Stats.luk,
+        //     // wis: hero.Stats.wis,
+        //     sprite: null,
+        //     actions: ['Attack', 'Defend', 'Spells', 'Skills'],
+        //     //element: hero.Stats.element,
+        //     statusEffects: [],
+        //     //immunities: hero.Stats.immunities || [],
+        //     Experience: {
+        //         atkXP: 0,
+        //         defXP: 0,
+        //         spdXP: 0,
+        //         magAtkXP: 0
+        //     },
+        //     KnownSkills: [
+        //         { name: "Slash", requiredLevel: 1, type: "physical", description: "A basic physical attack." }
+        //     ],
+        //     Level: 1
+        // };
 
         // const enemyStats = await fetchEnemyStats();
-        this.enemy = {
-            // name: 'Enemy',
-            // description: `${enemy.Name}, ${enemy.Description}`,
-            // health: enemy.Stats.health,
-            // mana: enemy.Stats.mana,
-            // atk: enemy.Stats.atk,
-            // def: enemy.Stats.def,
-            // spd: enemy.Stats.spd,
-            // eva: enemy.Stats.eva,
-            // magAtk: enemy.Stats.magAtk,
-            // magDef: enemy.Stats.magDef,
-            // luk: enemy.Stats.luk,
-            // wis: enemy.Stats.wis,
-            sprite: null,
-            actions: this.generateEnemyActions(this.enemy.Stats),
-            //element: enemy.Stats.element, // Example element multipliers
-            learnedElementalWeaknesses: {
-                fire: 0,
-                ice: 0,
-                water: 0,
-                lightning: 0,
-                physical: 0 // Track physical attack damage
-            },
-            learnedStatusImmunities: [],
-            triedElements: {
-                fire: false,
-                ice: false,
-                water: false,
-                lightning: false,
-                physical: false
-            },
-            statusEffects: [],
-            immunities: this.enemy.Stats.immunities || []
-        };
+        // this.enemy = {
+        //     // name: 'Enemy',
+        //     // description: `${enemy.Name}, ${enemy.Description}`,
+        //     // health: enemy.Stats.health,
+        //     // mana: enemy.Stats.mana,
+        //     // atk: enemy.Stats.atk,
+        //     // def: enemy.Stats.def,
+        //     // spd: enemy.Stats.spd,
+        //     // eva: enemy.Stats.eva,
+        //     // magAtk: enemy.Stats.magAtk,
+        //     // magDef: enemy.Stats.magDef,
+        //     // luk: enemy.Stats.luk,
+        //     // wis: enemy.Stats.wis,
+        //     sprite: null,
+        //     actions: this.generateEnemyActions(this.enemy.Stats),
+        //     //element: enemy.Stats.element, // Example element multipliers
+        //     learnedElementalWeaknesses: {
+        //         fire: 0,
+        //         ice: 0,
+        //         water: 0,
+        //         lightning: 0,
+        //         physical: 0 // Track physical attack damage
+        //     },
+        //     learnedStatusImmunities: [],
+        //     triedElements: {
+        //         fire: false,
+        //         ice: false,
+        //         water: false,
+        //         lightning: false,
+        //         physical: false
+        //     },
+        //     statusEffects: [],
+        //     immunities: this.enemy.Stats.immunities || []
+        // };
 
         // Hide loading indicator
         this.hideLoadingIndicator();
