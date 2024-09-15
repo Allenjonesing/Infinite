@@ -131,14 +131,14 @@ class ExplorationScene extends Phaser.Scene {
     }
 
     battleSequence(index) {
-        if (index < this.enemies.getChildren().length) {
-            let currentEnemy = this.enemies.getChildren()[index];
+        if (index < enemies.getChildren().length) {
+            let currentEnemy = enemies.getChildren()[index];
             this.startBattle(this.player, currentEnemy);
             // Transition to the next enemy after battle ends
             this.time.delayedCall(2000, () => this.battleSequence(index + 1), [], this);
         } else {
             // After all small enemies, fight the boss
-            this.startBattle(this.player, this.boss);
+            this.startBattle(this.player, boss);
         }
     }
 
