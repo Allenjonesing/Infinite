@@ -346,7 +346,7 @@ class BattleScene extends Phaser.Scene {
 
         this.player = data.player;
         this.enemy = data.enemy;
-        this.enemy.actions = this.generateEnemyActions(this.enemy.Stats);
+        this.enemy.actions = this.generateEnemyActions(this.enemy);
 
         // Show loading indicator
         this.showLoadingIndicator();
