@@ -94,26 +94,40 @@ class ExplorationScene extends Phaser.Scene {
 
         // Randomly select a hero and multiple enemies from the selected location
         const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
+        console.log('hero: ', hero);
         this.enemyObjects = randomLocation.Enemies.slice(0, 5); // Choose 5 small enemies
+        console.log('this.enemyObjects: ', this.enemyObjects);
         this.bossObject = randomLocation.Bosses[Math.floor(Math.random() * randomLocation.Bosses.length)]; // Select 1 boss
+        console.log('this.bossObject: ', this.bossObject);
 
         // Create player and set random hero from JSON data
         this.player = this.physics.add.sprite(400, 300, 'player');
+        console.log('this.player: ', this.player);
         this.player.description = `${hero.Name}, ${hero.Description}`;
+        console.log('this.player.description: ', this.player.description);
         this.player.stats = hero.Stats;
+        console.log('this.player.stats: ', this.player.stats);
 
         // Create enemies group and add small enemies
         this.enemies = this.physics.add.group();
+        console.log('this.enemies: ', this.enemies);
         this.enemyObjects.forEach((enemyData, index) => {
+            console.log('enemyData: ', enemyData);
             let enemySprite = this.enemies.create(600, 300, 'enemy');
             enemySprite.description = `${enemyData.Name}, ${enemyData.Description}`;
+            console.log('enemySprite.description: ', enemySprite.description);
             enemySprite.stats = enemyData.Stats;
+            console.log('enemySprite.stats: ', enemySprite.stats);
         });
 
         // Add the boss at the end of the fight
+        console.log('this.enemyObjects: ', this.enemyObjects);
         this.boss = this.physics.add.sprite(600, 300, 'enemy');
+        console.log('this.boss: ', this.boss);
         this.boss.description = `${this.bossObject.Name}, ${this.bossObject.Description}`;
+        console.log('this.boss.description: ', this.boss.description);
         this.boss.stats = this.bossObject.Stats;
+        console.log('this.boss.stats: ', this.boss.stats);
 
         this.player.setCollideWorldBounds(true);
 
@@ -127,18 +141,25 @@ class ExplorationScene extends Phaser.Scene {
 
     spawnEnemies() {
         // Start the battle with the first enemy and progress through the list
+        console.log('spawnEnemies: ');
         this.battleSequence(0);
     }
 
     battleSequence(index) {
+        console.log('battleSequence index: ', index);
+        console.log('battleSequence this.enemyObjects.length: ', this.enemyObjects.length);
         if (index < this.enemyObjects.length) {
+            console.log('index: ', index);
             let currentEnemy = this.enemyObjects[index];
+            console.log('currentEnemy: ', currentEnemy);
             this.startBattle(this.player, currentEnemy);
+            console.log('Started Enemy Battle');
             // Transition to the next enemy after battle ends
             this.time.delayedCall(2000, () => this.battleSequence(index + 1), [], this);
         } else {
             // After all small enemies, fight the boss
             this.startBattle(this.player, this.bossObject);
+            console.log('Started BOSS Battle');
         }
     }
 
@@ -151,6 +172,8 @@ class ExplorationScene extends Phaser.Scene {
 
     startBattle(player, enemy) {
         // Transition to the battle scene, passing necessary data
+        console.log('startBattle player: ', player);
+        console.log('startBattle enemy: ', enemy);
         this.scene.start('BattleScene', { player: player, enemy: enemy });
     }
 
@@ -219,30 +242,30 @@ class BattleScene extends Phaser.Scene {
 
 
         // Randomly select a hero and an enemy from the selected location
-        const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
-        const enemy = randomLocation.Bosses[Math.floor(Math.random() * randomLocation.Bosses.length)];
+        //const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
+        //const enemy = randomLocation.Bosses[Math.floor(Math.random() * randomLocation.Bosses.length)];
 
         
         // Initialize player and enemy data
         // const playerStats = await fetchPlayerStats();
         this.player = {
-            name: 'Player',
-            description: `${hero.Name}, ${hero.Description}`,
-            health: hero.Stats.health,
-            mana: hero.Stats.mana,
-            atk: hero.Stats.atk,
-            def: hero.Stats.def,
-            spd: hero.Stats.spd,
-            eva: hero.Stats.eva,
-            magAtk: hero.Stats.magAtk,
-            magDef: hero.Stats.magDef,
-            luk: hero.Stats.luk,
-            wis: hero.Stats.wis,
+            // name: 'Player',
+            // description: `${hero.Name}, ${hero.Description}`,
+            // health: hero.Stats.health,
+            // mana: hero.Stats.mana,
+            // atk: hero.Stats.atk,
+            // def: hero.Stats.def,
+            // spd: hero.Stats.spd,
+            // eva: hero.Stats.eva,
+            // magAtk: hero.Stats.magAtk,
+            // magDef: hero.Stats.magDef,
+            // luk: hero.Stats.luk,
+            // wis: hero.Stats.wis,
             sprite: null,
             actions: ['Attack', 'Defend', 'Spells', 'Skills'],
-            element: hero.Stats.element,
+            //element: hero.Stats.element,
             statusEffects: [],
-            immunities: hero.Stats.immunities || [],
+            //immunities: hero.Stats.immunities || [],
             Experience: {
                 atkXP: 0,
                 defXP: 0,
@@ -257,21 +280,21 @@ class BattleScene extends Phaser.Scene {
 
         // const enemyStats = await fetchEnemyStats();
         this.enemy = {
-            name: 'Enemy',
-            description: `${enemy.Name}, ${enemy.Description}`,
-            health: enemy.Stats.health,
-            mana: enemy.Stats.mana,
-            atk: enemy.Stats.atk,
-            def: enemy.Stats.def,
-            spd: enemy.Stats.spd,
-            eva: enemy.Stats.eva,
-            magAtk: enemy.Stats.magAtk,
-            magDef: enemy.Stats.magDef,
-            luk: enemy.Stats.luk,
-            wis: enemy.Stats.wis,
+            // name: 'Enemy',
+            // description: `${enemy.Name}, ${enemy.Description}`,
+            // health: enemy.Stats.health,
+            // mana: enemy.Stats.mana,
+            // atk: enemy.Stats.atk,
+            // def: enemy.Stats.def,
+            // spd: enemy.Stats.spd,
+            // eva: enemy.Stats.eva,
+            // magAtk: enemy.Stats.magAtk,
+            // magDef: enemy.Stats.magDef,
+            // luk: enemy.Stats.luk,
+            // wis: enemy.Stats.wis,
             sprite: null,
-            actions: this.generateEnemyActions(enemy.Stats),
-            element: enemy.Stats.element, // Example element multipliers
+            actions: this.generateEnemyActions(this.enemy.Stats),
+            //element: enemy.Stats.element, // Example element multipliers
             learnedElementalWeaknesses: {
                 fire: 0,
                 ice: 0,
@@ -288,7 +311,7 @@ class BattleScene extends Phaser.Scene {
                 physical: false
             },
             statusEffects: [],
-            immunities: enemy.Stats.immunities || []
+            immunities: this.enemy.Stats.immunities || []
         };
 
         // Hide loading indicator
