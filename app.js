@@ -660,7 +660,7 @@ class BattleScene extends Phaser.Scene {
             }
     
             if (action === 'Attack') {
-                damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.luk, this.enemy.eva);
+                damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.luk, this.enemy.acc, this.enemy.eva);
                 this.showDamageIndicator(this.enemy, damage, critical);
                 this.addHelpText(`Player attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
     
@@ -868,7 +868,7 @@ class BattleScene extends Phaser.Scene {
     enemyAction() {
         console.log('enemyAction...');
         console.log('performEnemyAction... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
-        if ((this.turnOrder[this.currentTurnIndex].name === 'Enemy')) {
+        if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
             const performEnemyAction = () => {
                 console.log('performEnemyAction...');
                 console.log('performEnemyAction... this.isCooldown: ', this.isCooldown);
@@ -879,7 +879,7 @@ class BattleScene extends Phaser.Scene {
                     let action;
                     let highestDamage = 0;
                     let bestElement = 'physical';
-
+    
                     // Periodically reset tried attacks and skills
                     if (this.enemy.triedElements.resetCounter === undefined || this.enemy.triedElements.resetCounter >= 20) {
                         console.log('performEnemyAction... Resetting learned damages...');
@@ -895,14 +895,14 @@ class BattleScene extends Phaser.Scene {
                     } else {
                         this.enemy.triedElements.resetCounter++;
                     }
-
+    
                     // Determine if there's an element, physical attack, or skill that hasn't been tried yet
                     const elements = Object.keys(this.enemy.triedElements).filter(e => e !== 'resetCounter' && e !== 'skills');
                     let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
-
+    
                     const skills = this.enemy.actions.skills || [];
                     let untriedSkill = skills.find(skill => !this.enemy.triedElements.skills.includes(skill));
-
+    
                     if (!untriedElement && untriedSkill) {
                         actionType = 'skills';
                         action = untriedSkill;
@@ -931,11 +931,12 @@ class BattleScene extends Phaser.Scene {
                             action = `${untriedElement.charAt(0).toUpperCase() + untriedElement.slice(1)} Spells`;
                         }
                     }
-
+    
                     console.log('performEnemyAction... actionType: ', actionType);
                     console.log('performEnemyAction... action: ', action);
                     if (actionType === 'physical') {
-                        damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
+                        // Using calculateDamageZ with acc and eva parameters
+                        damage = this.calculateDamageZ(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc);
                         this.showDamageIndicator(this.player, damage, critical);
                         this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                         this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
@@ -943,19 +944,20 @@ class BattleScene extends Phaser.Scene {
                         this.enemy.triedElements.physical = true; // Mark physical attack as tried
                     } else if (actionType === 'magic') {
                         const elementType = action.split(' ')[0].toLowerCase();
-
+    
                         if (this.enemy.mana >= 10) {
-                            damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.luk);
+                            // Using calculateMagicDamageZ with wisdom (wis) and the elemental multiplier
+                            damage = this.calculateMagicDamageZ(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.wis, this.enemy.acc);
                             this.enemy.mana -= 10;
                             this.addHelpText(`Enemy uses ${elementType.charAt(0).toUpperCase() + elementType.slice(1)} Spells! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                             this.playMagicAttackAnimation(this.enemy, this.player, elementType, damage, critical, this.player.element[elementType]);
-
+    
                             // Learn about player's elemental weaknesses
                             this.enemy.learnedElementalWeaknesses[elementType] = Math.max(this.enemy.learnedElementalWeaknesses[elementType], damage);
                             this.enemy.triedElements[elementType] = true; // Mark this element as tried
                         } else {
                             // Fallback to physical attack if not enough mana
-                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
+                            damage = this.calculateDamageZ(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc);
                             this.showDamageIndicator(this.player, damage, critical);
                             this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                             this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
@@ -969,14 +971,14 @@ class BattleScene extends Phaser.Scene {
                             this.applyStatusEffect('Enemy', 'Player', action);
                             this.enemy.triedElements.skills.push(action); // Mark skill as tried
                         } else {
-                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
+                            damage = this.calculateDamageZ(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc);
                             this.showDamageIndicator(this.player, damage, critical);
                             this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                             this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
                         }
                     } else if (actionType === 'Heal') {
                         if (this.enemy.mana >= 15) {
-                            damage = -this.calculateHealing(this.enemy.magAtk);
+                            damage = -this.calculateHealingZ(this.enemy.magAtk);
                             this.enemy.mana -= 15;
                             this.enemy.health -= damage; // Assuming 100 is max health
                             this.addHelpText(`Enemy uses Heal! Restores ${-damage} health.`);
@@ -984,7 +986,7 @@ class BattleScene extends Phaser.Scene {
                             this.applyHealingEffect(this.enemy);
                         } else {
                             // Fallback to physical attack if not enough mana
-                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
+                            damage = this.calculateDamageZ(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc);
                             this.showDamageIndicator(this.player, damage, critical);
                             this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                             this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
@@ -997,7 +999,7 @@ class BattleScene extends Phaser.Scene {
                         this.addHelpText('Enemy defends, boosting defense for this turn.');
                     }
                     console.log('performEnemyAction... damage: ', damage);
-
+    
                     this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
                     this.startCooldown();
                 } else {
@@ -1010,7 +1012,7 @@ class BattleScene extends Phaser.Scene {
             console.error('It is not currently the enemy\'s turn');
         }
     }
-
+    
     applyStatusEffect(caster, target, statusEffect) {
         console.log('applyStatusEffect... caster: ', caster);
         console.log('applyStatusEffect... target: ', target);
@@ -1159,6 +1161,84 @@ class BattleScene extends Phaser.Scene {
         return evaded ? 0 : baseDamage;
     }
 
+    calculatePhysicalDamageX(strength, defense, damageConstant = 16) {
+        const baseDamage = ((Math.pow(strength, 3) / 32) + 32) * damageConstant / 16;
+        const defNum = ((defense - 280.4) ** 2 / 110) + 16;
+        const reducedDamage = (baseDamage * defNum) / 730;
+        return reducedDamage;
+    }
+
+    calculateMagicDamageX(magic, magicDefense, damageConstant = 24) {
+        const baseDamage = (damageConstant * ((Math.pow(magic, 2) / 6) + damageConstant)) / 4;
+        const defNum = ((magicDefense - 280.4) ** 2 / 110) + 16;
+        const reducedDamage = (baseDamage * defNum) / 730;
+        return reducedDamage;
+    }
+    
+    calculateHealingX(magic, healingConstant = 80) {
+        return healingConstant * ((magic + healingConstant) / 2);
+    }
+    
+    calculateDamageZ(atk, def, luk, eva, acc, damageConstant = 16) {
+        // Original critical logic from calculateDamage
+        let criticalChance = luk / 100;
+        let critical = Math.random() < criticalChance;
+        let variance = Phaser.Math.FloatBetween(0.9, 1.1);
+    
+        // Calculate Hit Rate
+        let hitRate = acc - eva;
+        let hitRoll = Math.random() * 100;
+    
+        // If hitRoll is greater than hitRate, the attack misses
+        if (hitRate <= 0 || hitRoll > hitRate) {
+            return 0; // Miss
+        }
+    
+        // Base damage calculation using logic from calculatePhysicalDamageX
+        let baseDamage;
+        if (critical) {
+            baseDamage = Math.floor(atk * 4 * variance);
+        } else {
+            baseDamage = ((Math.pow(atk, 3) / 32) + 32) * damageConstant / 16;
+            const defNum = ((def - 280.4) ** 2 / 110) + 16;
+            baseDamage = (baseDamage * defNum) / 730;
+            baseDamage = Math.floor(baseDamage * variance);
+        }
+    
+        baseDamage = Math.max(1, baseDamage); // Ensure minimum damage is 1
+        return baseDamage; // Return damage since the attack hit
+    }
+        
+    calculateMagicDamageZ(magAtk, magDef, defenderElement, wis, damageConstant = 24) {
+        // Critical and variance logic now using Wisdom (wis) instead of Luck (luk)
+        let criticalChance = wis / 100; // Wisdom determines critical chance
+        let critical = Math.random() < criticalChance;
+        let variance = Phaser.Math.FloatBetween(0.9, 1.1);
+    
+        // Base magic damage calculation using logic from calculateMagicDamageX
+        let baseDamage;
+        if (critical) {
+            baseDamage = Math.floor(2 * magAtk * variance);
+        } else {
+            baseDamage = (damageConstant * ((Math.pow(magAtk, 2) / 6) + damageConstant)) / 4;
+            const defNum = ((magDef - 280.4) ** 2 / 110) + 16;
+            baseDamage = (baseDamage * defNum) / 730;
+            baseDamage = Math.floor(baseDamage * variance);
+        }
+    
+        // Elemental multiplier from the original calculateMagicDamage
+        baseDamage *= defenderElement;
+    
+        return Math.floor(baseDamage); // Return the final damage, allowing negative values for potential healing
+    }
+        
+    calculateHealingZ(magAtk, healingConstant = 80) {
+        // Combine logic from calculateHealing and calculateHealingX
+        let variance = Phaser.Math.FloatBetween(0.9, 1.1);
+        let baseHealing = healingConstant * ((magAtk + healingConstant) / 2) * variance;
+        return Math.max(1, Math.floor(baseHealing)); // Ensure minimum healing is 1
+    }
+    
     calculateMagicDamage(magAtk, magDef, defenderElement, luk) {
         let criticalChance = luk / 100;
         let critical = Math.random() < criticalChance;
