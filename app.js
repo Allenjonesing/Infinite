@@ -198,22 +198,23 @@ class ExplorationScene extends Phaser.Scene {
         console.log('this.boss.description: ', this.boss.description);
         this.boss.stats = this.bossObject.Stats;
         console.log('this.boss.stats: ', this.boss.stats);
+        console.log('this.bossObject: ', this.bossObject);
         this.formattedBossObject = {
             name: 'Enemy',
-            description: `${this.boss.Name}, ${this.boss.Description}`,
-            health: this.boss.Stats.health,
-            mana: this.boss.Stats.mana,
-            atk: this.boss.Stats.atk,
-            def: this.boss.Stats.def,
-            spd: this.boss.Stats.spd,
-            eva: this.boss.Stats.eva,
-            magAtk: this.boss.Stats.magAtk,
-            magDef: this.boss.Stats.magDef,
-            luk: this.boss.Stats.luk,
-            wis: this.boss.Stats.wis,
+            description: `${bossObject.Name}, ${bossObject.Description}`,
+            health: bossObject.Stats.health,
+            mana: bossObject.Stats.mana,
+            atk: bossObject.Stats.atk,
+            def: bossObject.Stats.def,
+            spd: bossObject.Stats.spd,
+            eva: bossObject.Stats.eva,
+            magAtk: bossObject.Stats.magAtk,
+            magDef: bossObject.Stats.magDef,
+            luk: bossObject.Stats.luk,
+            wis: bossObject.Stats.wis,
             sprite: null,
-            actions: this.generateEnemyActions(this.boss.Stats),
-            element: this.boss.Stats.element, // Example element multipliers
+            actions: this.generateEnemyActions(bossObject.Stats),
+            element: bossObject.Stats.element, // Example element multipliers
             learnedElementalWeaknesses: {
                 fire: 0,
                 ice: 0,
@@ -230,8 +231,9 @@ class ExplorationScene extends Phaser.Scene {
                 physical: false
             },
             statusEffects: [],
-            immunities: this.boss.Stats.immunities || []
+            immunities: bossObject.Stats.immunities || []
         };
+        console.log('this.formattedBossObject: ', this.formattedBossObject);
 
         this.player.setCollideWorldBounds(true);
 
@@ -250,11 +252,13 @@ class ExplorationScene extends Phaser.Scene {
     }
 
     battleSequence(index) {
+        console.log('battleSequence this.player: ', this.player);
         console.log('battleSequence index: ', index);
         console.log('battleSequence this.enemyObjects.length: ', this.enemyObjects.length);
         if (index < this.formattedEnemyObjects.length) {
             console.log('index: ', index);
             let currentEnemy = this.formattedEnemyObjects[index];
+            console.log('Starting Enemy Battle');
             console.log('currentEnemy: ', currentEnemy);
             this.startBattle(this.player, currentEnemy);
             console.log('Started Enemy Battle');
@@ -262,6 +266,8 @@ class ExplorationScene extends Phaser.Scene {
             this.time.delayedCall(2000, () => this.battleSequence(index + 1), [], this);
         } else {
             // After all small enemies, fight the boss
+            console.log('this.formattedBossObject: ', this.formattedBossObject);
+            console.log('Starting BOSS Battle');
             this.startBattle(this.player, this.formattedBossObject);
             console.log('Started BOSS Battle');
         }
