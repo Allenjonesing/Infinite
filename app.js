@@ -660,7 +660,8 @@ class BattleScene extends Phaser.Scene {
             }
     
             if (action === 'Attack') {
-                damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.luk, this.enemy.acc, this.enemy.eva);
+                // Use calculateDamageZ with acc and eva parameters
+                damage = this.calculateDamageZ(this.player.atk, this.enemy.def, this.player.wis, this.enemy.eva, this.player.acc);
                 this.showDamageIndicator(this.enemy, damage, critical);
                 this.addHelpText(`Player attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
     
@@ -670,7 +671,8 @@ class BattleScene extends Phaser.Scene {
                 this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
             } else if (action === 'Spells') {
                 if (this.player.mana >= 10) {
-                    damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.enemy.element[elementType], this.player.luk, this.enemy.eva);
+                    // Use calculateMagicDamageZ with wisdom (wis) and acc
+                    damage = this.calculateMagicDamageZ(this.player.magAtk, this.enemy.magDef, this.enemy.element[elementType], this.player.wis, this.player.acc);
                     this.player.mana -= 10;
                     this.addHelpText(`Player uses ${elementType} Spells! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
     
@@ -694,7 +696,8 @@ class BattleScene extends Phaser.Scene {
                 return;
             } else if (action === 'Heal') {
                 if (this.player.mana >= 15) {
-                    healing = this.calculateHealing(this.player.magAtk);
+                    // Use calculateHealingZ for the healing calculation
+                    healing = this.calculateHealingZ(this.player.magAtk);
                     this.player.mana -= 15;
                     this.player.health += healing;
                     this.addHelpText(`Player uses Heal! Restores ${healing} health.`);
@@ -710,6 +713,7 @@ class BattleScene extends Phaser.Scene {
                 }
             }
     
+            // Update health and mana displays
             this.playerHealthText.setText(`Health: ${this.player.health}`);
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
             this.playerManaText.setText(`Mana: ${this.player.mana}`);
@@ -717,7 +721,7 @@ class BattleScene extends Phaser.Scene {
             this.hidePlayerActions();
         }
     }
-    
+        
     gainXP(action) {
         switch(action) {
             case 'attack':
