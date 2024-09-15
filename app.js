@@ -105,26 +105,26 @@ class ExplorationScene extends Phaser.Scene {
         console.log('this.player: ', this.player);
         this.player.description = `${hero.Name}, ${hero.Description}`;
         console.log('this.player.description: ', this.player.description);
-        //this.player.stats = hero;
+        //this.player.stats = hero.Stats;
         console.log('this.player.stats: ', this.player.stats);
         let playerObject = {
             name: 'Player',
             description: `${hero.Name}, ${hero.Description}`,
-            health: hero.health,
-            mana: hero.mana,
-            atk: hero.atk,
-            def: hero.def,
-            spd: hero.spd,
-            eva: hero.eva,
-            magAtk: hero.magAtk,
-            magDef: hero.magDef,
-            luk: hero.luk,
-            wis: hero.wis,
+            health: hero.Stats.health,
+            mana: hero.Stats.mana,
+            atk: hero.Stats.atk,
+            def: hero.Stats.def,
+            spd: hero.Stats.spd,
+            eva: hero.Stats.eva,
+            magAtk: hero.Stats.magAtk,
+            magDef: hero.Stats.magDef,
+            luk: hero.Stats.luk,
+            wis: hero.Stats.wis,
             sprite: null,
             actions: ['Attack', 'Defend', 'Spells', 'Skills'],
-            element: hero.element,
+            element: hero.Stats.element,
             statusEffects: [],
-            immunities: hero.immunities || [],
+            immunities: hero.Stats.immunities || [],
             Experience: {
                 atkXP: 0,
                 defXP: 0,
@@ -147,24 +147,24 @@ class ExplorationScene extends Phaser.Scene {
             let enemySprite = this.enemies.create(600, 300, 'enemy');
             enemySprite.description = `${enemyData.Name}, ${enemyData.Description}`;
             console.log('enemySprite.description: ', enemySprite.description);
-            //enemySprite.stats = enemyData;
+            //enemySprite.stats = enemyData.Stats;
             console.log('enemySprite.stats: ', enemySprite.stats);
             let enemyObject = {
                 name: 'Enemy',
                 description: `${enemyData.Name}, ${enemyData.Description}`,
-                health: enemyData.health,
-                mana: enemyData.mana,
-                atk: enemyData.atk,
-                def: enemyData.def,
-                spd: enemyData.spd,
-                eva: enemyData.eva,
-                magAtk: enemyData.magAtk,
-                magDef: enemyData.magDef,
-                luk: enemyData.luk,
-                wis: enemyData.wis,
+                health: enemyData.Stats.health,
+                mana: enemyData.Stats.mana,
+                atk: enemyData.Stats.atk,
+                def: enemyData.Stats.def,
+                spd: enemyData.Stats.spd,
+                eva: enemyData.Stats.eva,
+                magAtk: enemyData.Stats.magAtk,
+                magDef: enemyData.Stats.magDef,
+                luk: enemyData.Stats.luk,
+                wis: enemyData.Stats.wis,
                 sprite: null,
-                //actions: this.generateEnemyActions(enemyData),
-                element: enemyData.element, // Example element multipliers
+                //actions: this.generateEnemyActions(enemyData.Stats),
+                element: enemyData.Stats.element, // Example element multipliers
                 learnedElementalWeaknesses: {
                     fire: 0,
                     ice: 0,
@@ -181,7 +181,7 @@ class ExplorationScene extends Phaser.Scene {
                     physical: false
                 },
                 statusEffects: [],
-                immunities: enemyData.immunities || []
+                immunities: enemyData.Stats.immunities || []
             };
             console.log('enemyObject: ', enemyObject);
 
@@ -196,25 +196,25 @@ class ExplorationScene extends Phaser.Scene {
         console.log('this.boss: ', this.boss);
         this.boss.description = `${this.bossObject.Name}, ${this.bossObject.Description}`;
         console.log('this.boss.description: ', this.boss.description);
-        //this.boss.stats = this.bossObject;
+        //this.boss.stats = this.bossObject.Stats;
         console.log('this.boss.stats: ', this.boss.stats);
         console.log('this.bossObject: ', this.bossObject);
         this.formattedBossObject = {
             name: 'Enemy',
             description: `${this.bossObject.Name}, ${this.bossObject.Description}`,
-            health: this.bossObject.health,
-            mana: this.bossObject.mana,
-            atk: this.bossObject.atk,
-            def: this.bossObject.def,
-            spd: this.bossObject.spd,
-            eva: this.bossObject.eva,
-            magAtk: this.bossObject.magAtk,
-            magDef: this.bossObject.magDef,
-            luk: this.bossObject.luk,
-            wis: this.bossObject.wis,
+            health: this.bossObject.Stats.health,
+            mana: this.bossObject.Stats.mana,
+            atk: this.bossObject.Stats.atk,
+            def: this.bossObject.Stats.def,
+            spd: this.bossObject.Stats.spd,
+            eva: this.bossObject.Stats.eva,
+            magAtk: this.bossObject.Stats.magAtk,
+            magDef: this.bossObject.Stats.magDef,
+            luk: this.bossObject.Stats.luk,
+            wis: this.bossObject.Stats.wis,
             sprite: null,
-            //actions: this.generateEnemyActions(this.bossObject),
-            element: this.bossObject.element, // Example element multipliers
+            //actions: this.generateEnemyActions(this.bossObject.Stats),
+            element: this.bossObject.Stats.element, // Example element multipliers
             learnedElementalWeaknesses: {
                 fire: 0,
                 ice: 0,
@@ -231,7 +231,7 @@ class ExplorationScene extends Phaser.Scene {
                 physical: false
             },
             statusEffects: [],
-            immunities: this.bossObject.immunities || []
+            immunities: this.bossObject.Stats.immunities || []
         };
         console.log('this.formattedBossObject: ', this.formattedBossObject);
 
@@ -362,21 +362,21 @@ class BattleScene extends Phaser.Scene {
         // this.player = {
         //     // name: 'Player',
         //     // description: `${hero.Name}, ${hero.Description}`,
-        //     // health: hero.health,
-        //     // mana: hero.mana,
-        //     // atk: hero.atk,
-        //     // def: hero.def,
-        //     // spd: hero.spd,
-        //     // eva: hero.eva,
-        //     // magAtk: hero.magAtk,
-        //     // magDef: hero.magDef,
-        //     // luk: hero.luk,
-        //     // wis: hero.wis,
+        //     // health: hero.Stats.health,
+        //     // mana: hero.Stats.mana,
+        //     // atk: hero.Stats.atk,
+        //     // def: hero.Stats.def,
+        //     // spd: hero.Stats.spd,
+        //     // eva: hero.Stats.eva,
+        //     // magAtk: hero.Stats.magAtk,
+        //     // magDef: hero.Stats.magDef,
+        //     // luk: hero.Stats.luk,
+        //     // wis: hero.Stats.wis,
         //     sprite: null,
         //     actions: ['Attack', 'Defend', 'Spells', 'Skills'],
-        //     //element: hero.element,
+        //     //element: hero.Stats.element,
         //     statusEffects: [],
-        //     //immunities: hero.immunities || [],
+        //     //immunities: hero.Stats.immunities || [],
         //     Experience: {
         //         atkXP: 0,
         //         defXP: 0,
@@ -393,19 +393,19 @@ class BattleScene extends Phaser.Scene {
         // this.enemy = {
         //     // name: 'Enemy',
         //     // description: `${enemy.Name}, ${enemy.Description}`,
-        //     // health: enemy.health,
-        //     // mana: enemy.mana,
-        //     // atk: enemy.atk,
-        //     // def: enemy.def,
-        //     // spd: enemy.spd,
-        //     // eva: enemy.eva,
-        //     // magAtk: enemy.magAtk,
-        //     // magDef: enemy.magDef,
-        //     // luk: enemy.luk,
-        //     // wis: enemy.wis,
+        //     // health: enemy.Stats.health,
+        //     // mana: enemy.Stats.mana,
+        //     // atk: enemy.Stats.atk,
+        //     // def: enemy.Stats.def,
+        //     // spd: enemy.Stats.spd,
+        //     // eva: enemy.Stats.eva,
+        //     // magAtk: enemy.Stats.magAtk,
+        //     // magDef: enemy.Stats.magDef,
+        //     // luk: enemy.Stats.luk,
+        //     // wis: enemy.Stats.wis,
         //     sprite: null,
-        //     actions: this.generateEnemyActions(this.enemy),
-        //     //element: enemy.element, // Example element multipliers
+        //     actions: this.generateEnemyActions(this.enemy.Stats),
+        //     //element: enemy.Stats.element, // Example element multipliers
         //     learnedElementalWeaknesses: {
         //         fire: 0,
         //         ice: 0,
@@ -422,7 +422,7 @@ class BattleScene extends Phaser.Scene {
         //         physical: false
         //     },
         //     statusEffects: [],
-        //     immunities: this.enemy.immunities || []
+        //     immunities: this.enemy.Stats.immunities || []
         // };
 
         // Hide loading indicator
@@ -919,9 +919,9 @@ class BattleScene extends Phaser.Scene {
     levelUpStat(stat, xp) {
         const XP_THRESHOLD = 100;  // Example threshold for leveling up
         if (xp >= XP_THRESHOLD) {
-            hero[stat] += Math.floor(xp / XP_THRESHOLD);  // Level up stat
+            hero.Stats[stat] += Math.floor(xp / XP_THRESHOLD);  // Level up stat
             hero.Experience[`${stat}XP`] = xp % XP_THRESHOLD;  // Carry over leftover XP
-            console.log(`${stat.toUpperCase()} leveled up! New ${stat} stat: ${hero[stat]}`);
+            console.log(`${stat.toUpperCase()} leveled up! New ${stat} stat: ${hero.Stats[stat]}`);
         }
     }
         
@@ -2161,12 +2161,12 @@ function checkForNewSkills() {
 
 function displayHeroStats(hero) {
     console.log(`Hero: ${hero.Name}`);
-    console.log(`Health: ${hero.health}`);
-    console.log(`Attack: ${hero.atk}`);
-    console.log(`Defense: ${hero.def}`);
-    console.log(`Speed: ${hero.spd}`);
-    console.log(`Magic Attack: ${hero.magAtk}`);
-    console.log(`Magic Defense: ${hero.magDef}`);
+    console.log(`Health: ${hero.Stats.health}`);
+    console.log(`Attack: ${hero.Stats.atk}`);
+    console.log(`Defense: ${hero.Stats.def}`);
+    console.log(`Speed: ${hero.Stats.spd}`);
+    console.log(`Magic Attack: ${hero.Stats.magAtk}`);
+    console.log(`Magic Defense: ${hero.Stats.magDef}`);
     console.log(`XP for Attack: ${hero.Experience.atkXP}`);
     console.log(`XP for Defense: ${hero.Experience.defXP}`);
     console.log(`XP for Speed: ${hero.Experience.spdXP}`);
