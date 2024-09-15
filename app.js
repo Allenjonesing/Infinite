@@ -95,7 +95,7 @@ class ExplorationScene extends Phaser.Scene {
         // Randomly select a hero and multiple enemies from the selected location
         const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
         this.enemyObjects = randomLocation.Enemies.slice(0, 5); // Choose 5 small enemies
-        this.bossObjects = randomLocation.Bosses[Math.floor(Math.random() * randomLocation.Bosses.length)]; // Select 1 boss
+        this.bossObject = randomLocation.Bosses[Math.floor(Math.random() * randomLocation.Bosses.length)]; // Select 1 boss
 
         // Create player and set random hero from JSON data
         this.player = this.physics.add.sprite(400, 300, 'player');
@@ -104,7 +104,7 @@ class ExplorationScene extends Phaser.Scene {
 
         // Create enemies group and add small enemies
         this.enemies = this.physics.add.group();
-        enemyObjects.forEach((enemyData, index) => {
+        this.enemyObjects.forEach((enemyData, index) => {
             let enemySprite = this.enemies.create(600, 300, 'enemy');
             enemySprite.description = `${enemyData.Name}, ${enemyData.Description}`;
             enemySprite.stats = enemyData.Stats;
@@ -112,8 +112,8 @@ class ExplorationScene extends Phaser.Scene {
 
         // Add the boss at the end of the fight
         this.boss = this.physics.add.sprite(600, 300, 'enemy');
-        this.boss.description = `${bossObjects.Name}, ${bossObjects.Description}`;
-        this.boss.stats = bossObjects.Stats;
+        this.boss.description = `${bossObject.Name}, ${bossObject.Description}`;
+        this.boss.stats = this.bossObject.Stats;
 
         this.player.setCollideWorldBounds(true);
 
@@ -131,14 +131,14 @@ class ExplorationScene extends Phaser.Scene {
     }
 
     battleSequence(index) {
-        if (index < enemyObjects.getChildren().length) {
-            let currentEnemy = enemyObjects.getChildren()[index];
+        if (index < this.enemyObjects.getChildren().length) {
+            let currentEnemy = this.enemyObjects.getChildren()[index];
             this.startBattle(this.player, currentEnemy);
             // Transition to the next enemy after battle ends
             this.time.delayedCall(2000, () => this.battleSequence(index + 1), [], this);
         } else {
             // After all small enemies, fight the boss
-            this.startBattle(this.player, bossObjects);
+            this.startBattle(this.player, this.bossObject);
         }
     }
 
