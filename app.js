@@ -161,7 +161,7 @@ class ExplorationScene extends Phaser.Scene {
                 luk: enemyData.Stats.luk,
                 wis: enemyData.Stats.wis,
                 sprite: null,
-                actions: this.generateEnemyActions(enemyData.Stats),
+                //actions: this.generateEnemyActions(enemyData.Stats),
                 element: enemyData.Stats.element, // Example element multipliers
                 learnedElementalWeaknesses: {
                     fire: 0,
@@ -335,6 +335,7 @@ class BattleScene extends Phaser.Scene {
 
         this.player = data.player;
         this.enemy = data.enemy;
+        this.enemy.actions = this.generateEnemyActions(this.enemy.Stats);
 
         // Show loading indicator
         this.showLoadingIndicator();
