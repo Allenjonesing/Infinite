@@ -201,20 +201,20 @@ class ExplorationScene extends Phaser.Scene {
         console.log('this.bossObject: ', this.bossObject);
         this.formattedBossObject = {
             name: 'Enemy',
-            description: `${bossObject.Name}, ${bossObject.Description}`,
-            health: bossObject.Stats.health,
-            mana: bossObject.Stats.mana,
-            atk: bossObject.Stats.atk,
-            def: bossObject.Stats.def,
-            spd: bossObject.Stats.spd,
-            eva: bossObject.Stats.eva,
-            magAtk: bossObject.Stats.magAtk,
-            magDef: bossObject.Stats.magDef,
-            luk: bossObject.Stats.luk,
-            wis: bossObject.Stats.wis,
+            description: `${this.bossObject.Name}, ${this.bossObject.Description}`,
+            health: this.bossObject.Stats.health,
+            mana: this.bossObject.Stats.mana,
+            atk: this.bossObject.Stats.atk,
+            def: this.bossObject.Stats.def,
+            spd: this.bossObject.Stats.spd,
+            eva: this.bossObject.Stats.eva,
+            magAtk: this.bossObject.Stats.magAtk,
+            magDef: this.bossObject.Stats.magDef,
+            luk: this.bossObject.Stats.luk,
+            wis: this.bossObject.Stats.wis,
             sprite: null,
-            actions: this.generateEnemyActions(bossObject.Stats),
-            element: bossObject.Stats.element, // Example element multipliers
+            actions: this.generateEnemyActions(this.bossObject.Stats),
+            element: this.bossObject.Stats.element, // Example element multipliers
             learnedElementalWeaknesses: {
                 fire: 0,
                 ice: 0,
@@ -231,7 +231,7 @@ class ExplorationScene extends Phaser.Scene {
                 physical: false
             },
             statusEffects: [],
-            immunities: bossObject.Stats.immunities || []
+            immunities: this.bossObject.Stats.immunities || []
         };
         console.log('this.formattedBossObject: ', this.formattedBossObject);
 
