@@ -213,7 +213,7 @@ class ExplorationScene extends Phaser.Scene {
             luk: this.bossObject.Stats.luk,
             wis: this.bossObject.Stats.wis,
             sprite: null,
-            actions: this.generateEnemyActions(this.bossObject.Stats),
+            //actions: this.generateEnemyActions(this.bossObject.Stats),
             element: this.bossObject.Stats.element, // Example element multipliers
             learnedElementalWeaknesses: {
                 fire: 0,
