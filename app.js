@@ -112,7 +112,7 @@ class ExplorationScene extends Phaser.Scene {
 
         // Add the boss at the end of the fight
         this.boss = this.physics.add.sprite(600, 300, 'enemy');
-        this.boss.description = `${bossObject.Name}, ${bossObject.Description}`;
+        this.boss.description = `${this.bossObject.Name}, ${this.bossObject.Description}`;
         this.boss.stats = this.bossObject.Stats;
 
         this.player.setCollideWorldBounds(true);
