@@ -92,28 +92,54 @@ class ExplorationScene extends Phaser.Scene {
         // Prep Base64 images
         this.prepBase64Images();        
 
-        // Randomly select a hero and an enemy from the selected location
+        // Randomly select a hero and multiple enemies from the selected location
         const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
-        const enemy = randomLocation.Bosses[Math.floor(Math.random() * randomLocation.Bosses.length)];
+        const enemies = randomLocation.Enemies.slice(0, 5); // Choose 5 small enemies
+        const boss = randomLocation.Bosses[Math.floor(Math.random() * randomLocation.Bosses.length)]; // Select 1 boss
 
         // Create player and set random hero from JSON data
         this.player = this.physics.add.sprite(400, 300, 'player');
         this.player.description = `${hero.Name}, ${hero.Description}`;
         this.player.stats = hero.Stats;
 
-        // Create enemy and set random enemy from JSON data
+        // Create enemies group and add small enemies
         this.enemies = this.physics.add.group();
-        let enemySprite = this.enemies.create(600, 300, 'enemy');
-        enemySprite.description = `${enemy.Name}, ${enemy.Description}`;
-        enemySprite.stats = enemy.Stats;
+        enemies.forEach((enemyData, index) => {
+            let enemySprite = this.enemies.create(600, 300, 'enemy');
+            enemySprite.description = `${enemyData.Name}, ${enemyData.Description}`;
+            enemySprite.stats = enemyData.Stats;
+        });
+
+        // Add the boss at the end of the fight
+        this.boss = this.physics.add.sprite(600, 300, 'enemy');
+        this.boss.description = `${boss.Name}, ${boss.Description}`;
+        this.boss.stats = boss.Stats;
 
         this.player.setCollideWorldBounds(true);
 
         // Spawn enemies after data is ready
-        spawnEnemies(this);
+        this.spawnEnemies();
+        
         // Remove the loading text and warning text after all steps are complete
         loadingText.destroy();
         warningText.destroy();
+    }
+
+    spawnEnemies() {
+        // Start the battle with the first enemy and progress through the list
+        this.battleSequence(0);
+    }
+
+    battleSequence(index) {
+        if (index < this.enemies.getChildren().length) {
+            let currentEnemy = this.enemies.getChildren()[index];
+            this.startBattle(this.player, currentEnemy);
+            // Transition to the next enemy after battle ends
+            this.time.delayedCall(2000, () => this.battleSequence(index + 1), [], this);
+        } else {
+            // After all small enemies, fight the boss
+            this.startBattle(this.player, this.boss);
+        }
     }
 
     prepBase64Images() {
