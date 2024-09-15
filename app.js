@@ -107,7 +107,7 @@ class ExplorationScene extends Phaser.Scene {
         console.log('this.player.description: ', this.player.description);
         //this.player.stats = hero.Stats;
         console.log('this.player.stats: ', this.player.stats);
-        let playerObject = {
+        this.playerObject = {
             name: 'Player',
             description: `${hero.Name}, ${hero.Description}`,
             health: hero.Stats.health,
@@ -253,6 +253,7 @@ class ExplorationScene extends Phaser.Scene {
 
     battleSequence(index) {
         console.log('battleSequence this.player: ', this.player);
+        console.log('battleSequence this.playerObject: ', this.playerObject);
         console.log('battleSequence index: ', index);
         console.log('battleSequence this.enemyObjects.length: ', this.enemyObjects.length);
         if (index < this.formattedEnemyObjects.length) {
@@ -260,7 +261,7 @@ class ExplorationScene extends Phaser.Scene {
             let currentEnemy = this.formattedEnemyObjects[index];
             console.log('Starting Enemy Battle');
             console.log('currentEnemy: ', currentEnemy);
-            this.startBattle(this.player, currentEnemy);
+            this.startBattle(this.playerObject, currentEnemy);
             console.log('Started Enemy Battle');
             // Transition to the next enemy after battle ends
             this.time.delayedCall(2000, () => this.battleSequence(index + 1), [], this);
@@ -268,7 +269,7 @@ class ExplorationScene extends Phaser.Scene {
             // After all small enemies, fight the boss
             console.log('this.formattedBossObject: ', this.formattedBossObject);
             console.log('Starting BOSS Battle');
-            this.startBattle(this.player, this.formattedBossObject);
+            this.startBattle(this.playerObject, this.formattedBossObject);
             console.log('Started BOSS Battle');
         }
     }
