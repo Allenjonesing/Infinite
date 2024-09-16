@@ -1,6 +1,6 @@
 const costSavingMode = true;
-const genericEnemyBase64 = '';
-const genericPlayerBase64 = '';
+const genericEnemyBase64 = 'zc';
+const genericPlayerBase64 = 'zxc';
 const version = 'Alpha v0.3_NoAI';
 
 // Constants for XP gain rates
