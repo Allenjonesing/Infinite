@@ -742,10 +742,10 @@ class BattleScene extends Phaser.Scene {
 
             // Add more magic attacks if magAtk is high
             if (stats.magAtk > stats.atk) {
-                if (stats.element.fire <= 0) actions.magic.push('Fire Spells');
-                if (stats.element.ice <= 0) actions.magic.push('Ice Spells');
-                if (stats.element.lightning <= 0) actions.magic.push('Lightning Spells');
-                if (stats.element.water <= 0) actions.magic.push('Water Spells');
+                if (stats.element.fire <= 0) actions.magic.push('fire');
+                if (stats.element.ice <= 0) actions.magic.push('ice');
+                if (stats.element.lightning <= 0) actions.magic.push('lightning');
+                if (stats.element.water <= 0) actions.magic.push('water');
             }
 
             // Add healing spells
@@ -1273,13 +1273,13 @@ class BattleScene extends Phaser.Scene {
                         this.enemy.triedElements.resetCounter++;
                     }
     
-                    // Determine if there's an element, physical attack, or skill that hasn't been tried yet
+                    // Determine if there's an element or skill that hasn't been tried yet, but check if they exist in enemy's actions
                     const elements = Object.keys(this.enemy.triedElements).filter(e => e !== 'resetCounter' && e !== 'skills');
-                    let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
-    
+                    let untriedElement = elements.find(element => !this.enemy.triedElements[element] && this.enemy.actions.magic[element]);
+
                     const skills = this.enemy.actions.skills || [];
-                    let untriedSkill = skills.find(skill => !this.enemy.triedElements.skills.includes(skill));
-    
+                    let untriedSkill = skills.find(skill => !this.enemy.triedElements.skills.includes(skill) && this.enemy.actions.skills[skill]);    
+
                     if (!untriedElement && untriedSkill) {
                         actionType = 'skills';
                         action = untriedSkill;
