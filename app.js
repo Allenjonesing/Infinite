@@ -2477,8 +2477,8 @@ function initDB() {
 
 
 // Initialize database and set up auto-save
-initDB();
-startAutoSave('save1', getGameState);
+//initDB();
+//startAutoSave('save1', getGameState);
 
 // // Example of manual save when the player clicks a button
 // document.querySelector('#saveButton').addEventListener('click', () => {
@@ -2493,16 +2493,16 @@ function startAutoSave(saveID, gameData) {
 }
 
 // Example of loading the game when the page is loaded
-window.onload = () => {
-    loadGame('save1', (gameData) => {
-        if (gameData) {
-            // Restore game state from saved data
-            hero = gameData.hero;
-            currentProgress = gameData.progress;
-            inventory = gameData.inventory;
-        }
-    });
-};
+// window.onload = () => {
+//     loadGame('save1', (gameData) => {
+//         if (gameData) {
+//             // Restore game state from saved data
+//             hero = gameData.hero;
+//             currentProgress = gameData.progress;
+//             inventory = gameData.inventory;
+//         }
+//     });
+// };
 
 let locationHeroes = [];
 let selectedHero;
