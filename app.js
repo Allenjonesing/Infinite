@@ -455,14 +455,14 @@ class BattleScene extends Phaser.Scene {
 
 
         // Add the boss at the end of the fight
-        console.log('this.enemyObjects: ', this.enemyObjects);
-        this.boss = this.physics.add.sprite(600, 300, 'enemy');
-        console.log('this.boss: ', this.boss);
-        this.boss.description = `${this.bossObject.Name}, ${this.bossObject.Description}`;
-        console.log('this.boss.description: ', this.boss.description);
+        //console.log('this.enemyObjects: ', this.enemyObjects);
+        //this.boss = this.physics.add.sprite(600, 300, 'enemy');
+        //console.log('this.boss: ', this.boss);
+        //this.boss.description = `${this.bossObject.Name}, ${this.bossObject.Description}`;
+        //console.log('this.boss.description: ', this.boss.description);
         //this.boss.stats = this.bossObject.Stats;
-        console.log('this.boss.stats: ', this.boss.stats);
-        console.log('this.bossObject: ', this.bossObject);
+        //console.log('this.boss.stats: ', this.boss.stats);
+        //console.log('this.bossObject: ', this.bossObject);
         this.formattedBossObject = {
             name: 'Enemy',
             description: `${this.bossObject.Name}, ${this.bossObject.Description}`,
@@ -817,7 +817,7 @@ class BattleScene extends Phaser.Scene {
             console.log('Started BOSS Battle');
         }
 
-        if (this.currentEnemyIndex) {
+        if (this.enemyHealthText) {
 
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
             this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
