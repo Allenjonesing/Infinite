@@ -251,17 +251,17 @@ class ExplorationScene extends Phaser.Scene {
         console.log('spawnEnemies: ');
         this.currentEnemyIndex = 0;
 
-        this.battleSequence(0);
+        this.battleSequence();
     }
 
-    battleSequence(index) {
+    battleSequence() {
         console.log('battleSequence this.player: ', this.player);
         console.log('battleSequence this.playerObject: ', this.playerObject);
-        console.log('battleSequence index: ', index);
+        console.log('battleSequence this.currentEnemyIndex: ', this.currentEnemyIndex);
         console.log('battleSequence this.enemyObjects.length: ', this.enemyObjects.length);
-        if (index < this.formattedEnemyObjects.length) {
-            console.log('index: ', index);
-            let currentEnemy = this.formattedEnemyObjects[index];
+        if (this.currentEnemyIndex < this.formattedEnemyObjects.length) {
+            console.log('this.currentEnemyIndex: ', this.currentEnemyIndex);
+            let currentEnemy = this.formattedEnemyObjects[this.currentEnemyIndex];
             console.log('Starting Enemy Battle');
             console.log('currentEnemy: ', currentEnemy);
             this.startBattle(this.playerObject, currentEnemy);
