@@ -904,6 +904,7 @@ class BattleScene extends Phaser.Scene {
     }
 
     generateEnemyActions(stats) {
+        console.log('generateEnemyActions... stats: ', stats);
         let actions = {
             physical: ['Attack'],
             skills: [],
@@ -911,14 +912,22 @@ class BattleScene extends Phaser.Scene {
         };
 
         // Determine if attack is far greater than magic attack or vice versa
+        console.log('generateEnemyActions... stats.magAtk: ', stats.magAtk);
+        console.log('generateEnemyActions... stats.atk: ', stats.atk);
         const isPhysicalOnly = stats.atk > 2 * stats.magAtk;
         const isMagicOnly = stats.magAtk > 2 * stats.atk;
+        console.log('generateEnemyActions... isPhysicalOnly: ', isPhysicalOnly);
+        console.log('generateEnemyActions... isMagicOnly: ', isMagicOnly);
 
         // Add skills if atk is high and not exclusively magic
         if (!isMagicOnly) {
+            console.log('generateEnemyActions... stats.element.fire: ', stats.element.fire);
             if (stats.element.fire <= 0) actions.skills.push('Burn');
+            console.log('generateEnemyActions... stats.element.ice: ', stats.element.ice);
             if (stats.element.ice <= 0) actions.skills.push('Freeze');
+            console.log('generateEnemyActions... stats.element.lightning: ', stats.element.lightning);
             if (stats.element.lightning <= 0) actions.skills.push('Stun');
+            console.log('generateEnemyActions... stats.element.water: ', stats.element.water);
             if (stats.element.water <= 0) actions.skills.push('Poison');
         }
 
@@ -932,6 +941,10 @@ class BattleScene extends Phaser.Scene {
 
             // Add more magic attacks if magAtk is high
             if (stats.magAtk > stats.atk) {
+                console.log('generateEnemyActions... stats.element.fire: ', stats.element.fire);
+                console.log('generateEnemyActions... stats.element.ice: ', stats.element.ice);
+                console.log('generateEnemyActions... stats.element.lightning: ', stats.element.lightning);
+                console.log('generateEnemyActions... stats.element.water: ', stats.element.water);
                 if (stats.element.fire <= 0) actions.magic.push('fire');
                 if (stats.element.ice <= 0) actions.magic.push('ice');
                 if (stats.element.lightning <= 0) actions.magic.push('lightning');
@@ -1233,7 +1246,7 @@ class BattleScene extends Phaser.Scene {
                 this.addHelpText(`Player attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
 
                 // Gain XP for attacking
-                this.gainXP('attack'); // Gain XP for attack action
+                //this.gainXP('attack'); // Gain XP for attack action
 
                 this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
             } else if (action === 'Spells') {
@@ -1244,7 +1257,7 @@ class BattleScene extends Phaser.Scene {
                     this.addHelpText(`Player uses ${elementType} Spells! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
 
                     // Gain XP for casting a spell
-                    this.gainXP('magic'); // Gain XP for magic action
+                    //this.gainXP('magic'); // Gain XP for magic action
 
                     this.playMagicAttackAnimation(this.player, this.enemy, elementType, damage, critical, this.enemy.element[elementType]);
                 } else {
@@ -1257,7 +1270,7 @@ class BattleScene extends Phaser.Scene {
                 this.addHelpText('Player defends, boosting defense for this turn.');
 
                 // Gain XP for defending
-                this.gainXP('defend'); // Gain XP for defend action
+                //this.gainXP('defend'); // Gain XP for defend action
             } else if (action === 'Skills') {
                 this.showSkillSelection();
                 return;
@@ -1270,7 +1283,7 @@ class BattleScene extends Phaser.Scene {
                     this.addHelpText(`Player uses Heal! Restores ${healing} health.`);
 
                     // Gain XP for healing
-                    this.gainXP('magic'); // Gain XP for magic/healing action
+                    //this.gainXP('magic'); // Gain XP for magic/healing action
 
                     this.showDamageIndicator(this.player, -healing, critical);
                     this.applyHealingEffect(this.player);
