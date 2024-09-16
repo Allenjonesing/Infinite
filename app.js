@@ -566,6 +566,7 @@ class BattleScene extends Phaser.Scene {
         console.log('Game saved after battle.');
     }
     
+
     endBattle(result) {
         battleEnded = true;
         this.time.delayedCall(1000, () => {
@@ -573,22 +574,27 @@ class BattleScene extends Phaser.Scene {
                 // Handle victory logic
                 this.addHelpText('You Won! Gaining XP...');
                 this.enemy.sprite.destroy(); // Remove enemy sprite
-                                
+                                    
                 // Save the game state
                 this.saveGameState();
+    
+                // Trigger the next battle in the sequence
+                this.time.delayedCall(3000, () => {
+                    this.scene.get('ExplorationScene').battleSequence(this.currentEnemyIndex + 1); // Move to the next enemy
+                }, [], this);
+    
             } else {
                 // Handle defeat logic
-                this.addHelpText('You Lost! Please wait for the window to reload...');
+                this.addHelpText('You Lost! Game Over... Please wait for the window to reload...');
                 this.player.sprite.destroy(); // Remove player sprite
+                this.time.delayedCall(5000, () => {
+                    // Refresh the whole page after the battle ends
+                    location.reload();
+                }, [], this);
             }
-    
-            this.time.delayedCall(4000, () => {
-                // Refresh the whole page after the battle ends
-                location.reload();
-            }, [], this);
         }, [], this);
     }
-    
+        
     checkForLevelUp() {
         // Check if the player has enough XP to level up
         const XP_THRESHOLD = 100; // Example XP threshold for leveling up
