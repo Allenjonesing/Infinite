@@ -365,12 +365,12 @@ class BattleScene extends Phaser.Scene {
         console.log('this.bossObject: ', this.bossObject);
 
         // Create player and set random hero from JSON data
-        this.player = this.physics.add.sprite(400, 300, 'player');
-        console.log('this.player: ', this.player);
-        this.player.description = `${hero.Name}, ${hero.Description}`;
-        console.log('this.player.description: ', this.player.description);
+        //this.player = this.physics.add.sprite(400, 300, 'player');
+        //console.log('this.player: ', this.player);
+        //this.player.description = `${hero.Name}, ${hero.Description}`;
+        //console.log('this.player.description: ', this.player.description);
         //this.player.stats = hero.Stats;
-        console.log('this.player.stats: ', this.player.stats);
+        //console.log('this.player.stats: ', this.player.stats);
         this.playerObject = {
             name: 'Player',
             description: `${hero.Name}, ${hero.Description}`,
@@ -402,17 +402,17 @@ class BattleScene extends Phaser.Scene {
         };
 
         // Create enemies group and add small enemies
-        this.enemies = this.physics.add.group();
-        console.log('this.enemies: ', this.enemies);
+        //this.enemies = this.physics.add.group();
+        //console.log('this.enemies: ', this.enemies);
         this.formattedEnemyObjects = [];
         console.log('this.formattedEnemyObjects: ', this.formattedEnemyObjects);
         this.enemyObjects.forEach((enemyData, index) => {
             console.log('enemyData: ', enemyData);
-            let enemySprite = this.enemies.create(600, 300, 'enemy');
-            enemySprite.description = `${enemyData.Name}, ${enemyData.Description}`;
-            console.log('enemySprite.description: ', enemySprite.description);
+            //let enemySprite = this.enemies.create(600, 300, 'enemy');
+            //enemySprite.description = `${enemyData.Name}, ${enemyData.Description}`;
+            //console.log('enemySprite.description: ', enemySprite.description);
             //enemySprite.stats = enemyData.Stats;
-            console.log('enemySprite.stats: ', enemySprite.stats);
+            //console.log('enemySprite.stats: ', enemySprite.stats);
             let enemyObject = {
                 name: 'Enemy',
                 description: `${enemyData.Name}, ${enemyData.Description}`,
@@ -944,14 +944,18 @@ class BattleScene extends Phaser.Scene {
             if (result === 'win') {
                 // Handle victory logic
                 this.addHelpText('You Won! Gaining XP...');
-                this.enemy.sprite.destroy(); // Remove enemy sprite
+                //let origX = this.enemy.sprite.x;
+                this.enemy.sprite.x += 9000; // Remove enemy sprite
 
                 // Save the game state
                 this.saveGameState();
 
                 // Trigger the next battle in the sequence
                 this.time.delayedCall(3000, () => {
-                    this.scene.start('ExplorationScene');//.battleSequence(); // Moves to the next enemy
+                    battleSequence();
+                    this.enemy.sprite.x -= 9000; // Restore enemy sprite
+
+                    //this.scene.start('ExplorationScene');//.battleSequence(); // Moves to the next enemy
                 }, [], this);
 
             } else {
