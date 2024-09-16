@@ -499,7 +499,7 @@ class BattleScene extends Phaser.Scene {
         };
         console.log('this.formattedBossObject: ', this.formattedBossObject);
 
-        this.player.setCollideWorldBounds(true);
+        //this.player.setCollideWorldBounds(true);
 
         // Spawn enemies after data is ready
         this.spawnEnemies();
@@ -640,12 +640,12 @@ class BattleScene extends Phaser.Scene {
         console.log('this.bossObject: ', this.bossObject);
 
         // Create player and set random hero from JSON data
-        this.player = this.physics.add.sprite(400, 300, 'player');
-        console.log('this.player: ', this.player);
-        this.player.description = `${hero.Name}, ${hero.Description}`;
-        console.log('this.player.description: ', this.player.description);
+        //this.player = this.physics.add.sprite(400, 300, 'player');
+        //console.log('this.player: ', this.player);
+        //this.player.description = `${hero.Name}, ${hero.Description}`;
+        //console.log('this.player.description: ', this.player.description);
         //this.player.stats = hero.Stats;
-        console.log('this.player.stats: ', this.player.stats);
+        //console.log('this.player.stats: ', this.player.stats);
         this.playerObject = {
             name: 'Player',
             description: `${hero.Name}, ${hero.Description}`,
@@ -677,17 +677,17 @@ class BattleScene extends Phaser.Scene {
         };
 
         // Create enemies group and add small enemies
-        this.enemies = this.physics.add.group();
-        console.log('this.enemies: ', this.enemies);
+        //this.enemies = this.physics.add.group();
+        //console.log('this.enemies: ', this.enemies);
         this.formattedEnemyObjects = [];
         console.log('this.formattedEnemyObjects: ', this.formattedEnemyObjects);
         this.enemyObjects.forEach((enemyData, index) => {
             console.log('enemyData: ', enemyData);
-            let enemySprite = this.enemies.create(600, 300, 'enemy');
+            //let enemySprite = this.enemies.create(600, 300, 'enemy');
             enemySprite.description = `${enemyData.Name}, ${enemyData.Description}`;
-            console.log('enemySprite.description: ', enemySprite.description);
+            //console.log('enemySprite.description: ', enemySprite.description);
             //enemySprite.stats = enemyData.Stats;
-            console.log('enemySprite.stats: ', enemySprite.stats);
+            //console.log('enemySprite.stats: ', enemySprite.stats);
             let enemyObject = {
                 name: 'Enemy',
                 description: `${enemyData.Name}, ${enemyData.Description}`,
@@ -730,14 +730,14 @@ class BattleScene extends Phaser.Scene {
 
 
         // Add the boss at the end of the fight
-        console.log('this.enemyObjects: ', this.enemyObjects);
-        this.boss = this.physics.add.sprite(600, 300, 'enemy');
-        console.log('this.boss: ', this.boss);
-        this.boss.description = `${this.bossObject.Name}, ${this.bossObject.Description}`;
-        console.log('this.boss.description: ', this.boss.description);
+        //console.log('this.enemyObjects: ', this.enemyObjects);
+        //this.boss = this.physics.add.sprite(600, 300, 'enemy');
+        //console.log('this.boss: ', this.boss);
+        //this.boss.description = `${this.bossObject.Name}, ${this.bossObject.Description}`;
+        //console.log('this.boss.description: ', this.boss.description);
         //this.boss.stats = this.bossObject.Stats;
-        console.log('this.boss.stats: ', this.boss.stats);
-        console.log('this.bossObject: ', this.bossObject);
+        //console.log('this.boss.stats: ', this.boss.stats);
+        //console.log('this.bossObject: ', this.bossObject);
         this.formattedBossObject = {
             name: 'Enemy',
             description: `${this.bossObject.Name}, ${this.bossObject.Description}`,
@@ -774,7 +774,7 @@ class BattleScene extends Phaser.Scene {
         };
         console.log('this.formattedBossObject: ', this.formattedBossObject);
 
-        this.player.setCollideWorldBounds(true);
+        //this.player.setCollideWorldBounds(true);
 
         // Spawn enemies after data is ready
         this.spawnEnemies();
