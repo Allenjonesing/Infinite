@@ -684,7 +684,7 @@ class BattleScene extends Phaser.Scene {
         this.enemyObjects.forEach((enemyData, index) => {
             console.log('enemyData: ', enemyData);
             //let enemySprite = this.enemies.create(600, 300, 'enemy');
-            enemySprite.description = `${enemyData.Name}, ${enemyData.Description}`;
+            //enemySprite.description = `${enemyData.Name}, ${enemyData.Description}`;
             //console.log('enemySprite.description: ', enemySprite.description);
             //enemySprite.stats = enemyData.Stats;
             //console.log('enemySprite.stats: ', enemySprite.stats);
@@ -822,7 +822,21 @@ class BattleScene extends Phaser.Scene {
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
             this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
             this.enemyDescription.setText(`${this.enemy.name}: ${this.enemy.description}`);
-            this.enemy.sprite.visible = true;
+            this.turnOrder = this.calculateTurnOrder();
+            this.currentTurnIndex = 0;
+
+            // Cooldown flag
+            this.isCooldown = false;
+
+            // Display UI elements
+            this.createUI(this.selectedLocation);
+
+            // Check whose turn it is and start the action immediately if it's the enemy's turn
+            if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
+                this.enemyAction();
+            } else {
+                this.showPlayerActions();
+            }
         }
 
     }
