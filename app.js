@@ -248,6 +248,7 @@ class ExplorationScene extends Phaser.Scene {
     spawnEnemies() {
         // Start the battle with the first enemy and progress through the list
         console.log('spawnEnemies: ');
+        this.currentEnemyIndex = 0;
         this.battleSequence(0);
     }
 
