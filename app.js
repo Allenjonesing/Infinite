@@ -348,7 +348,7 @@ class BattleScene extends Phaser.Scene {
         // Randomly select a location
         //const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
         // this.selectedLocation = randomLocation;
-        this.scale.on('resize', this.resize, this), null, randomLocation;
+        this.scale.on('resize', this.resize, this), null, this.selectedLocation;
 
         //this.player = data.player;
         //this.enemy = data.enemy;
@@ -445,7 +445,7 @@ class BattleScene extends Phaser.Scene {
                 this.isCooldown = false;
 
                 // Display UI elements
-                this.createUI(this.currentLocation);
+                this.createUI(this.selectedLocation);
 
                 // Check whose turn it is and start the action immediately if it's the enemy's turn
                 if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
@@ -716,7 +716,7 @@ class BattleScene extends Phaser.Scene {
         this.cameras.resize(width, height);
 
         // Adjust other elements like UI, if necessary
-        this.createUI(randomLocation); // Recreate the UI on resize
+        this.createUI(this.selectedLocation); // Recreate the UI on resize
     }
 
     generateEnemyActions(stats) {
