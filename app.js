@@ -594,6 +594,7 @@ class BattleScene extends Phaser.Scene {
 
         // Generate enemy image based on news article and setting
         if (newsData.length > 0) {
+            enemyImageBase64 == enemyImageBase64 || genericEnemyBase64;
             if (enemyImageBase64) {
                 // Initialize turn order and current turn index
                 this.turnOrder = this.calculateTurnOrder();
