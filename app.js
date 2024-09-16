@@ -828,7 +828,7 @@ class BattleScene extends Phaser.Scene {
     
             if (action === 'Attack') {
                 // Use calculateDamageZ with acc and eva parameters
-                damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.wis, this.enemy.eva, this.player.acc);
+                damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.luk, this.enemy.eva, this.player.acc);
                 this.showDamageIndicator(this.enemy, damage, critical);
                 this.addHelpText(`Player attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
     
@@ -1350,7 +1350,7 @@ class BattleScene extends Phaser.Scene {
         return healingConstant * ((magic + healingConstant) / 2);
     }
     
-    calculateDamage(atk, def, luk, eva, acc, damageConstant = 16) {
+    calculateDamageZ(atk, def, luk, eva, acc, damageConstant = 16) {
         // Original critical logic from calculateDamage
         let criticalChance = luk / 100;
         let critical = Math.random() < criticalChance;
@@ -1380,7 +1380,7 @@ class BattleScene extends Phaser.Scene {
         return baseDamage; // Return damage since the attack hit
     }
         
-    calculateMagicDamage(magAtk, magDef, defenderElement, wis, damageConstant = 24) {
+    calculateMagicDamageZ(magAtk, magDef, defenderElement, wis, damageConstant = 24) {
         // Critical and variance logic now using Wisdom (wis) instead of Luck (luk)
         let criticalChance = wis / 100; // Wisdom determines critical chance
         let critical = Math.random() < criticalChance;
@@ -1403,7 +1403,7 @@ class BattleScene extends Phaser.Scene {
         return Math.floor(baseDamage); // Return the final damage, allowing negative values for potential healing
     }
         
-    calculateHealing(magAtk, healingConstant = 80) {
+    calculateHealingZ(magAtk, healingConstant = 80) {
         // Combine logic from calculateHealing and calculateHealingX
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
         let baseHealing = healingConstant * ((magAtk + healingConstant) / 2) * variance;
