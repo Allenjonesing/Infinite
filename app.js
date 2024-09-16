@@ -249,6 +249,7 @@ class ExplorationScene extends Phaser.Scene {
         // Start the battle with the first enemy and progress through the list
         console.log('spawnEnemies: ');
         this.currentEnemyIndex = 0;
+
         this.battleSequence(0);
     }
 
@@ -265,7 +266,8 @@ class ExplorationScene extends Phaser.Scene {
             this.startBattle(this.playerObject, currentEnemy);
             console.log('Started Enemy Battle');
             // Transition to the next enemy after battle ends
-            this.time.delayedCall(2000, () => this.battleSequence(index + 1), [], this);
+            //this.time.delayedCall(2000, () => this.battleSequence(index + 1), [], this);
+            this.currentEnemyIndex++;
         } else {
             // After all small enemies, fight the boss
             console.log('this.formattedBossObject: ', this.formattedBossObject);
@@ -581,7 +583,7 @@ class BattleScene extends Phaser.Scene {
     
                 // Trigger the next battle in the sequence
                 this.time.delayedCall(3000, () => {
-                    this.scene.get('ExplorationScene').battleSequence(this.currentEnemyIndex + 1); // Move to the next enemy
+                    this.scene.get('ExplorationScene').battleSequence(); // Moves to the next enemy
                 }, [], this);
     
             } else {
