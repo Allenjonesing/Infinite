@@ -816,9 +816,13 @@ class BattleScene extends Phaser.Scene {
             //this.startBattle(this.playerObject, this.formattedBossObject);
             console.log('Started BOSS Battle');
         }
-        this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
-        this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
-        this.enemyDescription.setText(`${this.enemy.name}: ${this.enemy.description}`);
+
+        if (this.currentEnemyIndex) {
+
+            this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
+            this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
+            this.enemyDescription.setText(`${this.enemy.name}: ${this.enemy.description}`);
+        }
 
     }
 
