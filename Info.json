@@ -287,7 +287,7 @@
                     "Name": "Sky Pirate",
                     "Description": "Airborne bandit with basic attacks.",
                     "Stats": {
-                        "health": 500,
+                        "health": 100,
                         "mana": 20,
                         "atk": 20,
                         "def": 10,
