@@ -839,7 +839,7 @@ class BattleScene extends Phaser.Scene {
             wordWrap: { width: this.scale.width - 2 * padding }
         });
         this.uiContainer.add(this.helpText);
-        this.addHelpText(`A battle has begun based on the article: ${newsData[0].title}`);
+        this.addHelpText(`A battle has begun.`);
 
         // Player health and mana
         this.playerHealthText = this.add.text(padding, topMargin + elementHeight, `Health: ${this.player.health}`, { fontSize: '26px', fill: '#fff' });
