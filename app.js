@@ -1059,20 +1059,20 @@ class BattleScene extends Phaser.Scene {
         this.uiContainer.add(this.enemy.sprite);
 
         // Player and enemy names and descriptions
-        const playerDescriptionText = `${this.player.name}: ${this.player.description}`;
-        const enemyDescriptionText = `${this.enemy.name}: ${this.enemy.description}`;
+        this.playerDescriptionText = `${this.player.name}: ${this.player.description}`;
+        this.enemyDescriptionText = `${this.enemy.name}: ${this.enemy.description}`;
 
-        const playerDescription = this.add.text(padding, this.scale.height / 2, playerDescriptionText, { fontSize: '24px', fill: '#fff', wordWrap: { width: 200 } });
-        const enemyDescription = this.add.text(this.scale.width - padding - 200, this.scale.height / 2, enemyDescriptionText, { fontSize: '24px', fill: '#fff', wordWrap: { width: 200 } });
+        this.playerDescription = this.add.text(padding, this.scale.height / 2, this.playerDescriptionText, { fontSize: '24px', fill: '#fff', wordWrap: { width: 200 } });
+        this.enemyDescription = this.add.text(this.scale.width - padding - 200, this.scale.height / 2, this.enemyDescriptionText, { fontSize: '24px', fill: '#fff', wordWrap: { width: 200 } });
 
         // Add borders around descriptions
-        const playerDescriptionBox = this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(padding - 10, this.scale.height / 2, 200, playerDescription.height + 20);
-        const enemyDescriptionBox = this.add.graphics().lineStyle(2, 0xff0000).strokeRect(this.scale.width - padding - 210, this.scale.height / 2, 200, enemyDescription.height + 20);
-        this.uiContainer.add(playerDescriptionBox);
-        this.uiContainer.add(enemyDescriptionBox);
+        this.playerDescriptionBox = this.add.graphics().lineStyle(2, 0x00ff00).strokeRect(padding - 10, this.scale.height / 2, 200, this.playerDescription.height + 20);
+        this.enemyDescriptionBox = this.add.graphics().lineStyle(2, 0xff0000).strokeRect(this.scale.width - padding - 210, this.scale.height / 2, 200, this.enemyDescription.height + 20);
+        this.uiContainer.add(this.playerDescriptionBox);
+        this.uiContainer.add(this.enemyDescriptionBox);
 
-        this.uiContainer.add(playerDescription);
-        this.uiContainer.add(enemyDescription);
+        this.uiContainer.add(this.playerDescription);
+        this.uiContainer.add(this.enemyDescription);
 
         // Turn order list
         this.turnOrderText = this.add.text(this.scale.width / 2, this.scale.height / 2, 'Turns:', { fontSize: '36px', fill: '#fff' }).setOrigin(0.5);
