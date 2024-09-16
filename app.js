@@ -619,11 +619,7 @@ class BattleScene extends Phaser.Scene {
 
         // Spawn enemies after data is ready
         this.spawnEnemies();
-        
-        // Remove the loading text and warning text after all steps are complete
-        loadingText.destroy();
-        warningText.destroy();
-    }
+            }
 
     spawnEnemies() {
         // Start the battle with the first enemy and progress through the list
@@ -661,7 +657,7 @@ class BattleScene extends Phaser.Scene {
         // Transition to the battle scene, passing necessary data
         console.log('startBattle player: ', player);
         console.log('startBattle enemy: ', enemy);
-        this.scene.start('BattleScene', { player: player, enemy: enemy });
+        //this.scene.start('BattleScene', { player: player, enemy: enemy });
     }
 
     showLoadingIndicator() {
