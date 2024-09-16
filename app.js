@@ -819,6 +819,8 @@ class BattleScene extends Phaser.Scene {
 
         if (this.enemyHealthText) {
 
+            this.enemy.actions = this.generateEnemyActions(this.enemy);
+
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
             this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
             this.enemyDescription.setText(`${this.enemy.name}: ${this.enemy.description}`);
