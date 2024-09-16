@@ -822,6 +822,7 @@ class BattleScene extends Phaser.Scene {
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
             this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
             this.enemyDescription.setText(`${this.enemy.name}: ${this.enemy.description}`);
+            this.enemy.sprite.visible = true;
         }
 
     }
@@ -1309,9 +1310,9 @@ class BattleScene extends Phaser.Scene {
     levelUpStat(stat, xp) {
         const XP_THRESHOLD = 100;  // Example threshold for leveling up
         if (xp >= XP_THRESHOLD) {
-            hero.Stats[stat] += Math.floor(xp / XP_THRESHOLD);  // Level up stat
-            hero.Experience[`${stat}XP`] = xp % XP_THRESHOLD;  // Carry over leftover XP
-            console.log(`${stat.toUpperCase()} leveled up! New ${stat} stat: ${hero.Stats[stat]}`);
+            this.player.Stats[stat] += Math.floor(xp / XP_THRESHOLD);  // Level up stat
+            this.player.Experience[`${stat}XP`] = xp % XP_THRESHOLD;  // Carry over leftover XP
+            console.log(`${stat.toUpperCase()} leveled up! New ${stat} stat: ${this.player.Stats[stat]}`);
         }
     }
 
