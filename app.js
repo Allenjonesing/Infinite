@@ -344,7 +344,165 @@ class BattleScene extends Phaser.Scene {
     }
 
     async create(data) {
-        await this.beginBattleScene();
+        await loadGameData();
+
+        // Randomly select a location
+        //const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
+        const randomLocation = gameData.Locations[0];
+        this.selectedLocation = randomLocation;
+
+        // Fetch news data and generate AI responses
+        await fetchNews();
+
+        await generateAIResponses();
+
+        // Randomly select a hero and multiple enemies from the selected location
+        const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
+        console.log('hero: ', hero);
+        this.enemyObjects = randomLocation.Enemies.slice(0, 5); // Choose 5 small enemies
+        console.log('this.enemyObjects: ', this.enemyObjects);
+        this.bossObject = randomLocation.Bosses[Math.floor(Math.random() * randomLocation.Bosses.length)]; // Select 1 boss
+        console.log('this.bossObject: ', this.bossObject);
+
+        // Create player and set random hero from JSON data
+        this.player = this.physics.add.sprite(400, 300, 'player');
+        console.log('this.player: ', this.player);
+        this.player.description = `${hero.Name}, ${hero.Description}`;
+        console.log('this.player.description: ', this.player.description);
+        //this.player.stats = hero.Stats;
+        console.log('this.player.stats: ', this.player.stats);
+        this.playerObject = {
+            name: 'Player',
+            description: `${hero.Name}, ${hero.Description}`,
+            health: hero.Stats.health,
+            mana: hero.Stats.mana,
+            atk: hero.Stats.atk,
+            def: hero.Stats.def,
+            spd: hero.Stats.spd,
+            eva: hero.Stats.eva,
+            magAtk: hero.Stats.magAtk,
+            magDef: hero.Stats.magDef,
+            luk: hero.Stats.luk,
+            wis: hero.Stats.wis,
+            sprite: null,
+            actions: ['Attack', 'Defend', 'Spells', 'Skills'],
+            element: hero.Stats.element,
+            statusEffects: [],
+            immunities: hero.Stats.immunities || [],
+            Experience: {
+                atkXP: 0,
+                defXP: 0,
+                spdXP: 0,
+                magAtkXP: 0
+            },
+            KnownSkills: [
+                { name: "Slash", requiredLevel: 1, type: "physical", description: "A basic physical attack." }
+            ],
+            Level: 1
+        };
+
+        // Create enemies group and add small enemies
+        this.enemies = this.physics.add.group();
+        console.log('this.enemies: ', this.enemies);
+        this.formattedEnemyObjects = [];
+        console.log('this.formattedEnemyObjects: ', this.formattedEnemyObjects);
+        this.enemyObjects.forEach((enemyData, index) => {
+            console.log('enemyData: ', enemyData);
+            let enemySprite = this.enemies.create(600, 300, 'enemy');
+            enemySprite.description = `${enemyData.Name}, ${enemyData.Description}`;
+            console.log('enemySprite.description: ', enemySprite.description);
+            //enemySprite.stats = enemyData.Stats;
+            console.log('enemySprite.stats: ', enemySprite.stats);
+            let enemyObject = {
+                name: 'Enemy',
+                description: `${enemyData.Name}, ${enemyData.Description}`,
+                health: enemyData.Stats.health,
+                mana: enemyData.Stats.mana,
+                atk: enemyData.Stats.atk,
+                def: enemyData.Stats.def,
+                spd: enemyData.Stats.spd,
+                eva: enemyData.Stats.eva,
+                magAtk: enemyData.Stats.magAtk,
+                magDef: enemyData.Stats.magDef,
+                luk: enemyData.Stats.luk,
+                wis: enemyData.Stats.wis,
+                sprite: null,
+                //actions: this.generateEnemyActions(enemyData.Stats),
+                element: enemyData.Stats.element, // Example element multipliers
+                learnedElementalWeaknesses: {
+                    fire: 0,
+                    ice: 0,
+                    water: 0,
+                    lightning: 0,
+                    physical: 0 // Track physical attack damage
+                },
+                learnedStatusImmunities: [],
+                triedElements: {
+                    fire: false,
+                    ice: false,
+                    water: false,
+                    lightning: false,
+                    physical: false
+                },
+                statusEffects: [],
+                immunities: enemyData.Stats.immunities || []
+            };
+            console.log('enemyObject: ', enemyObject);
+
+            this.formattedEnemyObjects.push(enemyObject);
+            console.log('this.formattedEnemyObjects: ', this.formattedEnemyObjects);
+        });
+
+
+        // Add the boss at the end of the fight
+        console.log('this.enemyObjects: ', this.enemyObjects);
+        this.boss = this.physics.add.sprite(600, 300, 'enemy');
+        console.log('this.boss: ', this.boss);
+        this.boss.description = `${this.bossObject.Name}, ${this.bossObject.Description}`;
+        console.log('this.boss.description: ', this.boss.description);
+        //this.boss.stats = this.bossObject.Stats;
+        console.log('this.boss.stats: ', this.boss.stats);
+        console.log('this.bossObject: ', this.bossObject);
+        this.formattedBossObject = {
+            name: 'Enemy',
+            description: `${this.bossObject.Name}, ${this.bossObject.Description}`,
+            health: this.bossObject.Stats.health,
+            mana: this.bossObject.Stats.mana,
+            atk: this.bossObject.Stats.atk,
+            def: this.bossObject.Stats.def,
+            spd: this.bossObject.Stats.spd,
+            eva: this.bossObject.Stats.eva,
+            magAtk: this.bossObject.Stats.magAtk,
+            magDef: this.bossObject.Stats.magDef,
+            luk: this.bossObject.Stats.luk,
+            wis: this.bossObject.Stats.wis,
+            sprite: null,
+            //actions: this.generateEnemyActions(this.bossObject.Stats),
+            element: this.bossObject.Stats.element, // Example element multipliers
+            learnedElementalWeaknesses: {
+                fire: 0,
+                ice: 0,
+                water: 0,
+                lightning: 0,
+                physical: 0 // Track physical attack damage
+            },
+            learnedStatusImmunities: [],
+            triedElements: {
+                fire: false,
+                ice: false,
+                water: false,
+                lightning: false,
+                physical: false
+            },
+            statusEffects: [],
+            immunities: this.bossObject.Stats.immunities || []
+        };
+        console.log('this.formattedBossObject: ', this.formattedBossObject);
+
+        this.player.setCollideWorldBounds(true);
+
+        // Spawn enemies after data is ready
+        this.spawnEnemies();
         // Randomly select a location
         //const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
         // this.selectedLocation = randomLocation;
