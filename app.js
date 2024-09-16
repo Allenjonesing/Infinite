@@ -91,7 +91,7 @@ class ExplorationScene extends Phaser.Scene {
         enemyImageBase64 = await generateEnemyImage(newsArticle, setting);
 
         // Prep Base64 images
-        this.prepBase64Images();        
+        this.prepBase64Images();
 
         // Randomly select a hero and multiple enemies from the selected location
         const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
@@ -240,7 +240,7 @@ class ExplorationScene extends Phaser.Scene {
 
         // Spawn enemies after data is ready
         this.spawnEnemies();
-        
+
         // Remove the loading text and warning text after all steps are complete
         loadingText.destroy();
         warningText.destroy();
@@ -333,7 +333,7 @@ class ExplorationScene extends Phaser.Scene {
         // Adjust other elements like UI, if necessary
     }
 
-    
+
 }
 
 class BattleScene extends Phaser.Scene {
@@ -347,7 +347,7 @@ class BattleScene extends Phaser.Scene {
         this.beginBattleScene();
         // Randomly select a location
         //const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
-       // this.selectedLocation = randomLocation;
+        // this.selectedLocation = randomLocation;
         this.scale.on('resize', this.resize, this), null, randomLocation;
 
         //this.player = data.player;
@@ -362,7 +362,7 @@ class BattleScene extends Phaser.Scene {
         //const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
         //const enemy = randomLocation.Bosses[Math.floor(Math.random() * randomLocation.Bosses.length)];
 
-        
+
         // Initialize player and enemy data
         // const playerStats = await fetchPlayerStats();
         // this.player = {
@@ -619,7 +619,7 @@ class BattleScene extends Phaser.Scene {
 
         // Spawn enemies after data is ready
         this.spawnEnemies();
-            }
+    }
 
     spawnEnemies() {
         // Start the battle with the first enemy and progress through the list
@@ -640,6 +640,9 @@ class BattleScene extends Phaser.Scene {
             console.log('Starting Enemy Battle');
             console.log('currentEnemy: ', currentEnemy);
             //this.startBattle(this.playerObject, currentEnemy);
+            this.player = this.playerObject;
+            this.enemy = currentEnemy;
+
             console.log('Started Enemy Battle');
             // Transition to the next enemy after battle ends
             //this.time.delayedCall(2000, () => this.battleSequence(index + 1), [], this);
@@ -648,6 +651,9 @@ class BattleScene extends Phaser.Scene {
             // After all small enemies, fight the boss
             console.log('this.formattedBossObject: ', this.formattedBossObject);
             console.log('Starting BOSS Battle');
+            this.player = this.playerObject;
+            this.enemy =  this.formattedBossObject;
+
             //this.startBattle(this.playerObject, this.formattedBossObject);
             console.log('Started BOSS Battle');
         }
@@ -771,7 +777,7 @@ class BattleScene extends Phaser.Scene {
         saveGame('save1', gameData);      // Save to IndexedDB
         console.log('Game saved after battle.');
     }
-    
+
 
     endBattle(result) {
         battleEnded = true;
@@ -780,15 +786,15 @@ class BattleScene extends Phaser.Scene {
                 // Handle victory logic
                 this.addHelpText('You Won! Gaining XP...');
                 this.enemy.sprite.destroy(); // Remove enemy sprite
-                                    
+
                 // Save the game state
                 this.saveGameState();
-    
+
                 // Trigger the next battle in the sequence
                 this.time.delayedCall(3000, () => {
                     this.scene.start('ExplorationScene');//.battleSequence(); // Moves to the next enemy
                 }, [], this);
-    
+
             } else {
                 // Handle defeat logic
                 this.addHelpText('You Lost! Game Over... Please wait for the window to reload...');
@@ -800,22 +806,22 @@ class BattleScene extends Phaser.Scene {
             }
         }, [], this);
     }
-        
+
     checkForLevelUp() {
         // Check if the player has enough XP to level up
         const XP_THRESHOLD = 100; // Example XP threshold for leveling up
-    
+
         if (this.player.Experience.atkXP >= XP_THRESHOLD) {
             this.player.Level++;
             this.player.Experience.atkXP -= XP_THRESHOLD;  // Carry over excess XP
-    
+
             console.log(`You've leveled up! Now level: ${this.player.Level}`);
-    
+
             // Trigger skill selection
             this.displayLevelUpScreen();  // Allow player to choose new skills/spells
         }
     }
-    
+
     createUI(location) {
         // Clear existing UI elements if any
         if (this.uiContainer) {
@@ -1021,26 +1027,26 @@ class BattleScene extends Phaser.Scene {
 
     handlePlayerAction(action, elementType = null) {
         this.hideSubOptions(); // Ensure sub-options are hidden when a main action is chosen
-    
+
         if (!this.isCooldown && this.turnOrder[this.currentTurnIndex].name === 'Player') {
             let damage = 0;
             let healing = 0;
             let critical = false;
-    
+
             if (action === 'Spells' && !elementType) {
                 this.showElementSelection();
                 return;
             }
-    
+
             if (action === 'Attack') {
                 // Use calculateDamageZ with acc and eva parameters
                 damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.luk, this.enemy.eva, this.player.acc);
                 this.showDamageIndicator(this.enemy, damage, critical);
                 this.addHelpText(`Player attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-    
+
                 // Gain XP for attacking
                 this.gainXP('attack'); // Gain XP for attack action
-    
+
                 this.playAttackAnimation(this.player.sprite, this.enemy.sprite);
             } else if (action === 'Spells') {
                 if (this.player.mana >= 10) {
@@ -1048,10 +1054,10 @@ class BattleScene extends Phaser.Scene {
                     damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.enemy.element[elementType], this.player.wis, this.player.acc);
                     this.player.mana -= 10;
                     this.addHelpText(`Player uses ${elementType} Spells! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-    
+
                     // Gain XP for casting a spell
                     this.gainXP('magic'); // Gain XP for magic action
-    
+
                     this.playMagicAttackAnimation(this.player, this.enemy, elementType, damage, critical, this.enemy.element[elementType]);
                 } else {
                     this.addHelpText("Not enough mana!");
@@ -1061,7 +1067,7 @@ class BattleScene extends Phaser.Scene {
                 this.player.def *= 4; // Temporary defense boost
                 this.player.isDefending = true;
                 this.addHelpText('Player defends, boosting defense for this turn.');
-    
+
                 // Gain XP for defending
                 this.gainXP('defend'); // Gain XP for defend action
             } else if (action === 'Skills') {
@@ -1074,10 +1080,10 @@ class BattleScene extends Phaser.Scene {
                     this.player.mana -= 15;
                     this.player.health += healing;
                     this.addHelpText(`Player uses Heal! Restores ${healing} health.`);
-    
+
                     // Gain XP for healing
                     this.gainXP('magic'); // Gain XP for magic/healing action
-    
+
                     this.showDamageIndicator(this.player, -healing, critical);
                     this.applyHealingEffect(this.player);
                 } else {
@@ -1085,7 +1091,7 @@ class BattleScene extends Phaser.Scene {
                     return;
                 }
             }
-    
+
             // Update health and mana displays
             this.playerHealthText.setText(`Health: ${this.player.health}`);
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
@@ -1094,9 +1100,9 @@ class BattleScene extends Phaser.Scene {
             this.hidePlayerActions();
         }
     }
-        
+
     gainXP(action) {
-        switch(action) {
+        switch (action) {
             case 'attack':
                 this.player.Experience.atkXP += XP_GAIN.attack;
                 console.log(`Gained ${XP_GAIN.attack} XP in Attack`);
@@ -1120,10 +1126,10 @@ class BattleScene extends Phaser.Scene {
             default:
                 console.log("No XP gained");
         }
-    
+
         // After gaining XP, check for level up
         this.checkForLevelUp();
-    
+
         // Optionally save the game state after each turn
         this.saveGameState();
     }
@@ -1137,7 +1143,7 @@ class BattleScene extends Phaser.Scene {
             console.log(`${stat.toUpperCase()} leveled up! New ${stat} stat: ${hero.Stats[stat]}`);
         }
     }
-        
+
     calculateHealing(magAtk) {
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
         let baseHealing = Math.floor((4 * magAtk + 200) * variance);
@@ -1256,7 +1262,7 @@ class BattleScene extends Phaser.Scene {
                     let action;
                     let highestDamage = 0;
                     let bestElement = 'physical';
-    
+
                     // Periodically reset tried attacks and skills
                     if (this.enemy.triedElements.resetCounter === undefined || this.enemy.triedElements.resetCounter >= 20) {
                         console.log('performEnemyAction... Resetting learned damages...');
@@ -1272,13 +1278,13 @@ class BattleScene extends Phaser.Scene {
                     } else {
                         this.enemy.triedElements.resetCounter++;
                     }
-    
+
                     // Determine if there's an element or skill that hasn't been tried yet, but check if they exist in enemy's actions
                     const elements = Object.keys(this.enemy.triedElements).filter(e => e !== 'resetCounter' && e !== 'skills');
                     let untriedElement = elements.find(element => !this.enemy.triedElements[element] && this.enemy.actions.magic[element]);
 
                     const skills = this.enemy.actions.skills || [];
-                    let untriedSkill = skills.find(skill => !this.enemy.triedElements.skills.includes(skill) && this.enemy.actions.skills[skill]);    
+                    let untriedSkill = skills.find(skill => !this.enemy.triedElements.skills.includes(skill) && this.enemy.actions.skills[skill]);
 
                     if (!untriedElement && untriedSkill) {
                         actionType = 'skills';
@@ -1308,7 +1314,7 @@ class BattleScene extends Phaser.Scene {
                             action = `${untriedElement.charAt(0).toUpperCase() + untriedElement.slice(1)} Spells`;
                         }
                     }
-    
+
                     console.log('performEnemyAction... actionType: ', actionType);
                     console.log('performEnemyAction... action: ', action);
                     if (actionType === 'physical') {
@@ -1321,14 +1327,14 @@ class BattleScene extends Phaser.Scene {
                         this.enemy.triedElements.physical = true; // Mark physical attack as tried
                     } else if (actionType === 'magic') {
                         const elementType = action.split(' ')[0].toLowerCase();
-    
+
                         if (this.enemy.mana >= 10) {
                             // Using calculateMagicDamageZ with wisdom (wis) and the elemental multiplier
                             damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.wis, this.enemy.acc);
                             this.enemy.mana -= 10;
                             this.addHelpText(`Enemy uses ${elementType.charAt(0).toUpperCase() + elementType.slice(1)} Spells! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                             this.playMagicAttackAnimation(this.enemy, this.player, elementType, damage, critical, this.player.element[elementType]);
-    
+
                             // Learn about player's elemental weaknesses
                             this.enemy.learnedElementalWeaknesses[elementType] = Math.max(this.enemy.learnedElementalWeaknesses[elementType], damage);
                             this.enemy.triedElements[elementType] = true; // Mark this element as tried
@@ -1376,7 +1382,7 @@ class BattleScene extends Phaser.Scene {
                         this.addHelpText('Enemy defends, boosting defense for this turn.');
                     }
                     console.log('performEnemyAction... damage: ', damage);
-    
+
                     this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
                     this.startCooldown();
                 } else {
@@ -1389,7 +1395,7 @@ class BattleScene extends Phaser.Scene {
             console.error('It is not currently the enemy\'s turn');
         }
     }
-    
+
     applyStatusEffect(caster, target, statusEffect) {
         console.log('applyStatusEffect... caster: ', caster);
         console.log('applyStatusEffect... target: ', target);
@@ -1551,26 +1557,26 @@ class BattleScene extends Phaser.Scene {
         const reducedDamage = (baseDamage * defNum) / 730;
         return reducedDamage;
     }
-    
+
     calculateHealingX(magic, healingConstant = 80) {
         return healingConstant * ((magic + healingConstant) / 2);
     }
-    
+
     calculateDamageZ(atk, def, luk, eva, acc, damageConstant = 16) {
         // Original critical logic from calculateDamage
         let criticalChance = luk / 100;
         let critical = Math.random() < criticalChance;
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
-    
+
         // Calculate Hit Rate
         let hitRate = acc - eva;
         let hitRoll = Math.random() * 100;
-    
+
         // If hitRoll is greater than hitRate, the attack misses
         if (hitRate <= 0 || hitRoll > hitRate) {
             return 0; // Miss
         }
-    
+
         // Base damage calculation using logic from calculatePhysicalDamageX
         let baseDamage;
         if (critical) {
@@ -1581,17 +1587,17 @@ class BattleScene extends Phaser.Scene {
             baseDamage = (baseDamage * defNum) / 730;
             baseDamage = Math.floor(baseDamage * variance);
         }
-    
+
         baseDamage = Math.max(1, baseDamage); // Ensure minimum damage is 1
         return baseDamage; // Return damage since the attack hit
     }
-        
+
     calculateMagicDamageZ(magAtk, magDef, defenderElement, wis, damageConstant = 24) {
         // Critical and variance logic now using Wisdom (wis) instead of Luck (luk)
         let criticalChance = wis / 100; // Wisdom determines critical chance
         let critical = Math.random() < criticalChance;
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
-    
+
         // Base magic damage calculation using logic from calculateMagicDamageX
         let baseDamage;
         if (critical) {
@@ -1602,20 +1608,20 @@ class BattleScene extends Phaser.Scene {
             baseDamage = (baseDamage * defNum) / 730;
             baseDamage = Math.floor(baseDamage * variance);
         }
-    
+
         // Elemental multiplier from the original calculateMagicDamage
         baseDamage *= defenderElement;
-    
+
         return Math.floor(baseDamage); // Return the final damage, allowing negative values for potential healing
     }
-        
+
     calculateHealingZ(magAtk, healingConstant = 80) {
         // Combine logic from calculateHealing and calculateHealingX
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
         let baseHealing = healingConstant * ((magAtk + healingConstant) / 2) * variance;
         return Math.max(1, Math.floor(baseHealing)); // Ensure minimum healing is 1
     }
-    
+
     calculateMagicDamage(magAtk, magDef, defenderElement, luk) {
         let criticalChance = luk / 100;
         let critical = Math.random() < criticalChance;
@@ -1906,27 +1912,27 @@ async function fetchNews() {
             const apiUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
             const newsEndpoint = '/test';
             const response = await fetch(apiUrl + newsEndpoint);
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            
+
             const jsonData = await response.json();
-            
+
             if (!jsonData) {
                 throw new Error('No Data gathered!');
             }
-            
+
             const bodyData = JSON.parse(jsonData.body);
-            
+
             if (!bodyData) {
                 throw new Error('No body found in the response!');
             }
-            
+
             if (!bodyData.articles) {
                 throw new Error('No articles found in the body!');
             }
-            
+
             newsData = structureNewsData(bodyData.articles.sort(() => 0.5 - Math.random()).slice(0, 1));
             return;
         } catch (error) {
@@ -2152,7 +2158,7 @@ async function fetchEnemyStats() {
             immunities: ["Freeze", "Poison"]
         };
     }
-} 
+}
 
 async function fetchPlayerStats() {
     const prompt = `Generate stats for the player based on this description: ${persona.name}, ${persona.description}. ${statRequirements}`;
@@ -2289,19 +2295,19 @@ function loadGame(saveID, callback) {
 
 function initDB() {
     const request = indexedDB.open('GameDatabase', 1); // Open a database with name 'GameDatabase'
-    
-    request.onerror = function(event) {
+
+    request.onerror = function (event) {
         console.error('Database error: ', event.target.errorCode);
     };
 
-    request.onsuccess = function(event) {
+    request.onsuccess = function (event) {
         console.log('Database initialized successfully');
         const db = event.target.result;
 
         // Optional: Perform any operations if you need to handle the DB right after init
     };
 
-    request.onupgradeneeded = function(event) {
+    request.onupgradeneeded = function (event) {
         const db = event.target.result;
         // Create an object store (like a table) for your game save data
         const objectStore = db.createObjectStore('gameSaves', { keyPath: 'saveID' });
