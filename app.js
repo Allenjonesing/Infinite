@@ -921,9 +921,9 @@ class BattleScene extends Phaser.Scene {
 
     update() {
         if (!battleEnded) {
-            if (this.player.health <= 0) {
+            if (this.player && this.player.health <= 0) {
                 this.endBattle('lose');
-            } else if (this.enemy.health <= 0) {
+            } else if (this.enemy && this.enemy.health <= 0) {
                 battleEnded = true;
                 this.endBattle('win');
             }
