@@ -945,15 +945,15 @@ class BattleScene extends Phaser.Scene {
                 // Handle victory logic
                 this.addHelpText('You Won! Gaining XP...');
                 //let origX = this.enemy.sprite.x;
-                this.enemy.sprite.x += 9000; // Remove enemy sprite
+                this.enemy.sprite.visible  = false; // Remove enemy sprite
 
                 // Save the game state
                 this.saveGameState();
 
                 // Trigger the next battle in the sequence
                 this.time.delayedCall(3000, () => {
-                    battleSequence();
-                    this.enemy.sprite.x -= 9000; // Restore enemy sprite
+                    this.battleSequence();
+                    this.enemy.sprite.visible  = true; // Remove enemy sprite
 
                     //this.scene.start('ExplorationScene');//.battleSequence(); // Moves to the next enemy
                 }, [], this);
