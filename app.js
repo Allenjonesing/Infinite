@@ -1857,8 +1857,10 @@ class BattleScene extends Phaser.Scene {
 
         if (attackerElement > 0) {
             baseDamage /= attackerElement;  // Weak to this element, reduce damage
-        } else if (attackerElement < 0) {
-            baseDamage *= -attackerElement; // Strong in this element, increase damage
+        } else if (attackerElement == 0) { // Immune = Strong
+            baseDamage *= 2; // Resistant in this element, increase damage
+        } else if (attackerElement < 0) { // Can only be -1 indicating healing strength
+            baseDamage *= 3; // Strong in this element, Greatly increase damage
         }
 
         if (defenderElement < 0) {
