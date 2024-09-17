@@ -1542,7 +1542,7 @@ class BattleScene extends Phaser.Scene {
                         this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
                         this.enemy.triedElements.physical = true; // Mark physical attack as tried
                     } else if (actionType === 'magic') {
-                        const elementType = action.split(' ')[0].toLowerCase();
+                        const elementType = action;
 
                         if (this.enemy.mana >= 10) {
                             // Using calculateMagicDamageZ with wisdom (wis) and the elemental multiplier
@@ -1565,7 +1565,7 @@ class BattleScene extends Phaser.Scene {
                         }
                     } else if (actionType === 'skills') {
                         this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
-                        if (skills.includes(action)) {
+                        if (this.enemy.actions.skills.includes(action)) {
                             this.addHelpText(`Enemy uses ${action}!`);
                             this.applyStatusEffect('Enemy', 'Player', action);
                             this.enemy.triedElements.skills.push(action); // Mark skill as tried
