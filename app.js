@@ -1455,10 +1455,12 @@ class BattleScene extends Phaser.Scene {
     enemyAction() {
         console.log('enemyAction...');
         console.log('performEnemyAction... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
+    
         if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
             const performEnemyAction = () => {
                 console.log('performEnemyAction...');
                 console.log('performEnemyAction... this.isCooldown: ', this.isCooldown);
+    
                 if (!this.isCooldown) {
                     let damage = 0;
                     let critical = false;
@@ -1466,170 +1468,104 @@ class BattleScene extends Phaser.Scene {
                     let action;
                     let highestDamage = 0;
                     let bestElement = 'physical';
-
+    
                     // Periodically reset tried attacks and skills
-                    if (this.enemy.triedElements.resetCounter === undefined || this.enemy.triedElements.resetCounter >= 20) {
-                        console.log('performEnemyAction... Resetting learned damages...');
-
-                        //const validMagicElements = Object.keys(this.enemy.actions.magic || {});
-                        const validMagicElements = this.enemy.actions.magic || [];
-                        console.log('enemyAction... validMagicElements: ', validMagicElements);
-                        const validSkills = this.enemy.actions.skills || [];
-                        console.log('enemyAction... validSkills: ', validSkills);
-
-                        this.enemy.triedElements = {};
-                        this.enemy.triedElements.skills = this.enemy.triedElements.skills || [];
-                        this.enemy.triedElements.skills.filter(skill => validSkills.includes(skill)); // Filter out invalid skills
-
-                        if (validMagicElements.includes('fire') && this.enemy.learnedElementalWeaknesses.fire < 0) 
-                            this.enemy.triedElements.fire = false;
-                        if (validMagicElements.includes('ice') && this.enemy.learnedElementalWeaknesses.ice < 0) 
-                            this.enemy.triedElements.ice = false;
-                        if (validMagicElements.includes('water') && this.enemy.learnedElementalWeaknesses.water < 0) 
-                            this.enemy.triedElements.water = false;
-                        if (validMagicElements.includes('lightning') && this.enemy.learnedElementalWeaknesses.lightning < 0) 
-                            this.enemy.triedElements.lightning = false;
-
-                        this.enemy.triedElements.resetCounter = 0;
-
-                        // this.enemy.triedElements = {
-                        //     // Only reset elements that exist in enemy actions and where weaknesses are known
-                        //     fire: validMagicElements.includes('fire') && this.enemy.learnedElementalWeaknesses.fire < 0 ? this.enemy.triedElements.fire : false,
-                        //     ice: validMagicElements.includes('ice') && this.enemy.learnedElementalWeaknesses.ice < 0 ? this.enemy.triedElements.ice : false,
-                        //     water: validMagicElements.includes('water') && this.enemy.learnedElementalWeaknesses.water < 0 ? this.enemy.triedElements.water : false,
-                        //     lightning: validMagicElements.includes('lightning') && this.enemy.learnedElementalWeaknesses.lightning < 0 ? this.enemy.triedElements.lightning : false,
-                        //     physical: this.enemy.learnedElementalWeaknesses.physical < 0 ? this.enemy.triedElements.physical : false,
-                        //     skills: this.enemy.triedElements.skills.filter(skill => validSkills.includes(skill)), // Filter out invalid skills
-                        //     resetCounter: 0
-                        // };
+                    if (!this.enemy.triedElements || this.enemy.triedElements.resetCounter >= 20) {
+                        console.log('Resetting tried actions and skills...');
+                        this.enemy.triedElements = {
+                            skills: [],
+                            magic: [],
+                            resetCounter: 0
+                        };
                     } else {
                         this.enemy.triedElements.resetCounter++;
                     }
-                    console.log('enemyAction... this.enemy.triedElements: ', this.enemy.triedElements);
-
-                    // Filter only valid elements
-                    const elements = Object.keys(this.enemy.triedElements).filter(e => e !== 'resetCounter' && e !== 'skills');
-                    console.log('enemyAction... elements: ', elements);
-
-                    let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
-                    console.log('enemyAction... untriedElement: ', untriedElement);
-
+    
+                    console.log('Current triedElements:', this.enemy.triedElements);
+    
+                    // Get valid actions
+                    const validMagic = this.enemy.actions.magic || [];
                     const validSkills = this.enemy.actions.skills || [];
-                    console.log('enemyAction... validSkills: ', validSkills);
-
-                    let untriedSkill = validSkills.find(skill => !this.enemy.triedElements.skills.includes(skill));
-                    console.log('enemyAction... untriedSkill: ', untriedSkill);
-
-                    if (!untriedElement && untriedSkill) {
+    
+                    // Find untried magic and skills
+                    const untriedMagic = validMagic.find(magic => !this.enemy.triedElements.magic.includes(magic));
+                    const untriedSkill = validSkills.find(skill => !this.enemy.triedElements.skills.includes(skill));
+    
+                    if (untriedMagic) {
+                        // Prioritize untried magic
+                        actionType = 'magic';
+                        action = untriedMagic;
+                        this.enemy.triedElements.magic.push(action); // Mark as tried
+                    } else if (untriedSkill) {
+                        // If no untried magic, try untried skill
                         actionType = 'skills';
                         action = untriedSkill;
-                    } else if (!untriedElement && !untriedSkill) {
-                        // Determine the best attack based on the highest damage dealt so far
+                        this.enemy.triedElements.skills.push(action); // Mark as tried
+                    } else {
+                        // All magic and skills have been tried, fallback to best attack based on known weaknesses
                         for (const [element, dmg] of Object.entries(this.enemy.learnedElementalWeaknesses)) {
-                            console.log(`performEnemyAction... Checking damage for element ${element}: ${dmg}`);
                             if (dmg > highestDamage) {
                                 highestDamage = dmg;
                                 bestElement = element;
                             }
                         }
+    
                         if (bestElement === 'physical') {
                             actionType = 'physical';
                             action = 'Attack';
                         } else {
                             actionType = 'magic';
-                            action = `${bestElement}`;
-                        }
-                    } else if (untriedElement) {
-                        if (untriedElement === 'physical') {
-                            actionType = 'physical';
-                            action = 'Attack';
-                        } else {
-                            actionType = 'magic';
-                            action = `${untriedElement}`;
+                            action = bestElement;
                         }
                     }
-
-                    console.log('performEnemyAction... actionType: ', actionType);
-                    console.log('performEnemyAction... action: ', action);
-                    if (actionType === 'physical') {
-                        // Using calculateDamageZ with acc and eva parameters
-                        damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc, this.player);
-                        //this.showDamageIndicator(this.player, damage, critical);
-                        this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-                        this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
-                        this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
-                        this.enemy.triedElements.physical = true; // Mark physical attack as tried
-                    } else if (actionType === 'magic') {
-                        const elementType = action;
-
-                        if (this.enemy.mana >= 10) {
-                            // Using calculateMagicDamageZ with wisdom (wis) and the elemental multiplier
-                            damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.enemy.element[elementType], this.player.element[elementType], this.enemy.wis, this.player.wis);
-                            this.enemy.mana -= 10;
-                            this.addHelpText(`Enemy uses ${elementType} Spell! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-                            this.playMagicAttackAnimation(this.enemy, this.player, elementType, damage, critical, this.player.element[elementType]);
-
-                            // Learn about player's elemental weaknesses
-                            this.enemy.learnedElementalWeaknesses[elementType] = Math.max(this.enemy.learnedElementalWeaknesses[elementType], damage);
-                            this.enemy.triedElements[elementType] = true; // Mark this element as tried
-                        } else {
-                            // Fallback to physical attack if not enough mana
-                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc, this.player);
-                            //this.showDamageIndicator(this.player, damage, critical);
-                            this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-                            this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
-                            this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
-                            this.enemy.triedElements.physical = true; // Mark physical attack as tried
-                        }
-                    } else if (actionType === 'skills') {
-                        this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
-                        if (this.enemy.actions.skills.includes(action)) {
-                            this.addHelpText(`Enemy uses ${action}!`);
-                            this.applyStatusEffect('Enemy', 'Player', action);
-                            this.enemy.triedElements.skills.push(action); // Mark skill as tried
-                        } else {
-                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc, this.player);
-                            //this.showDamageIndicator(this.player, damage, critical);
-                            this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-                            this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
-                        }
-                    } else if (actionType === 'Heal') {
-                        if (this.enemy.mana >= 15) {
-                            damage = -this.calculateHealing(this.enemy.magAtk);
-                            this.enemy.mana -= 15;
-                            this.enemy.health -= damage; // Assuming 100 is max health
-                            this.addHelpText(`Enemy uses Heal! Restores ${-damage} health.`);
-                            this.showDamageIndicator(this.enemy, damage, critical);
-                            this.applyHealingEffect(this.enemy);
-                        } else {
-                            // Fallback to physical attack if not enough mana
-                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc, this.player);
-                            //this.showDamageIndicator(this.player, damage, critical);
-                            this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
-                            this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
-                            this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
-                            this.enemy.triedElements.physical = true; // Mark physical attack as tried
-                        }
-                    } else if (actionType === 'Defend') {
-                        this.enemy.def *= 4; // Temporary defense boost
-                        this.enemy.isDefending = true; // Temporary defense boost
-                        this.addHelpText('Enemy defends, boosting defense for this turn.');
-                    }
-                    console.log('performEnemyAction... damage: ', damage);
-
+    
+                    // Execute the selected action
+                    this.executeEnemyAction(actionType, action, damage, critical, bestElement);
+    
+                    // Update mana and reset counter if needed
                     this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
                     this.startCooldown();
+    
                 } else {
                     console.log('Delaying Call to performEnemyAction...');
                     this.time.delayedCall(200, performEnemyAction, [], this);
                 }
             };
+    
             performEnemyAction();
         } else {
             console.error('It is not currently the enemy\'s turn');
         }
     }
-
+    
+    // Helper method to handle execution of the action
+    executeEnemyAction(actionType, action, damage, critical, bestElement) {
+        if (actionType === 'physical') {
+            // Physical attack
+            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc, this.player);
+            this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+            this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
+            this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
+        } else if (actionType === 'magic') {
+            if (this.enemy.mana >= 10) {
+                // Magic attack
+                const elementType = action;
+                damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.enemy.element[elementType], this.player.element[elementType], this.enemy.wis, this.player.wis);
+                this.enemy.mana -= 10;
+                this.addHelpText(`Enemy uses ${elementType} Spell! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                this.playMagicAttackAnimation(this.enemy, this.player, elementType, damage, critical, this.player.element[elementType]);
+                this.enemy.learnedElementalWeaknesses[elementType] = Math.max(this.enemy.learnedElementalWeaknesses[elementType], damage);
+            } else {
+                // Fallback to physical if no mana
+                this.executeEnemyAction('physical', 'Attack', damage, critical, 'physical');
+            }
+        } else if (actionType === 'skills') {
+            this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
+            this.addHelpText(`Enemy uses ${action}!`);
+            this.applyStatusEffect('Enemy', 'Player', action);
+        }
+    }
+    
     applyStatusEffect(caster, target, statusEffect) {
         console.log('applyStatusEffect... caster: ', caster);
         console.log('applyStatusEffect... target: ', target);
