@@ -1252,7 +1252,7 @@ class BattleScene extends Phaser.Scene {
             } else if (action === 'Spells') {
                 if (this.player.mana >= 10) {
                     // Use calculateMagicDamageZ with wisdom (wis) and acc
-                    damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.enemy.element[elementType], this.player.wis, this.player.acc);
+                    damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.player.element[elementType], this.enemy.element[elementType], this.player.wis, this.enemyImageBase64.wis);
                     this.player.mana -= 10;
                     this.addHelpText(`Player uses ${elementType} Spells! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
 
@@ -1844,8 +1844,8 @@ class BattleScene extends Phaser.Scene {
         return Math.max(1, Math.floor(baseHealing)); // Ensure minimum healing is 1
     }
 
-    calculateMagicDamage(magAtk, magDef, defenderElement, luk) {
-        let criticalChance = luk / 100;
+    calculateMagicDamage(magAtk, magDef, attackerElement, defenderElement, attackerWis, defenderWis) {
+        let criticalChance = ( Math.max(0, Math.floor(attackerWis - defenderElement)) ) / 100;
         let critical = Math.random() < criticalChance;
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
 
@@ -1858,7 +1858,17 @@ class BattleScene extends Phaser.Scene {
 
         baseDamage *= defenderElement;
 
-        return Math.floor(baseDamage); // Allow negative values for potential healing
+        if (attackerElement > 0) {
+            baseDamage /= attackerElement;  // Weak to this element, reduce damage
+        } else if (attackerElement < 0) {
+            baseDamage *= -attackerElement; // Strong in this element, increase damage
+        }
+
+        if (defenderElement < 0) {   
+            return Math.floor(baseDamage); // Allow negative values for potential healing
+        } else {
+            Math.max(0, Math.floor(baseDamage)); // DO NOTAllow negative values for Unless it's a buff
+        }
     }
 
     startCooldown() {
