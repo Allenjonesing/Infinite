@@ -1471,8 +1471,11 @@ class BattleScene extends Phaser.Scene {
                     if (this.enemy.triedElements.resetCounter === undefined || this.enemy.triedElements.resetCounter >= 20) {
                         console.log('performEnemyAction... Resetting learned damages...');
 
-                        const validMagicElements = Object.keys(this.enemy.actions.magic || {});
+                        //const validMagicElements = Object.keys(this.enemy.actions.magic || {});
+                        const validMagicElements = this.enemy.actions.magic || [];
+                        console.log('enemyAction... validMagicElements: ', validMagicElements);
                         const validSkills = this.enemy.actions.skills || [];
+                        console.log('enemyAction... validSkills: ', validSkills);
 
                         this.enemy.triedElements.skills = this.enemy.triedElements.skills || [];
                         this.enemy.triedElements = {
@@ -1488,6 +1491,7 @@ class BattleScene extends Phaser.Scene {
                     } else {
                         this.enemy.triedElements.resetCounter++;
                     }
+                    console.log('enemyAction... this.enemy.triedElements: ', this.enemy.triedElements);
 
                     // Filter only valid elements
                     const elements = Object.keys(this.enemy.triedElements).filter(e => e !== 'resetCounter' && e !== 'skills' && this.enemy.actions.magic[e]);
