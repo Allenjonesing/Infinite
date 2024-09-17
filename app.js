@@ -1472,15 +1472,17 @@ class BattleScene extends Phaser.Scene {
 
                     // Periodically reset tried attacks and skills
                     // Ensure triedElements are initialized properly
-                    if (!this.enemy.triedElements) {
+                    if (!this.enemy.triedElements || this.enemy.triedElements.resetCounter >= 5) {
                         this.enemy.triedElements = {
                             magic: [],
                             skills: [],
+                            physical: false, // Track whether the enemy has tried physical attacks
                             resetCounter: 0
                         };
                     } else {
                         this.enemy.triedElements.magic = this.enemy.triedElements.magic || [];
                         this.enemy.triedElements.skills = this.enemy.triedElements.skills || [];
+                        this.enemy.triedElements.physical = this.enemy.triedElements.physical || false; // Default to false if undefined
                     }
 
                     console.log('Current triedElements:', this.enemy.triedElements);
@@ -1489,9 +1491,10 @@ class BattleScene extends Phaser.Scene {
                     const validMagic = this.enemy.actions.magic || [];
                     const validSkills = this.enemy.actions.skills || [];
 
-                    // Find untried magic and skills
+                    // Find untried magic, skills, and check if physical has been tried
                     const untriedMagic = validMagic.find(magic => !this.enemy.triedElements.magic.includes(magic));
                     const untriedSkill = validSkills.find(skill => !this.enemy.triedElements.skills.includes(skill));
+                    const untriedPhysical = !this.enemy.triedElements.physical;
 
                     if (untriedMagic) {
                         // Prioritize untried magic
@@ -1503,8 +1506,13 @@ class BattleScene extends Phaser.Scene {
                         actionType = 'skills';
                         action = untriedSkill;
                         this.enemy.triedElements.skills.push(action); // Mark as tried
+                    } else if (untriedPhysical) {
+                        // If no untried magic or skills, try physical attack
+                        actionType = 'physical';
+                        action = 'Attack';
+                        this.enemy.triedElements.physical = true; // Mark physical attack as tried
                     } else {
-                        // All magic and skills have been tried, fallback to best attack based on known weaknesses
+                        // All magic, skills, and physical attacks have been tried, fallback to best attack based on known weaknesses
                         for (const [element, dmg] of Object.entries(this.enemy.learnedElementalWeaknesses)) {
                             if (dmg > highestDamage) {
                                 highestDamage = dmg;
@@ -1520,6 +1528,9 @@ class BattleScene extends Phaser.Scene {
                             action = bestElement;
                         }
                     }
+
+                    // Log the selected action
+                    console.log('Enemy action selected:', actionType, action);
 
                     // Execute the selected action
                     this.executeEnemyAction(actionType, action, damage, critical, bestElement);
