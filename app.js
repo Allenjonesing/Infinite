@@ -1255,7 +1255,7 @@ class BattleScene extends Phaser.Scene {
             } else if (action === 'Spells') {
                 if (this.player.mana >= 10) {
                     // Use calculateMagicDamageZ with wisdom (wis) and acc
-                    damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.player.element[elementType], this.enemy.element[elementType], this.player.wis, this.enemyImageBase64.wis);
+                    damage = this.calculateMagicDamage(this.player.magAtk, this.enemy.magDef, this.player.element[elementType], this.enemy.element[elementType], this.player.wis, this.enemy.wis);
                     this.player.mana -= 10;
                     this.addHelpText(`Player uses ${elementType} Spells! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
 
