@@ -634,8 +634,10 @@ class BattleScene extends Phaser.Scene {
         // Randomly select a hero and multiple enemies from the selected location
         const hero = randomLocation.Heros[Math.floor(Math.random() * randomLocation.Heros.length)];
         console.log('hero: ', hero);
-        this.enemyObjects = randomLocation.Enemies.slice(0, 5); // Choose 5 small enemies
-        console.log('this.enemyObjects: ', this.enemyObjects);
+        this.enemyObjects = randomLocation.Enemies
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 5); // Choose 5 random enemies
+            console.log('this.enemyObjects: ', this.enemyObjects);
         this.bossObject = randomLocation.Bosses[Math.floor(Math.random() * randomLocation.Bosses.length)]; // Select 1 boss
         console.log('this.bossObject: ', this.bossObject);
 
