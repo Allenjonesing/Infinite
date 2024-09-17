@@ -1470,31 +1470,35 @@ class BattleScene extends Phaser.Scene {
                     // Periodically reset tried attacks and skills
                     if (this.enemy.triedElements.resetCounter === undefined || this.enemy.triedElements.resetCounter >= 20) {
                         console.log('performEnemyAction... Resetting learned damages...');
+
+                        const validMagicElements = Object.keys(this.enemy.actions.magic || {});
+                        const validSkills = this.enemy.actions.skills || [];
+
                         this.enemy.triedElements = {
-                            fire: this.enemy.learnedElementalWeaknesses.fire < 0 ? this.enemy.triedElements.fire : false,
-                            ice: this.enemy.learnedElementalWeaknesses.ice < 0 ? this.enemy.triedElements.fire : false,
-                            water: this.enemy.learnedElementalWeaknesses.water < 0 ? this.enemy.triedElements.fire : false,
-                            lightning: this.enemy.learnedElementalWeaknesses.lightning < 0 ? this.enemy.triedElements.fire : false,
-                            physical: this.enemy.learnedElementalWeaknesses.physical < 0 ? this.enemy.triedElements.fire : false,
-                            skills: this.enemy.triedElements.skills || [],
+                            // Only reset elements that exist in enemy actions and where weaknesses are known
+                            fire: validMagicElements.includes('fire') && this.enemy.learnedElementalWeaknesses.fire < 0 ? this.enemy.triedElements.fire : false,
+                            ice: validMagicElements.includes('ice') && this.enemy.learnedElementalWeaknesses.ice < 0 ? this.enemy.triedElements.ice : false,
+                            water: validMagicElements.includes('water') && this.enemy.learnedElementalWeaknesses.water < 0 ? this.enemy.triedElements.water : false,
+                            lightning: validMagicElements.includes('lightning') && this.enemy.learnedElementalWeaknesses.lightning < 0 ? this.enemy.triedElements.lightning : false,
+                            physical: this.enemy.learnedElementalWeaknesses.physical < 0 ? this.enemy.triedElements.physical : false,
+                            skills: this.enemy.triedElements.skills.filter(skill => validSkills.includes(skill)), // Filter out invalid skills
                             resetCounter: 0
                         };
                     } else {
                         this.enemy.triedElements.resetCounter++;
                     }
 
-                    // Determine if there's an element or skill that hasn't been tried yet, but check if they exist in enemy's actions
-                    console.log('enemyAction...  this.enemy.actions: ',  this.enemy.actions);
-                    console.log('enemyAction...  this.enemy.actions.skills: ',  this.enemy.actions.skills);
-                    console.log('enemyAction...  this.enemy.actions.magic: ',  this.enemy.actions.magic);
-                    const elements = Object.keys(this.enemy.triedElements).filter(e => e !== 'resetCounter' && e !== 'skills');
+                    // Filter only valid elements
+                    const elements = Object.keys(this.enemy.triedElements).filter(e => e !== 'resetCounter' && e !== 'skills' && this.enemy.actions.magic[e]);
                     console.log('enemyAction... elements: ', elements);
-                    let untriedElement = elements.find(element => !this.enemy.triedElements[element] && this.enemy.actions.magic[element]);
+
+                    let untriedElement = elements.find(element => !this.enemy.triedElements[element]);
                     console.log('enemyAction... untriedElement: ', untriedElement);
 
-                    const skills = this.enemy.actions.skills || [];
-                    console.log('enemyAction... skills: ', skills);
-                    let untriedSkill = skills.find(skill => !this.enemy.triedElements.skills.includes(skill) && this.enemy.actions.skills[skill]);
+                    const validSkills = this.enemy.actions.skills || [];
+                    console.log('enemyAction... validSkills: ', validSkills);
+
+                    let untriedSkill = validSkills.find(skill => !this.enemy.triedElements.skills.includes(skill));
                     console.log('enemyAction... untriedSkill: ', untriedSkill);
 
                     if (!untriedElement && untriedSkill) {
