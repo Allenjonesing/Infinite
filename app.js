@@ -1840,6 +1840,13 @@ class BattleScene extends Phaser.Scene {
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
 
         let baseDamage;
+
+        if (defenderElement < 0) {
+            magDef = 0;
+        } else if (defenderElement == 0) {
+            return 0;
+        }
+
         if (critical) {
             baseDamage = Math.floor((2 * magAtk) * variance)
         } else {
