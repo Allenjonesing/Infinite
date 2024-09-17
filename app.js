@@ -1762,7 +1762,7 @@ class BattleScene extends Phaser.Scene {
 
         baseDamage = Math.max(1, baseDamage); // Ensure minimum damage is 1
         let evaded = (Math.floor(Math.random() * 100) + 1) <= (acc - eva);
-        this.showDamageIndicator(target, damage, critical, elementValue, evaded ? 'MISS!' : null, evaded ? true : false);
+        this.showDamageIndicator(target, baseDamage, critical, elementValue, evaded ? 'MISS!' : null, evaded ? true : false);
         return evaded ? 0 : baseDamage;
     }
 
