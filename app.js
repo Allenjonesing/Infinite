@@ -1541,7 +1541,7 @@ class BattleScene extends Phaser.Scene {
 
                         if (this.enemy.mana >= 10) {
                             // Using calculateMagicDamageZ with wisdom (wis) and the elemental multiplier
-                            damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.wis, this.enemy.acc);
+                            damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.enemy.element[elementType], this.player.element[elementType], this.enemy.wis, this.player.wis);
                             this.enemy.mana -= 10;
                             this.addHelpText(`Enemy uses ${elementType} Spell! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                             this.playMagicAttackAnimation(this.enemy, this.player, elementType, damage, critical, this.player.element[elementType]);
@@ -1855,7 +1855,13 @@ class BattleScene extends Phaser.Scene {
     }
 
     calculateMagicDamage(magAtk, magDef, attackerElement, defenderElement, attackerWis, defenderWis) {
-        let criticalChance = ( Math.max(0, Math.floor(attackerWis - defenderElement)) ) / 100;
+        console.log('calculateMagicDamage... magAtk: ', magAtk);
+        console.log('calculateMagicDamage... magDef: ', magDef);
+        console.log('calculateMagicDamage... attackerElement: ', attackerElement);
+        console.log('calculateMagicDamage... defenderElement: ', defenderElement);
+        console.log('calculateMagicDamage... attackerWis: ', attackerWis);
+        console.log('calculateMagicDamage... defenderWis: ', defenderWis);
+        let criticalChance = ( Math.max(0, Math.floor(attackerWis - defenderWis)) ) / 100;
         let critical = Math.random() < criticalChance;
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
 
