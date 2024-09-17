@@ -1522,7 +1522,7 @@ class BattleScene extends Phaser.Scene {
                             action = 'Attack';
                         } else {
                             actionType = 'magic';
-                            action = `${untriedElement.charAt(0).toUpperCase() + untriedElement.slice(1)} Spells`;
+                            action = `${untriedElement}`;
                         }
                     }
 
@@ -1861,7 +1861,7 @@ class BattleScene extends Phaser.Scene {
         console.log('calculateMagicDamage... defenderElement: ', defenderElement);
         console.log('calculateMagicDamage... attackerWis: ', attackerWis);
         console.log('calculateMagicDamage... defenderWis: ', defenderWis);
-        let criticalChance = ( Math.max(0, Math.floor(attackerWis - defenderWis)) ) / 100;
+        let criticalChance = ( Math.max(1, Math.floor(attackerWis - defenderWis)) ) / 100;
         let critical = Math.random() < criticalChance;
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
 
@@ -1883,7 +1883,7 @@ class BattleScene extends Phaser.Scene {
         if (defenderElement < 0) {   
             return Math.floor(baseDamage); // Allow negative values for potential healing
         } else {
-            Math.max(0, Math.floor(baseDamage)); // DO NOTAllow negative values for Unless it's a buff
+            return Math.max(1, Math.floor(baseDamage)); // DO NOTAllow negative values for Unless it's a buff
         }
     }
 
