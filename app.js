@@ -1841,6 +1841,7 @@ class BattleScene extends Phaser.Scene {
 
         let baseDamage;
 
+        // If the target is to be healed, remove magic defense
         if (defenderElement < 0) {
             magDef = 0;
         } else if (defenderElement == 0) {
@@ -1855,12 +1856,13 @@ class BattleScene extends Phaser.Scene {
 
         baseDamage *= defenderElement;
 
-        if (attackerElement > 0) {
+        // Calculate Attacker's Elemental Affitiy
+        if (attackerElement > 0) {          // Positive = Weak
             baseDamage /= attackerElement;  // Weak to this element, reduce damage
-        } else if (attackerElement == 0) { // Immune = Strong
-            baseDamage *= 2; // Resistant in this element, increase damage
-        } else if (attackerElement < 0) { // Can only be -1 indicating healing strength
-            baseDamage *= 3; // Strong in this element, Greatly increase damage
+        } else if (attackerElement == 0) {  // 0 = Immune = Strong
+            baseDamage *= 2;                // Resistant in this element, increase damage
+        } else if (attackerElement < 0) {   // Can only be -1 indicating healing strength
+            baseDamage *= 3;                // Strong in this element, Greatly increase damage
         }
 
         if (defenderElement < 0) {
