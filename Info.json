@@ -50,9 +50,9 @@
                         "wis": 5,
                         "element": {
                             "fire": 1,
-                            "ice": 2,
-                            "water": -1,
-                            "lightning": 3
+                            "ice": 1,
+                            "water": 1,
+                            "lightning": 1
                         },
                         "immunities": [
                             "Freeze",
@@ -89,7 +89,7 @@
                 },
                 {
                     "Name": "Seren, Sky Archer",
-                    "Description": "Master of ranged attacks, controls winds.",
+                    "Description": "Master of ranged attacks.",
                     "Stats": {
                         "health": 2500,
                         "mana": 150,
@@ -97,7 +97,7 @@
                         "def": 20,
                         "spd": 40,
                         "eva": 40,
-                        "acc": 50,
+                        "acc": 100,
                         "magAtk": 20,
                         "magDef": 10,
                         "luk": 5,
@@ -132,7 +132,7 @@
                         "element": {
                             "fire": 1,
                             "ice": 1,
-                            "water": 3,
+                            "water": 2,
                             "lightning": -1
                         },
                         "immunities": [
@@ -562,21 +562,21 @@
                     "Name": "Thalios, Flameborne",
                     "Description": "Warrior infused with fire magic.",
                     "Stats": {
-                        "health": 8000,
+                        "health": 4000,
                         "mana": 250,
-                        "atk": 85,
-                        "def": 70,
-                        "spd": 60,
-                        "eva": 40,
+                        "atk": 40,
+                        "def": 30,
+                        "spd": 40,
+                        "eva": 30,
                         "acc": 80,
                         "magAtk": 50,
                         "magDef": 65,
-                        "luk": 70,
-                        "wis": 60,
+                        "luk": 40,
+                        "wis": 10,
                         "element": {
                             "fire": -1,
                             "ice": 3,
-                            "water": 2,
+                            "water": 1,
                             "lightning": 1
                         },
                         "immunities": [
@@ -591,20 +591,20 @@
                     "Stats": {
                         "health": 5000,
                         "mana": 400,
-                        "atk": 40,
-                        "def": 50,
-                        "spd": 75,
-                        "eva": 60,
+                        "atk": 20,
+                        "def": 30,
+                        "spd": 40,
+                        "eva": 30,
                         "acc": 70,
                         "magAtk": 85,
                         "magDef": 70,
-                        "luk": 55,
-                        "wis": 80,
+                        "luk": 10,
+                        "wis": 20,
                         "element": {
                             "fire": 3,
                             "ice": -1,
                             "water": 1,
-                            "lightning": 2
+                            "lightning": 1
                         },
                         "immunities": [
                             "Freeze",
@@ -616,22 +616,22 @@
                     "Name": "Dorn, Stonebreaker",
                     "Description": "Earth warrior, resistant to volcanic heat.",
                     "Stats": {
-                        "health": 9000,
+                        "health": 4000,
                         "mana": 150,
-                        "atk": 90,
-                        "def": 85,
-                        "spd": 50,
-                        "eva": 30,
+                        "atk": 60,
+                        "def": 40,
+                        "spd": 30,
+                        "eva": 20,
                         "acc": 70,
-                        "magAtk": 45,
-                        "magDef": 60,
-                        "luk": 40,
-                        "wis": 55,
+                        "magAtk": 10,
+                        "magDef": 80,
+                        "luk": 10,
+                        "wis": 10,
                         "element": {
-                            "fire": 1,
+                            "fire": 0,
                             "ice": 3,
-                            "water": 0,
-                            "lightning": 2
+                            "water": 1,
+                            "lightning": 1
                         },
                         "immunities": [
                             "Stun",
@@ -645,20 +645,20 @@
                     "Stats": {
                         "health": 6000,
                         "mana": 450,
-                        "atk": 50,
-                        "def": 55,
+                        "atk": 20,
+                        "def": 10,
                         "spd": 70,
                         "eva": 45,
                         "acc": 65,
                         "magAtk": 90,
                         "magDef": 80,
-                        "luk": 60,
-                        "wis": 75,
+                        "luk": 0,
+                        "wis": 20,
                         "element": {
-                            "fire": 1,
+                            "fire": -1,
                             "ice": 3,
-                            "water": 0,
-                            "lightning": 2
+                            "water": 1,
+                            "lightning": 1
                         },
                         "immunities": [
                             "Burn",
@@ -670,19 +670,19 @@
                     "Name": "Galvan, Thunder Paladin",
                     "Description": "Charged with the power of lightning.",
                     "Stats": {
-                        "health": 7000,
-                        "mana": 350,
-                        "atk": 80,
-                        "def": 70,
+                        "health": 4000,
+                        "mana": 150,
+                        "atk": 40,
+                        "def": 30,
                         "spd": 65,
-                        "eva": 50,
+                        "eva": 20,
                         "acc": 75,
                         "magAtk": 70,
-                        "magDef": 60,
-                        "luk": 50,
-                        "wis": 65,
+                        "magDef": 20,
+                        "luk": 10,
+                        "wis": 5,
                         "element": {
-                            "fire": 2,
+                            "fire": 1,
                             "ice": 1,
                             "water": 3,
                             "lightning": -1
@@ -701,8 +701,8 @@
                     "Stats": {
                         "health": 13000,
                         "mana": 600,
-                        "atk": 95,
-                        "def": 90,
+                        "atk": 150,
+                        "def": 200,
                         "spd": 35,
                         "eva": 10,
                         "acc": 65,
@@ -1109,421 +1109,6 @@
                             "Burn",
                             "Poison",
                             "Stun"
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "Name": "Frostgarde Tundra",
-            "Description": "An icy wasteland where temperatures drop far below freezing. The tundra is home to ferocious creatures adapted to the cold and is guarded by powerful ice spirits. Frozen caverns and glaciers dominate the landscape.",
-            "Heros": [
-                {
-                    "Name": "Bryn, Frostborne",
-                    "Description": "A warrior who thrives in cold environments.",
-                    "Stats": {
-                        "health": 8000,
-                        "mana": 250,
-                        "atk": 85,
-                        "def": 70,
-                        "spd": 60,
-                        "eva": 50,
-                        "acc": 60,
-                        "magAtk": 50,
-                        "magDef": 70,
-                        "luk": 40,
-                        "wis": 60,
-                        "element": {
-                            "ice": -1,
-                            "fire": 3,
-                            "lightning": 1,
-                            "water": 2
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Poison"
-                        ]
-                    }
-                },
-                {
-                    "Name": "Lirien, Fire Mage",
-                    "Description": "Master of flames in the cold tundra.",
-                    "Stats": {
-                        "health": 6000,
-                        "mana": 400,
-                        "atk": 40,
-                        "def": 50,
-                        "spd": 65,
-                        "eva": 55,
-                        "acc": 70,
-                        "magAtk": 95,
-                        "magDef": 60,
-                        "luk": 65,
-                        "wis": 90,
-                        "element": {
-                            "fire": 0,
-                            "ice": 3,
-                            "lightning": 1,
-                            "water": 2
-                        },
-                        "immunities": [
-                            "Burn",
-                            "Freeze"
-                        ]
-                    }
-                }
-            ],
-            "Bosses": [
-                {
-                    "Name": "Glacius, The Frozen King",
-                    "Description": "Ruler of the frozen wasteland.",
-                    "Stats": {
-                        "health": 12000,
-                        "mana": 300,
-                        "atk": 90,
-                        "def": 80,
-                        "spd": 50,
-                        "eva": 40,
-                        "acc": 65,
-                        "magAtk": 80,
-                        "magDef": 85,
-                        "luk": 60,
-                        "wis": 80,
-                        "element": {
-                            "ice": -1,
-                            "fire": 3,
-                            "lightning": 1,
-                            "water": 2
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Stun"
-                        ]
-                    }
-                },
-                {
-                    "Name": "Frostfang, Ice Dragon",
-                    "Description": "A massive dragon that breathes frost.",
-                    "Stats": {
-                        "health": 15000,
-                        "mana": 350,
-                        "atk": 110,
-                        "def": 90,
-                        "spd": 55,
-                        "eva": 35,
-                        "acc": 70,
-                        "magAtk": 100,
-                        "magDef": 90,
-                        "luk": 65,
-                        "wis": 85,
-                        "element": {
-                            "ice": -1,
-                            "fire": 4,
-                            "lightning": 2,
-                            "water": 3
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Poison"
-                        ]
-                    }
-                },
-                {
-                    "Name": "Shard, Ice Golem",
-                    "Description": "A towering golem made of living ice.",
-                    "Stats": {
-                        "health": 13000,
-                        "mana": 200,
-                        "atk": 100,
-                        "def": 85,
-                        "spd": 40,
-                        "eva": 20,
-                        "acc": 50,
-                        "magAtk": 70,
-                        "magDef": 90,
-                        "luk": 55,
-                        "wis": 75,
-                        "element": {
-                            "ice": -1,
-                            "fire": 3,
-                            "lightning": 1,
-                            "water": 2
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Stun"
-                        ]
-                    }
-                }
-            ],
-            "Enemies": [
-                {
-                    "Name": "Snow Wolf",
-                    "Description": "Predator of the tundra.",
-                    "Stats": {
-                        "health": 3000,
-                        "mana": 150,
-                        "atk": 65,
-                        "def": 50,
-                        "spd": 70,
-                        "eva": 60,
-                        "acc": 55,
-                        "magAtk": 40,
-                        "magDef": 45,
-                        "luk": 40,
-                        "wis": 50,
-                        "element": {
-                            "ice": 1,
-                            "fire": 3,
-                            "lightning": 2,
-                            "water": 1
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Poison"
-                        ]
-                    }
-                },
-                {
-                    "Name": "Ice Wraith",
-                    "Description": "A spectral entity that haunts the tundra.",
-                    "Stats": {
-                        "health": 3500,
-                        "mana": 200,
-                        "atk": 60,
-                        "def": 40,
-                        "spd": 80,
-                        "eva": 70,
-                        "acc": 50,
-                        "magAtk": 80,
-                        "magDef": 60,
-                        "luk": 45,
-                        "wis": 65,
-                        "element": {
-                            "ice": -1,
-                            "fire": 2,
-                            "lightning": 1,
-                            "water": 2
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Stun"
-                        ]
-                    }
-                },
-                {
-                    "Name": "Frost Giant",
-                    "Description": "A massive giant that roams the frozen wastelands.",
-                    "Stats": {
-                        "health": 5000,
-                        "mana": 100,
-                        "atk": 80,
-                        "def": 60,
-                        "spd": 45,
-                        "eva": 30,
-                        "acc": 55,
-                        "magAtk": 50,
-                        "magDef": 55,
-                        "luk": 50,
-                        "wis": 55,
-                        "element": {
-                            "ice": -1,
-                            "fire": 3,
-                            "lightning": 2,
-                            "water": 1
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Poison"
-                        ]
-                    }
-                },
-                {
-                    "Name": "Blizzard Hawk",
-                    "Description": "A bird that controls snowstorms.",
-                    "Stats": {
-                        "health": 2800,
-                        "mana": 150,
-                        "atk": 70,
-                        "def": 40,
-                        "spd": 90,
-                        "eva": 80,
-                        "acc": 65,
-                        "magAtk": 55,
-                        "magDef": 50,
-                        "luk": 45,
-                        "wis": 55,
-                        "element": {
-                            "ice": 0,
-                            "fire": 3,
-                            "lightning": 1,
-                            "water": 2
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Blind"
-                        ]
-                    }
-                },
-                {
-                    "Name": "Frozen Slime",
-                    "Description": "A gelatinous creature that freezes everything it touches.",
-                    "Stats": {
-                        "health": 2500,
-                        "mana": 50,
-                        "atk": 40,
-                        "def": 70,
-                        "spd": 30,
-                        "eva": 20,
-                        "acc": 45,
-                        "magAtk": 30,
-                        "magDef": 40,
-                        "luk": 35,
-                        "wis": 40,
-                        "element": {
-                            "ice": -1,
-                            "fire": 2,
-                            "lightning": 1,
-                            "water": 3
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Poison"
-                        ]
-                    }
-                },
-                {
-                    "Name": "Ice Spider",
-                    "Description": "A large spider adapted to the icy terrain.",
-                    "Stats": {
-                        "health": 3200,
-                        "mana": 100,
-                        "atk": 65,
-                        "def": 55,
-                        "spd": 60,
-                        "eva": 50,
-                        "acc": 60,
-                        "magAtk": 45,
-                        "magDef": 50,
-                        "luk": 40,
-                        "wis": 55,
-                        "element": {
-                            "ice": 0,
-                            "fire": 3,
-                            "lightning": 2,
-                            "water": 1
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Poison"
-                        ]
-                    }
-                },
-                {
-                    "Name": "Tundra Wolf",
-                    "Description": "A larger, more vicious version of the snow wolf.",
-                    "Stats": {
-                        "health": 4000,
-                        "mana": 150,
-                        "atk": 70,
-                        "def": 60,
-                        "spd": 75,
-                        "eva": 65,
-                        "acc": 60,
-                        "magAtk": 45,
-                        "magDef": 50,
-                        "luk": 45,
-                        "wis": 50,
-                        "element": {
-                            "ice": 1,
-                            "fire": 3,
-                            "lightning": 2,
-                            "water": 1
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Poison"
-                        ]
-                    }
-                },
-                {
-                    "Name": "Frost Zombie",
-                    "Description": "The undead, reanimated by the freezing cold.",
-                    "Stats": {
-                        "health": 2800,
-                        "mana": 0,
-                        "atk": 60,
-                        "def": 50,
-                        "spd": 40,
-                        "eva": 30,
-                        "acc": 50,
-                        "magAtk": 30,
-                        "magDef": 35,
-                        "luk": 30,
-                        "wis": 40,
-                        "element": {
-                            "ice": 0,
-                            "fire": 3,
-                            "lightning": 2,
-                            "water": 1
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Poison"
-                        ]
-                    }
-                },
-                {
-                    "Name": "Frost Ogre",
-                    "Description": "A brutish ogre that thrives in the cold.",
-                    "Stats": {
-                        "health": 6000,
-                        "mana": 100,
-                        "atk": 85,
-                        "def": 70,
-                        "spd": 50,
-                        "eva": 25,
-                        "acc": 60,
-                        "magAtk": 40,
-                        "magDef": 50,
-                        "luk": 45,
-                        "wis": 55,
-                        "element": {
-                            "ice": -1,
-                            "fire": 3,
-                            "lightning": 2,
-                            "water": 1
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Poison"
-                        ]
-                    }
-                },
-                {
-                    "Name": "Icy Phantom",
-                    "Description": "A ghost that drains warmth from its surroundings.",
-                    "Stats": {
-                        "health": 4000,
-                        "mana": 250,
-                        "atk": 55,
-                        "def": 45,
-                        "spd": 65,
-                        "eva": 55,
-                        "acc": 70,
-                        "magAtk": 85,
-                        "magDef": 60,
-                        "luk": 50,
-                        "wis": 75,
-                        "element": {
-                            "ice": -1,
-                            "fire": 2,
-                            "lightning": 1,
-                            "water": 2
-                        },
-                        "immunities": [
-                            "Freeze",
-                            "Blind"
                         ]
                     }
                 }
