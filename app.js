@@ -1242,7 +1242,7 @@ class BattleScene extends Phaser.Scene {
             if (action === 'Attack') {
                 // Use calculateDamageZ with acc and eva parameters
                 damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.luk, this.enemy.eva, this.player.acc);
-                this.showDamageIndicator(this.enemy, damage, critical);
+                //this.showDamageIndicator(this.enemy, damage, critical);
                 this.addHelpText(`Player attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
 
                 // Gain XP for attacking
@@ -1521,7 +1521,7 @@ class BattleScene extends Phaser.Scene {
                     if (actionType === 'physical') {
                         // Using calculateDamageZ with acc and eva parameters
                         damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc);
-                        this.showDamageIndicator(this.player, damage, critical);
+                        //this.showDamageIndicator(this.player, damage, critical);
                         this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                         this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                         this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
@@ -1542,7 +1542,7 @@ class BattleScene extends Phaser.Scene {
                         } else {
                             // Fallback to physical attack if not enough mana
                             damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc);
-                            this.showDamageIndicator(this.player, damage, critical);
+                            //this.showDamageIndicator(this.player, damage, critical);
                             this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                             this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                             this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
@@ -1556,7 +1556,7 @@ class BattleScene extends Phaser.Scene {
                             this.enemy.triedElements.skills.push(action); // Mark skill as tried
                         } else {
                             damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc);
-                            this.showDamageIndicator(this.player, damage, critical);
+                            //this.showDamageIndicator(this.player, damage, critical);
                             this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                             this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
                         }
@@ -1571,7 +1571,7 @@ class BattleScene extends Phaser.Scene {
                         } else {
                             // Fallback to physical attack if not enough mana
                             damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc);
-                            this.showDamageIndicator(this.player, damage, critical);
+                            //this.showDamageIndicator(this.player, damage, critical);
                             this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                             this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
                             this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
@@ -1648,12 +1648,12 @@ class BattleScene extends Phaser.Scene {
         }
     }
 
-    showDamageIndicator(target, damage, critical, elementValue) {
+    showDamageIndicator(target, damage, critical, elementValue, additionalText, hideDamageNumber) {
         let fontColor = '#f0d735';
         let delaytime = 0;
 
         if (elementValue <= 0.0) {
-            delaytime = 300;
+            delaytime = 500;
             fontColor = elementValue < 0.0 ? '#0cc43d' : '#2bf1ff';
             const immunityText = elementValue < 0.0 ? 'BUFF' : 'IMMUNE';
             const displayText = this.add.text(target.sprite.x, target.sprite.y - 50, immunityText, { fontSize: '50px', fill: fontColor, fontStyle: 'bold' });
@@ -1667,10 +1667,28 @@ class BattleScene extends Phaser.Scene {
                     displayText.destroy();
                 }
             });
-        } else if (critical) {
+        }
+        
+        if (critical) {
             delaytime = 500;
             fontColor = '#f0d735'
             const displayText = this.add.text(target.sprite.x, target.sprite.y - 50, 'CRITICAL', { fontSize: '50px', fill: fontColor, fontStyle: 'bold' });
+            this.tweens.add({
+                targets: displayText,
+                y: target.sprite.y - 250,
+                alpha: { from: 1, to: 0 },
+                duration: 2500,
+                ease: 'Power1',
+                onComplete: () => {
+                    displayText.destroy();
+                }
+            });
+        }
+
+        if (additionalText) {
+            delaytime = 500;
+            fontColor = '#f0d735'
+            const displayText = this.add.text(target.sprite.x, target.sprite.y - 50, additionalText, { fontSize: '50px', fill: fontColor, fontStyle: 'bold' });
             this.tweens.add({
                 targets: displayText,
                 y: target.sprite.y - 250,
@@ -1696,17 +1714,19 @@ class BattleScene extends Phaser.Scene {
             this.enemyHealthText.setText(`Health: ${this.enemy.health}`);
 
 
-            const damageText = this.add.text(target.sprite.x, target.sprite.y - 50, damage, { fontSize: '60px', fill: fontColor, fontStyle: 'bold' });
-            this.tweens.add({
-                targets: damageText,
-                y: target.sprite.y - 250,
-                alpha: { from: 1, to: 0 },
-                duration: 2500,
-                ease: 'Power1',
-                onComplete: () => {
-                    damageText.destroy();
-                }
-            });
+            if (!hideDamageNumber) {
+                const damageText = this.add.text(target.sprite.x, target.sprite.y - 50, damage, { fontSize: '60px', fill: fontColor, fontStyle: 'bold' });
+                this.tweens.add({
+                    targets: damageText,
+                    y: target.sprite.y - 250,
+                    alpha: { from: 1, to: 0 },
+                    duration: 2500,
+                    ease: 'Power1',
+                    onComplete: () => {
+                        damageText.destroy();
+                    }
+                });
+            }
         }, [], this);
     }
 
@@ -1728,7 +1748,7 @@ class BattleScene extends Phaser.Scene {
         }, [], this);
     }
 
-    calculateDamage(atk, def, luk, eva) {
+    calculateDamage(atk, def, luk, eva, acc, target, elementValue) {
         let criticalChance = luk / 100;
         let critical = Math.random() < criticalChance;
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
@@ -1741,7 +1761,8 @@ class BattleScene extends Phaser.Scene {
         }
 
         baseDamage = Math.max(1, baseDamage); // Ensure minimum damage is 1
-        let evaded = Math.random() < (eva * 0.01);
+        let evaded = (Math.floor(Math.random() * 100) + 1) <= (acc - eva);
+        this.showDamageIndicator(target, damage, critical, elementValue, evaded ? 'MISS!' : null, evaded ? true : false);
         return evaded ? 0 : baseDamage;
     }
 
