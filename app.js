@@ -1733,7 +1733,7 @@ class BattleScene extends Phaser.Scene {
     }
 
     calculateDamage(atk, def, luk, eva, acc, target, elementValue) {
-        let criticalChance = luk / 100;
+        let criticalChance = luk / 1000;
         let critical = Math.random() < criticalChance;
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
 
