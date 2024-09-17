@@ -930,6 +930,7 @@ class BattleScene extends Phaser.Scene {
             console.log('generateEnemyActions... stats.element.water: ', stats.element.water);
             if (stats.element.water <= 0) actions.skills.push('Poison');
         }
+        console.log('generateEnemyActions... actions.skills: ', actions.skills);
 
         // Add magic attacks based on elemental strengths and not exclusively physical
         if (!isPhysicalOnly) {
@@ -954,6 +955,8 @@ class BattleScene extends Phaser.Scene {
             // Add healing spells
             actions.magic.push('Heal');
         }
+        console.log('generateEnemyActions... actions.magic: ', actions.magic);
+        console.log('generateEnemyActions... actions: ', actions);
 
         return actions;
     }
@@ -1481,11 +1484,18 @@ class BattleScene extends Phaser.Scene {
                     }
 
                     // Determine if there's an element or skill that hasn't been tried yet, but check if they exist in enemy's actions
+                    console.log('enemyAction...  this.enemy.actions: ',  this.enemy.actions);
+                    console.log('enemyAction...  this.enemy.actions.skills: ',  this.enemy.actions.skills);
+                    console.log('enemyAction...  this.enemy.actions.magic: ',  this.enemy.actions.magic);
                     const elements = Object.keys(this.enemy.triedElements).filter(e => e !== 'resetCounter' && e !== 'skills');
+                    console.log('enemyAction... elements: ', elements);
                     let untriedElement = elements.find(element => !this.enemy.triedElements[element] && this.enemy.actions.magic[element]);
+                    console.log('enemyAction... untriedElement: ', untriedElement);
 
                     const skills = this.enemy.actions.skills || [];
+                    console.log('enemyAction... skills: ', skills);
                     let untriedSkill = skills.find(skill => !this.enemy.triedElements.skills.includes(skill) && this.enemy.actions.skills[skill]);
+                    console.log('enemyAction... untriedSkill: ', untriedSkill);
 
                     if (!untriedElement && untriedSkill) {
                         actionType = 'skills';
