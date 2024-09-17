@@ -347,8 +347,8 @@ class BattleScene extends Phaser.Scene {
         await loadGameData();
 
         // Randomly select a location
-        //const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
-        const randomLocation = gameData.Locations[0];
+        const randomLocation = gameData.Locations[Math.floor(Math.random() * gameData.Locations.length)];
+        //const randomLocation = gameData.Locations[0];
         this.selectedLocation = randomLocation;
 
         // Fetch news data and generate AI responses
