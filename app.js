@@ -1241,7 +1241,7 @@ class BattleScene extends Phaser.Scene {
 
             if (action === 'Attack') {
                 // Use calculateDamageZ with acc and eva parameters
-                damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.luk, this.enemy.eva, this.player.acc);
+                damage = this.calculateDamage(this.player.atk, this.enemy.def, this.player.luk, this.enemy.eva, this.player.acc, this.enemy);
                 //this.showDamageIndicator(this.enemy, damage, critical);
                 this.addHelpText(`Player attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
 
@@ -1520,7 +1520,7 @@ class BattleScene extends Phaser.Scene {
                     console.log('performEnemyAction... action: ', action);
                     if (actionType === 'physical') {
                         // Using calculateDamageZ with acc and eva parameters
-                        damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc);
+                        damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc, this.player);
                         //this.showDamageIndicator(this.player, damage, critical);
                         this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                         this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
@@ -1541,7 +1541,7 @@ class BattleScene extends Phaser.Scene {
                             this.enemy.triedElements[elementType] = true; // Mark this element as tried
                         } else {
                             // Fallback to physical attack if not enough mana
-                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc);
+                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc, this.player);
                             //this.showDamageIndicator(this.player, damage, critical);
                             this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                             this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
@@ -1555,7 +1555,7 @@ class BattleScene extends Phaser.Scene {
                             this.applyStatusEffect('Enemy', 'Player', action);
                             this.enemy.triedElements.skills.push(action); // Mark skill as tried
                         } else {
-                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc);
+                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc, this.player);
                             //this.showDamageIndicator(this.player, damage, critical);
                             this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                             this.enemy.learnedElementalWeaknesses.physical = Math.max(this.enemy.learnedElementalWeaknesses.physical, damage);
@@ -1570,7 +1570,7 @@ class BattleScene extends Phaser.Scene {
                             this.applyHealingEffect(this.enemy);
                         } else {
                             // Fallback to physical attack if not enough mana
-                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc);
+                            damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.wis, this.player.eva, this.enemy.acc, this.player);
                             //this.showDamageIndicator(this.player, damage, critical);
                             this.addHelpText(`Enemy attacks! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                             this.playAttackAnimation(this.enemy.sprite, this.player.sprite);
