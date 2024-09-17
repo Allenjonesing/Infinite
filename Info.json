@@ -5,29 +5,31 @@
             "Description": "A floating fortress held aloft by ancient magic, Skyhold Citadel was once the heart of an advanced skyborne civilization. Now, it lies in ruin, filled with dangerous creatures and treasure waiting to be claimed. Storms rage around the citadel, and only the brave can weather the journey.",
             "Heros": [
                 {
-                    "Name": "Aeron, Windblade",
-                    "Description": "Aerial combat expert with dual swords.",
+                    "Name": "GOD",
+                    "Description": "Test Player with Max stats..",
                     "Stats": {
-                        "health": 2000,
-                        "mana": 50,
-                        "atk": 40,
-                        "def": 35,
-                        "spd": 40,
-                        "eva": 30,
-                        "acc": 40,
-                        "magAtk": 20,
-                        "magDef": 10,
-                        "luk": 10,
-                        "wis": 0,
+                        "health": 10000,
+                        "mana": 999,
+                        "atk": 999,
+                        "def": 999,
+                        "spd": 999,
+                        "eva": 999,
+                        "acc": 999,
+                        "magAtk": 999,
+                        "magDef": 999,
+                        "luk": 999,
+                        "wis": 999,
                         "element": {
-                            "fire": 1,
-                            "ice": 1,
-                            "water": 1,
-                            "lightning": 1
+                            "fire": -1,
+                            "ice": -1,
+                            "water": -1,
+                            "lightning": -1
                         },
                         "immunities": [
                             "Poison",
-                            "Stun"
+                            "Stun",
+                            "Freeze",
+                            "Burn"
                         ]
                     }
                 },
