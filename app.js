@@ -993,6 +993,7 @@ class BattleScene extends Phaser.Scene {
 
                 // Trigger the next battle in the sequence
                 this.time.delayedCall(3000, () => {
+                    battleEnded = false;
                     this.battleSequence();
                     //this.enemy.sprite.visible  = true; // Remove enemy sprite
 
