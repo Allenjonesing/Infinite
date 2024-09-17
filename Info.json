@@ -289,7 +289,7 @@
                     "Name": "Sky Pirate",
                     "Description": "Airborne bandit with basic attacks.",
                     "Stats": {
-                        "health": 100,
+                        "health": 300,
                         "mana": 20,
                         "atk": 20,
                         "def": 10,
@@ -318,12 +318,12 @@
                         "health": 700,
                         "mana": 150,
                         "atk": 20,
-                        "def": 10,
+                        "def": 5,
                         "spd": 40,
-                        "eva": 60,
+                        "eva": 80,
                         "acc": 30,
                         "magAtk": 30,
-                        "magDef": 40,
+                        "magDef": 5,
                         "luk": 0,
                         "wis": 5,
                         "element": {
@@ -344,14 +344,14 @@
                         "health": 1000,
                         "mana": 200,
                         "atk": 0,
-                        "def": 60,
+                        "def": 200,
                         "spd": 10,
                         "eva": 70,
                         "acc": 0,
-                        "magAtk": 40,
-                        "magDef": 20,
+                        "magAtk": 155,
+                        "magDef": 10,
                         "luk": 0,
-                        "wis": 20,
+                        "wis": 2,
                         "element": {
                             "fire": 1,
                             "ice": 1,
@@ -359,8 +359,7 @@
                             "lightning": 3
                         },
                         "immunities": [
-                            "Burn",
-                            "Freeze"
+                            "Burn"
                         ]
                     }
                 },
@@ -376,7 +375,7 @@
                         "eva": 5,
                         "acc": 30,
                         "magAtk": 5,
-                        "magDef": 10,
+                        "magDef": 0,
                         "luk": 5,
                         "wis": 0,
                         "element": {
@@ -402,8 +401,8 @@
                         "spd": 40,
                         "eva": 40,
                         "acc": 30,
-                        "magAtk": 40,
-                        "magDef": 20,
+                        "magAtk": 80,
+                        "magDef": 10,
                         "luk": 0,
                         "wis": 5,
                         "element": {
@@ -844,17 +843,17 @@
                     "Name": "Fire Elemental",
                     "Description": "Creature of pure fire.",
                     "Stats": {
-                        "health": 3000,
+                        "health": 1200,
                         "mana": 200,
-                        "atk": 65,
-                        "def": 50,
-                        "spd": 70,
-                        "eva": 50,
-                        "acc": 60,
+                        "atk": 10,
+                        "def": 500,
+                        "spd": 30,
+                        "eva": 90,
+                        "acc": 20,
                         "magAtk": 80,
-                        "magDef": 70,
-                        "luk": 60,
-                        "wis": 70,
+                        "magDef": 20,
+                        "luk": 10,
+                        "wis": 5,
                         "element": {
                             "fire": -1,
                             "ice": 3,
@@ -863,7 +862,8 @@
                         },
                         "immunities": [
                             "Burn",
-                            "Stun"
+                            "Stun",
+                            "Freeze"
                         ]
                     }
                 },
@@ -871,26 +871,27 @@
                     "Name": "Magma Hound",
                     "Description": "A lava-infused dog-like creature.",
                     "Stats": {
-                        "health": 4000,
-                        "mana": 150,
-                        "atk": 75,
-                        "def": 65,
+                        "health": 800,
+                        "mana": 50,
+                        "atk": 30,
+                        "def": 20,
                         "spd": 60,
-                        "eva": 55,
+                        "eva": 30,
                         "acc": 70,
-                        "magAtk": 50,
-                        "magDef": 60,
-                        "luk": 50,
-                        "wis": 55,
+                        "magAtk": 10,
+                        "magDef": 5,
+                        "luk": 5,
+                        "wis": 0,
                         "element": {
-                            "fire": 1,
+                            "fire": -1,
                             "ice": 3,
-                            "water": 0,
-                            "lightning": 2
+                            "water": 2,
+                            "lightning": 1
                         },
                         "immunities": [
                             "Burn",
-                            "Poison"
+                            "Poison",
+                            "Freeze"
                         ]
                     }
                 },
@@ -898,22 +899,22 @@
                     "Name": "Lava Slime",
                     "Description": "A slow-moving blob of molten lava.",
                     "Stats": {
-                        "health": 3500,
-                        "mana": 100,
-                        "atk": 50,
-                        "def": 40,
-                        "spd": 30,
-                        "eva": 20,
-                        "acc": 50,
+                        "health": 2500,
+                        "mana": 200,
+                        "atk": 10,
+                        "def": 100,
+                        "spd": 10,
+                        "eva": 0,
+                        "acc": 30,
                         "magAtk": 60,
-                        "magDef": 55,
-                        "luk": 45,
-                        "wis": 50,
+                        "magDef": 20,
+                        "luk": 0,
+                        "wis": 5,
                         "element": {
-                            "fire": 1,
+                            "fire": -1,
                             "ice": 3,
-                            "water": 0,
-                            "lightning": 2
+                            "water": 2,
+                            "lightning": 1
                         },
                         "immunities": [
                             "Burn",
@@ -925,26 +926,27 @@
                     "Name": "Obsidian Golem",
                     "Description": "A smaller golem made from obsidian.",
                     "Stats": {
-                        "health": 6000,
+                        "health": 3000,
                         "mana": 100,
                         "atk": 80,
                         "def": 85,
-                        "spd": 35,
-                        "eva": 25,
+                        "spd": 20,
+                        "eva": 5,
                         "acc": 60,
-                        "magAtk": 45,
-                        "magDef": 70,
-                        "luk": 40,
-                        "wis": 50,
+                        "magAtk": 10,
+                        "magDef": 5,
+                        "luk": 20,
+                        "wis": 0,
                         "element": {
-                            "fire": 1,
+                            "fire": -1,
                             "ice": 3,
-                            "water": 0,
-                            "lightning": 2
+                            "water": 2,
+                            "lightning": 1
                         },
                         "immunities": [
                             "Freeze",
-                            "Poison"
+                            "Poison",
+                            "burn"
                         ]
                     }
                 },
@@ -954,13 +956,13 @@
                     "Stats": {
                         "health": 1500,
                         "mana": 250,
-                        "atk": 30,
-                        "def": 25,
+                        "atk": 10,
+                        "def": 300,
                         "spd": 85,
                         "eva": 80,
                         "acc": 65,
-                        "magAtk": 90,
-                        "magDef": 75,
+                        "magAtk": 200,
+                        "magDef": 30,
                         "luk": 60,
                         "wis": 80,
                         "element": {
