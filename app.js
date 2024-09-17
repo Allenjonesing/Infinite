@@ -1474,6 +1474,7 @@ class BattleScene extends Phaser.Scene {
                         const validMagicElements = Object.keys(this.enemy.actions.magic || {});
                         const validSkills = this.enemy.actions.skills || [];
 
+                        this.enemy.triedElements.skills = this.enemy.triedElements.skills || [];
                         this.enemy.triedElements = {
                             // Only reset elements that exist in enemy actions and where weaknesses are known
                             fire: validMagicElements.includes('fire') && this.enemy.learnedElementalWeaknesses.fire < 0 ? this.enemy.triedElements.fire : false,
