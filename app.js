@@ -596,22 +596,22 @@ class BattleScene extends Phaser.Scene {
         if (newsData.length > 0) {
             enemyImageBase64 = enemyImageBase64 || genericEnemyBase64 || 'asdf';
             //if (enemyImageBase64) {
-                // Initialize turn order and current turn index
-                this.turnOrder = this.calculateTurnOrder();
-                this.currentTurnIndex = 0;
+            // Initialize turn order and current turn index
+            this.turnOrder = this.calculateTurnOrder();
+            this.currentTurnIndex = 0;
 
-                // Cooldown flag
-                this.isCooldown = false;
+            // Cooldown flag
+            this.isCooldown = false;
 
-                // Display UI elements
-                this.createUI(this.selectedLocation);
+            // Display UI elements
+            this.createUI(this.selectedLocation);
 
-                // Check whose turn it is and start the action immediately if it's the enemy's turn
-                if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
-                    this.enemyAction();
-                } else {
-                    this.showPlayerActions();
-                }
+            // Check whose turn it is and start the action immediately if it's the enemy's turn
+            if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
+                this.enemyAction();
+            } else {
+                this.showPlayerActions();
+            }
             //} else {
             //    console.error('Failed to generate enemy image');
             //}
@@ -811,7 +811,7 @@ class BattleScene extends Phaser.Scene {
             console.log('this.formattedBossObject: ', this.formattedBossObject);
             console.log('Starting BOSS Battle');
             this.player = this.playerObject;
-            this.enemy =  this.formattedBossObject;
+            this.enemy = this.formattedBossObject;
 
             //this.startBattle(this.playerObject, this.formattedBossObject);
             console.log('Started BOSS Battle');
@@ -986,7 +986,7 @@ class BattleScene extends Phaser.Scene {
                 // Handle victory logic
                 this.addHelpText('You Won! Gaining XP...');
                 //let origX = this.enemy.sprite.x;
-                this.enemy.sprite.visible  = false; // Remove enemy sprite
+                this.enemy.sprite.visible = false; // Remove enemy sprite
 
                 // Save the game state
                 this.saveGameState();
@@ -1455,12 +1455,12 @@ class BattleScene extends Phaser.Scene {
     enemyAction() {
         console.log('enemyAction...');
         console.log('performEnemyAction... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
-    
+
         if (this.turnOrder[this.currentTurnIndex].name === 'Enemy') {
             const performEnemyAction = () => {
                 console.log('performEnemyAction...');
                 console.log('performEnemyAction... this.isCooldown: ', this.isCooldown);
-    
+
                 if (!this.isCooldown) {
                     let damage = 0;
                     let critical = false;
@@ -1468,29 +1468,30 @@ class BattleScene extends Phaser.Scene {
                     let action;
                     let highestDamage = 0;
                     let bestElement = 'physical';
-    
+
                     // Periodically reset tried attacks and skills
-                    if (!this.enemy.triedElements || this.enemy.triedElements.resetCounter >= 20) {
-                        console.log('Resetting tried actions and skills...');
+                    // Ensure triedElements are initialized properly
+                    if (!this.enemy.triedElements) {
                         this.enemy.triedElements = {
-                            skills: [],
                             magic: [],
+                            skills: [],
                             resetCounter: 0
                         };
                     } else {
-                        this.enemy.triedElements.resetCounter++;
+                        this.enemy.triedElements.magic = this.enemy.triedElements.magic || [];
+                        this.enemy.triedElements.skills = this.enemy.triedElements.skills || [];
                     }
-    
+
                     console.log('Current triedElements:', this.enemy.triedElements);
-    
+
                     // Get valid actions
                     const validMagic = this.enemy.actions.magic || [];
                     const validSkills = this.enemy.actions.skills || [];
-    
+
                     // Find untried magic and skills
                     const untriedMagic = validMagic.find(magic => !this.enemy.triedElements.magic.includes(magic));
                     const untriedSkill = validSkills.find(skill => !this.enemy.triedElements.skills.includes(skill));
-    
+
                     if (untriedMagic) {
                         // Prioritize untried magic
                         actionType = 'magic';
@@ -1509,7 +1510,7 @@ class BattleScene extends Phaser.Scene {
                                 bestElement = element;
                             }
                         }
-    
+
                         if (bestElement === 'physical') {
                             actionType = 'physical';
                             action = 'Attack';
@@ -1518,26 +1519,26 @@ class BattleScene extends Phaser.Scene {
                             action = bestElement;
                         }
                     }
-    
+
                     // Execute the selected action
                     this.executeEnemyAction(actionType, action, damage, critical, bestElement);
-    
+
                     // Update mana and reset counter if needed
                     this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
                     this.startCooldown();
-    
+
                 } else {
                     console.log('Delaying Call to performEnemyAction...');
                     this.time.delayedCall(200, performEnemyAction, [], this);
                 }
             };
-    
+
             performEnemyAction();
         } else {
             console.error('It is not currently the enemy\'s turn');
         }
     }
-    
+
     // Helper method to handle execution of the action
     executeEnemyAction(actionType, action, damage, critical, bestElement) {
         if (actionType === 'physical') {
@@ -1565,7 +1566,7 @@ class BattleScene extends Phaser.Scene {
             this.applyStatusEffect('Enemy', 'Player', action);
         }
     }
-    
+
     applyStatusEffect(caster, target, statusEffect) {
         console.log('applyStatusEffect... caster: ', caster);
         console.log('applyStatusEffect... target: ', target);
@@ -1637,7 +1638,7 @@ class BattleScene extends Phaser.Scene {
                 }
             });
         }
-        
+
         if (critical) {
             delaytime = 500;
             fontColor = '#f0d735'
@@ -1820,7 +1821,7 @@ class BattleScene extends Phaser.Scene {
         console.log('calculateMagicDamage... defenderElement: ', defenderElement);
         console.log('calculateMagicDamage... attackerWis: ', attackerWis);
         console.log('calculateMagicDamage... defenderWis: ', defenderWis);
-        let criticalChance = ( Math.max(1, Math.floor(attackerWis - defenderWis)) ) / 100;
+        let criticalChance = (Math.max(1, Math.floor(attackerWis - defenderWis))) / 100;
         let critical = Math.random() < criticalChance;
         let variance = Phaser.Math.FloatBetween(0.9, 1.1);
 
@@ -1839,7 +1840,7 @@ class BattleScene extends Phaser.Scene {
             baseDamage *= -attackerElement; // Strong in this element, increase damage
         }
 
-        if (defenderElement < 0) {   
+        if (defenderElement < 0) {
             return Math.floor(baseDamage); // Allow negative values for potential healing
         } else {
             return Math.max(1, Math.floor(baseDamage)); // DO NOTAllow negative values for Unless it's a buff
