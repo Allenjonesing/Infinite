@@ -934,11 +934,11 @@ class BattleScene extends Phaser.Scene {
 
         // Add magic attacks based on elemental strengths and not exclusively physical
         if (!isPhysicalOnly) {
-            for (const [element, value] of Object.entries(stats.element)) {
-                if (value <= 0) { // Strong in this element
-                    actions.magic.push(`${element.charAt(0).toUpperCase() + element.slice(1)} Spells`);
-                }
-            }
+            // for (const [element, value] of Object.entries(stats.element)) {
+            //     if (value <= 0) { // Strong in this element
+            //         actions.magic.push(`${element.charAt(0).toUpperCase() + element.slice(1)} Spells`);
+            //     }
+            // }
 
             // Add more magic attacks if magAtk is high
             if (stats.magAtk > stats.atk) {
@@ -953,7 +953,7 @@ class BattleScene extends Phaser.Scene {
             }
 
             // Add healing spells
-            actions.magic.push('Heal');
+            //actions.magic.push('Heal');
         }
         console.log('generateEnemyActions... actions.magic: ', actions.magic);
         console.log('generateEnemyActions... actions: ', actions);
@@ -1514,7 +1514,7 @@ class BattleScene extends Phaser.Scene {
                             action = 'Attack';
                         } else {
                             actionType = 'magic';
-                            action = `${bestElement.charAt(0).toUpperCase() + bestElement.slice(1)} Spells`;
+                            action = `${bestElement}`;
                         }
                     } else if (untriedElement) {
                         if (untriedElement === 'physical') {
@@ -1543,7 +1543,7 @@ class BattleScene extends Phaser.Scene {
                             // Using calculateMagicDamageZ with wisdom (wis) and the elemental multiplier
                             damage = this.calculateMagicDamage(this.enemy.magAtk, this.player.magDef, this.player.element[elementType], this.enemy.wis, this.enemy.acc);
                             this.enemy.mana -= 10;
-                            this.addHelpText(`Enemy uses ${elementType.charAt(0).toUpperCase() + elementType.slice(1)} Spells! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
+                            this.addHelpText(`Enemy uses ${elementType} Spell! ${critical ? 'Critical hit! ' : ''}Deals ${damage} damage.`);
                             this.playMagicAttackAnimation(this.enemy, this.player, elementType, damage, critical, this.player.element[elementType]);
 
                             // Learn about player's elemental weaknesses
