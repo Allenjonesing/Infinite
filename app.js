@@ -1739,9 +1739,9 @@ class BattleScene extends Phaser.Scene {
 
         let baseDamage;
         if (critical) {
-            baseDamage = Math.floor(atk * 4 * variance);
+            baseDamage = Math.floor((atk * 4) * variance);
         } else {
-            baseDamage = Math.floor((4 * atk - 2 * def) * variance);
+            baseDamage = Math.floor(((4 * atk) - (2 * def)) * variance);
         }
 
         baseDamage = Math.max(1, baseDamage); // Ensure minimum damage is 1
@@ -1848,9 +1848,9 @@ class BattleScene extends Phaser.Scene {
         }
 
         if (critical) {
-            baseDamage = Math.floor((2 * magAtk) * variance)
+            baseDamage = Math.floor((4 * magAtk) * variance)
         } else {
-            baseDamage = Math.floor((2 * magAtk - magDef) * variance);
+            baseDamage = Math.floor(((4 * magAtk) - (2 * magDef)) * variance);
         }
 
         baseDamage *= defenderElement;
