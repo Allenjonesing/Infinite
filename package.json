@@ -1,10 +1,16 @@
 {
   "type": "module",
+  "scripts": {
+    "deploy": "gh-pages -d . --src '{index.html,app.js,styles.css,favicon.ico}'"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mssql": "^10.0.2",
     "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
   }
 }
