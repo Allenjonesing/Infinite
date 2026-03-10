@@ -1,10 +1,13 @@
 const costSavingMode = true;
 const genericEnemyBase64 = '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';
 const genericPlayerBase64 = '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';
-const version = 'Alpha v0.2'
+const version = 'Alpha v0.2';
 
-let health = 100;
-let healthText;
+// Set DEBUG = true to enable verbose console logging during development.
+const DEBUG = false;
+// Maximum number of API retry attempts before falling back to mock data.
+const MAX_RETRIES = 3;
+
 let target = null;
 let newsData = []; // Global variable to store news articles
 let setting = ''; // Global variable to store the game setting
@@ -723,12 +726,12 @@ class BattleScene extends Phaser.Scene {
     }
 
     enemyAction() {
-        console.log('enemyAction...');
-        console.log('performEnemyAction... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
+        if (DEBUG) console.log('enemyAction...');
+        if (DEBUG) console.log('performEnemyAction... this.turnOrder[this.currentTurnIndex].name: ', this.turnOrder[this.currentTurnIndex].name);
         if ((this.turnOrder[this.currentTurnIndex].name === 'Enemy')) {
             const performEnemyAction = () => {
-                console.log('performEnemyAction...');
-                console.log('performEnemyAction... this.isCooldown: ', this.isCooldown);
+                if (DEBUG) console.log('performEnemyAction...');
+                if (DEBUG) console.log('performEnemyAction... this.isCooldown: ', this.isCooldown);
                 if (!this.isCooldown) {
                     let damage = 0;
                     let critical = false;
@@ -739,13 +742,13 @@ class BattleScene extends Phaser.Scene {
 
                     // Periodically reset tried attacks and skills
                     if (this.enemy.triedElements.resetCounter === undefined || this.enemy.triedElements.resetCounter >= 20) {
-                        console.log('performEnemyAction... Resetting learned damages...');
+                        if (DEBUG) console.log('performEnemyAction... Resetting learned damages...');
                         this.enemy.triedElements = {
                             fire: this.enemy.learnedElementalWeaknesses.fire < 0 ? this.enemy.triedElements.fire : false,
-                            ice: this.enemy.learnedElementalWeaknesses.ice < 0 ? this.enemy.triedElements.fire : false,
-                            water: this.enemy.learnedElementalWeaknesses.water < 0 ? this.enemy.triedElements.fire : false,
-                            lightning: this.enemy.learnedElementalWeaknesses.lightning < 0 ? this.enemy.triedElements.fire : false,
-                            physical: this.enemy.learnedElementalWeaknesses.physical < 0 ? this.enemy.triedElements.fire : false,
+                            ice: this.enemy.learnedElementalWeaknesses.ice < 0 ? this.enemy.triedElements.ice : false,
+                            water: this.enemy.learnedElementalWeaknesses.water < 0 ? this.enemy.triedElements.water : false,
+                            lightning: this.enemy.learnedElementalWeaknesses.lightning < 0 ? this.enemy.triedElements.lightning : false,
+                            physical: this.enemy.learnedElementalWeaknesses.physical < 0 ? this.enemy.triedElements.physical : false,
                             skills: this.enemy.triedElements.skills || [],
                             resetCounter: 0
                         };
@@ -766,7 +769,7 @@ class BattleScene extends Phaser.Scene {
                     } else if (!untriedElement && !untriedSkill) {
                         // Determine the best attack based on the highest damage dealt so far
                         for (const [element, dmg] of Object.entries(this.enemy.learnedElementalWeaknesses)) {
-                            console.log(`performEnemyAction... Checking damage for element ${element}: ${dmg}`);
+                            if (DEBUG) console.log(`performEnemyAction... Checking damage for element ${element}: ${dmg}`);
                             if (dmg > highestDamage) {
                                 highestDamage = dmg;
                                 bestElement = element;
@@ -789,8 +792,8 @@ class BattleScene extends Phaser.Scene {
                         }
                     }
 
-                    console.log('performEnemyAction... actionType: ', actionType);
-                    console.log('performEnemyAction... action: ', action);
+                    if (DEBUG) console.log('performEnemyAction... actionType: ', actionType);
+                    if (DEBUG) console.log('performEnemyAction... action: ', action);
                     if (actionType === 'physical') {
                         damage = this.calculateDamage(this.enemy.atk, this.player.def, this.enemy.luk, this.player.eva);
                         this.showDamageIndicator(this.player.sprite, damage, critical);
@@ -853,7 +856,7 @@ class BattleScene extends Phaser.Scene {
                         this.enemy.isDefending = true; // Temporary defense boost
                         this.addHelpText('Enemy defends, boosting defense for this turn.');
                     }
-                    console.log('performEnemyAction... damage: ', damage);
+                    if (DEBUG) console.log('performEnemyAction... damage: ', damage);
 
                     this.player.health -= damage;
                     this.playerHealthText.setText(`Health: ${this.player.health}`);
@@ -861,7 +864,7 @@ class BattleScene extends Phaser.Scene {
                     this.enemyManaText.setText(`Mana: ${this.enemy.mana}`);
                     this.startCooldown();
                 } else {
-                    console.log('Delaying Call to performEnemyAction...');
+                    if (DEBUG) console.log('Delaying Call to performEnemyAction...');
                     this.time.delayedCall(200, performEnemyAction, [], this);
                 }
             };
@@ -872,26 +875,26 @@ class BattleScene extends Phaser.Scene {
     }
 
     applyStatusEffect(caster, target, statusEffect) {
-        console.log('applyStatusEffect... caster: ', caster);
-        console.log('applyStatusEffect... target: ', target);
-        console.log('applyStatusEffect... statusEffect: ', statusEffect);
+        if (DEBUG) console.log('applyStatusEffect... caster: ', caster);
+        if (DEBUG) console.log('applyStatusEffect... target: ', target);
+        if (DEBUG) console.log('applyStatusEffect... statusEffect: ', statusEffect);
 
         this.time.delayedCall(150, () => {
             let targetCharacter = target === 'Player' ? this.player : this.enemy;
             let casterCharacter = caster === 'Player' ? this.player : this.enemy;
 
-            console.log('applyStatusEffect... targetCharacter.immunities: ', targetCharacter.immunities);
+            if (DEBUG) console.log('applyStatusEffect... targetCharacter.immunities: ', targetCharacter.immunities);
             if (targetCharacter.immunities && targetCharacter.immunities.includes(statusEffect)) {
-                console.log('applyStatusEffect... IMMUNE');
+                if (DEBUG) console.log('applyStatusEffect... IMMUNE');
                 this.addHelpText(`${targetCharacter.name} is immune to ${statusEffect}!`);
                 this.showPhraseIndicator(targetCharacter.sprite, 'IMMUNE', '#2bf1ff');
                 if (caster === 'Enemy') {
                     this.enemy.learnedStatusImmunities[statusEffect] = true;
                 }
             } else {
-                console.log('applyStatusEffect... Not Immune');
+                if (DEBUG) console.log('applyStatusEffect... Not Immune');
                 let existingEffect = targetCharacter.statusEffects.find(effect => effect.type === statusEffect);
-                console.log('applyStatusEffect... existingEffect: ', existingEffect);
+                if (DEBUG) console.log('applyStatusEffect... existingEffect: ', existingEffect);
                 if (existingEffect) {
                     if (existingEffect.turns !== -1) { // Only refresh if it is not infinite
                         if (statusEffect === 'Stun') existingEffect.turns = 1;
@@ -1031,7 +1034,7 @@ class BattleScene extends Phaser.Scene {
     }
 
     startCooldown() {
-        console.log('startCooldown...');
+        if (DEBUG) console.log('startCooldown...');
         this.isCooldown = true;
 
         this.time.delayedCall(1000, () => {  // Delay of 1 second for a more natural response
@@ -1042,7 +1045,7 @@ class BattleScene extends Phaser.Scene {
     }
 
     nextTurn() {
-        console.log('nextTurn...');
+        if (DEBUG) console.log('nextTurn...');
         if (this.turnOrder[this.currentTurnIndex].name === 'Player' && this.player.isDefending) {
             this.player.def /= 4; // Reset defense boost after turn
             this.player.isDefending = false;
@@ -1081,7 +1084,7 @@ class BattleScene extends Phaser.Scene {
     }
 
     isCharacterFrozenOrStunned(character) {
-        console.log('isCharacterFrozenOrStunned... character: ', character);
+        if (DEBUG) console.log('isCharacterFrozenOrStunned... character: ', character);
 
         const frozenStatus = character.statusEffects.find(effect => effect.type === 'Freeze');
         const stunnedStatus = character.statusEffects.find(effect => effect.type === 'Stun');
@@ -1206,9 +1209,15 @@ class BattleScene extends Phaser.Scene {
             this.applyEffect(defender, color);
             this.showDamageIndicator(defender, damage, critical, elementValue);
 
-            // Inflict status effect if applicable and defender has immunities property
-            if (statusEffect && defender.immunities && !defender.immunities.includes(statusEffect)) {
-                this.applyStatusEffect(attacker.name, defender.name, statusEffect);
+            // Resolve which game-object each sprite belongs to so we can pass
+            // the correct string identifiers ('Player' / 'Enemy') to applyStatusEffect.
+            const attackerName = attacker === this.player.sprite ? 'Player' : 'Enemy';
+            const defenderName = defender === this.player.sprite ? 'Player' : 'Enemy';
+            const defenderCharacter = defenderName === 'Player' ? this.player : this.enemy;
+
+            // Inflict status effect if applicable and the defender is not immune.
+            if (statusEffect && defenderCharacter.immunities && !defenderCharacter.immunities.includes(statusEffect)) {
+                this.applyStatusEffect(attackerName, defenderName, statusEffect);
             }
         });
     }
@@ -1250,7 +1259,7 @@ window.addEventListener('resize', () => {
     });
 });
 
-async function generateEnemyImage(newsArticle, setting) {
+async function generateEnemyImage(newsArticle, setting, retryCount = 0) {
     const prompt = `Generate an image of an enemy based on the following description:${monsterDescription}`;
     const encodedPrompt = encodeURIComponent(prompt);
 
@@ -1277,7 +1286,11 @@ async function generateEnemyImage(newsArticle, setting) {
             }
         } catch (error) {
             console.error('Error generating enemy image:', error);
-            return generateEnemyImage(newsArticle, setting); // Retry on failure
+            if (retryCount < MAX_RETRIES) {
+                return generateEnemyImage(newsArticle, setting, retryCount + 1);
+            }
+            console.error('Max retries reached for generateEnemyImage. Using generic image.');
+            return `data:image/png;base64,${genericEnemyBase64}`;
         }
     } else {
         // Cost Saving Mode
@@ -1299,7 +1312,7 @@ function spawnEnemies(scene) {
     }
 }
 
-async function fetchNews() {
+async function fetchNews(retryCount = 0) {
     if (!costSavingMode) {
         try {
             const apiUrl = 'https://bjvbrhjov8.execute-api.us-east-2.amazonaws.com';
@@ -1330,7 +1343,17 @@ async function fetchNews() {
             return;
         } catch (error) {
             console.error('Error fetching news:', error);
-            return fetchNews(); // Retry on failure
+            if (retryCount < MAX_RETRIES) {
+                return fetchNews(retryCount + 1);
+            }
+            console.error('Max retries reached for fetchNews. Using mock news data.');
+            newsData = structureNewsData([
+                {
+                    title: 'Local Hero Saves Cat from Tree',
+                    description: 'A brave individual scaled a tall oak tree to rescue a cat stuck for hours.',
+                    url: 'https://mocknews.com/hero-saves-cat'
+                }
+            ]);
         }
     } else {
         console.warn('Cost Saving Mode Enabled, returning mock news data.');
@@ -1361,7 +1384,7 @@ function structureNewsData(articles) {
     });
 }
 
-async function generateAIResponses() {
+async function generateAIResponses(retryCount = 0) {
     const responses = [];
 
     for (let i = 0; i < newsData.length; i++) {
@@ -1437,7 +1460,12 @@ async function generateAIResponses() {
                                     }
                                 } catch (error) {
                                     console.error('Error generating AI response:', error);
-                                    return generateAIResponses(); // Retry on failure
+                                    if (retryCount < MAX_RETRIES) {
+                                        return generateAIResponses(retryCount + 1);
+                                    }
+                                    console.error('Max retries reached for generateAIResponses (image). Using generic image.');
+                                    npcBase64image = `data:image/png;base64,${genericPlayerBase64}`;
+                                    responses.push({ response: monsterDescription, persona: persona, imageBase64: npcBase64image });
                                 }
                             } else {
                                 // Cost Saving Mode
@@ -1448,12 +1476,20 @@ async function generateAIResponses() {
                         }
                     } catch (error) {
                         console.error('Error generating AI response:', error);
-                        return generateAIResponses(); // Retry on failure
+                        if (retryCount < MAX_RETRIES) {
+                            return generateAIResponses(retryCount + 1);
+                        }
+                        console.error('Max retries reached for generateAIResponses (monster). Reloading.');
+                        location.reload();
                     }
                 }
             } catch (error) {
                 console.error('Error generating AI response:', error);
-                return generateAIResponses(); // Retry on failure
+                if (retryCount < MAX_RETRIES) {
+                    return generateAIResponses(retryCount + 1);
+                }
+                console.error('Max retries reached for generateAIResponses (setting). Reloading.');
+                location.reload();
             }
         } else {
             // Simulated AI response for the setting and persona
@@ -1474,7 +1510,7 @@ async function generateAIResponses() {
     return responses;
 }
 
-async function generatePersonas(setting) {
+async function generatePersonas(setting, retryCount = 0) {
     const prompt = `Generate 5 short (5-10 word) and detailed fictional character (Ensure no likeness to real people/places/brands) for a ${setting} setting in JSON format. Each persona should have a name and a description.`;
     const encodedPrompt = encodeURIComponent(prompt);
     let parsedPersonas = [];
@@ -1498,14 +1534,18 @@ async function generatePersonas(setting) {
             parsedPersonas = JSON.parse(aiResponse.choices[0].message.content);
         }
     } catch (error) {
-        loacation.reload();
         console.error('Error generating AI response:', error);
+        if (retryCount < MAX_RETRIES) {
+            return generatePersonas(setting, retryCount + 1);
+        }
+        console.error('Max retries reached for generatePersonas. Reloading.');
+        location.reload();
     }
 
     return parsedPersonas;
 }
 
-async function fetchEnemyStats() {
+async function fetchEnemyStats(retryCount = 0) {
     const prompt = `Generate stats for an enemy based on this description: ${monsterDescription}. ${statRequirements}`;
     const encodedPrompt = encodeURIComponent(prompt);
 
@@ -1532,28 +1572,30 @@ async function fetchEnemyStats() {
             }
         } catch (error) {
             console.error('Error fetching enemy stats:', error);
-            return fetchEnemyStats(); // Retry on failure
+            if (retryCount < MAX_RETRIES) {
+                return fetchEnemyStats(retryCount + 1);
+            }
+            console.error('Max retries reached for fetchEnemyStats. Using default stats.');
         }
-    } else {
-        // Simulated enemy stats
-        return {
-            health: 5000,
-            mana: 200,
-            atk: 80,
-            def: 70,
-            spd: 50,
-            eva: 30,
-            magAtk: 90,
-            magDef: 60,
-            luk: 40,
-            wis: 75,
-            element: { fire: 2, ice: -1, water: 0, lightning: 3 },
-            immunities: ["Freeze", "Poison"]
-        };
     }
+    // Simulated / fallback enemy stats
+    return {
+        health: 5000,
+        mana: 200,
+        atk: 80,
+        def: 70,
+        spd: 50,
+        eva: 30,
+        magAtk: 90,
+        magDef: 60,
+        luk: 40,
+        wis: 75,
+        element: { fire: 2, ice: -1, water: 0, lightning: 3 },
+        immunities: ["Freeze", "Poison"]
+    };
 }
 
-async function fetchPlayerStats() {
+async function fetchPlayerStats(retryCount = 0) {
     const prompt = `Generate stats for the player based on this description: ${persona.name}, ${persona.description}. ${statRequirements}`;
     const encodedPrompt = encodeURIComponent(prompt);
 
@@ -1580,23 +1622,26 @@ async function fetchPlayerStats() {
             }
         } catch (error) {
             console.error('Error fetching player stats:', error);
-            return fetchPlayerStats(); // Retry on failure
+            if (retryCount < MAX_RETRIES) {
+                return fetchPlayerStats(retryCount + 1);
+            }
+            console.error('Max retries reached for fetchPlayerStats. Using default stats.');
         }
-    } else {
-        // Simulated player stats
-        return {
-            health: 6000,
-            mana: 300,
-            atk: 85,
-            def: 65,
-            spd: 55,
-            eva: 35,
-            magAtk: 100,
-            magDef: 70,
-            luk: 50,
-            wis: 80,
-            element: { fire: -1, ice: 2, water: 1, lightning: 0 },
-            immunities: ["Burn", "Stun"]
-        };
     }
+
+    // Simulated / fallback player stats
+    return {
+        health: 6000,
+        mana: 300,
+        atk: 85,
+        def: 65,
+        spd: 55,
+        eva: 35,
+        magAtk: 100,
+        magDef: 70,
+        luk: 50,
+        wis: 80,
+        element: { fire: -1, ice: 2, water: 1, lightning: 0 },
+        immunities: ["Burn", "Stun"]
+    };
 }
