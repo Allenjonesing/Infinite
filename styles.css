@@ -1,21 +1,58 @@
-body {
-    font-family: Arial, sans-serif;
+/* ─── Reset & base ─────────────────────────────────────────────────────── */
+* {
+    box-sizing: border-box;
     margin: 0;
-    padding: 20px;
-    background-color: #f4f4f4;
+    padding: 0;
 }
 
-h1 {
-    text-align: center;
-    color: #333;
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #0a0a0f;
+    color: #e0e0e0;
+    overflow: hidden; /* game canvas fills the viewport */
 }
 
+/* ─── Pre-game loading overlay ─────────────────────────────────────────── */
+#loading {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, #12122a 0%, #0a0a0f 100%);
+    z-index: 999;
+    gap: 16px;
+    transition: opacity 0.5s ease;
+}
+
+.loading-title {
+    font-size: 3rem;
+    font-weight: 900;
+    letter-spacing: 0.35em;
+    color: #c0a060;
+    text-shadow: 0 0 24px rgba(192, 160, 96, 0.6);
+}
+
+.loading-sub {
+    font-size: 1rem;
+    letter-spacing: 0.15em;
+    color: #888;
+    animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.35; }
+}
+
+/* ─── News / article area (hidden in full-screen game mode) ─────────────── */
 #news {
-    margin-top: 20px;
+    display: none;
 }
 
 .news-article {
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #2a2a3a;
     padding: 10px 0;
 }
 
@@ -26,24 +63,38 @@ h1 {
 .news-title {
     font-size: 1.2em;
     font-weight: bold;
+    color: #c0a060;
 }
 
 .news-description {
     margin-top: 5px;
-    color: #666;
+    color: #888;
 }
 
 .news-activity {
     margin-top: 10px;
-    color: #444;
+    color: #aaa;
 }
 
+/* ─── Activity / action buttons ──────────────────────────────────────────── */
 .activity-options {
     margin-top: 10px;
 }
 
 .activity-options button {
     margin-right: 5px;
-    padding: 5px 10px;
+    padding: 6px 14px;
     cursor: pointer;
+    background: #1e1e30;
+    color: #c0a060;
+    border: 1px solid #c0a060;
+    border-radius: 4px;
+    font-size: 0.9em;
+    transition: background 0.2s, color 0.2s;
 }
+
+.activity-options button:hover {
+    background: #c0a060;
+    color: #0a0a0f;
+}
+
